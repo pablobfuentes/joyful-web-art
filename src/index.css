@@ -9,22 +9,22 @@
     --background: 30 50% 97%;
     --foreground: 20 30% 15%;
 
-    --card: 30 40% 95%;
+    --card: 0 0% 100%;
     --card-foreground: 20 30% 15%;
 
     --popover: 30 50% 97%;
     --popover-foreground: 20 30% 15%;
 
-    --primary: 12 80% 62%;
+    --primary: 12 90% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 340 45% 72%;
+    --secondary: 340 55% 68%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 30 30% 92%;
     --muted-foreground: 20 15% 45%;
 
-    --accent: 174 50% 45%;
+    --accent: 174 60% 42%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -32,26 +32,36 @@
 
     --border: 30 25% 88%;
     --input: 30 25% 88%;
-    --ring: 12 80% 62%;
+    --ring: 12 90% 58%;
 
     --radius: 1rem;
 
+    /* Playful extras */
+    --peach: 20 100% 92%;
+    --peach-strong: 12 85% 85%;
+    --lavender: 280 60% 92%;
+    --mint: 160 50% 90%;
+    --sunshine: 45 100% 88%;
+    --bubblegum: 340 80% 88%;
+
     --sidebar-background: 30 40% 95%;
     --sidebar-foreground: 20 30% 15%;
-    --sidebar-primary: 12 80% 62%;
+    --sidebar-primary: 12 90% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 30 30% 90%;
     --sidebar-accent-foreground: 20 30% 15%;
     --sidebar-border: 30 25% 88%;
-    --sidebar-ring: 12 80% 62%;
+    --sidebar-ring: 12 90% 58%;
 
     /* Custom tokens */
-    --gradient-warm: linear-gradient(135deg, hsl(12 80% 62%), hsl(340 45% 72%));
+    --gradient-warm: linear-gradient(135deg, hsl(12 90% 58%), hsl(340 55% 68%));
     --gradient-soft: linear-gradient(135deg, hsl(30 50% 97%), hsl(340 30% 95%));
-    --gradient-hero: linear-gradient(180deg, hsl(30 50% 97% / 0) 0%, hsl(30 50% 97% / 0.8) 100%);
-    --shadow-soft: 0 4px 20px -4px hsl(12 80% 62% / 0.15);
-    --shadow-card: 0 8px 30px -8px hsl(20 30% 15% / 0.08);
-    --shadow-card-hover: 0 16px 40px -8px hsl(12 80% 62% / 0.2);
+    --gradient-hero: linear-gradient(180deg, hsl(12 90% 58%) 0%, hsl(340 55% 68%) 100%);
+    --gradient-candy: linear-gradient(135deg, hsl(340 80% 88%), hsl(280 60% 92%), hsl(200 80% 90%));
+    --shadow-soft: 0 4px 20px -4px hsl(12 90% 58% / 0.2);
+    --shadow-card: 0 8px 30px -8px hsl(20 30% 15% / 0.1);
+    --shadow-card-hover: 0 16px 40px -8px hsl(12 90% 58% / 0.25);
+    --shadow-playful: 6px 6px 0px hsl(12 90% 58% / 0.3);
   }
 
   .dark {
@@ -61,27 +71,33 @@
     --card-foreground: 30 30% 92%;
     --popover: 20 20% 8%;
     --popover-foreground: 30 30% 92%;
-    --primary: 12 80% 62%;
+    --primary: 12 90% 58%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 340 45% 72%;
+    --secondary: 340 55% 68%;
     --secondary-foreground: 0 0% 100%;
     --muted: 20 15% 18%;
     --muted-foreground: 30 15% 60%;
-    --accent: 174 50% 45%;
+    --accent: 174 60% 42%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 20 15% 20%;
     --input: 20 15% 20%;
-    --ring: 12 80% 62%;
+    --ring: 12 90% 58%;
+    --peach: 20 40% 20%;
+    --peach-strong: 12 40% 25%;
+    --lavender: 280 30% 20%;
+    --mint: 160 30% 18%;
+    --sunshine: 45 40% 20%;
+    --bubblegum: 340 40% 22%;
     --sidebar-background: 20 20% 10%;
     --sidebar-foreground: 30 30% 92%;
-    --sidebar-primary: 12 80% 62%;
+    --sidebar-primary: 12 90% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 20 15% 15%;
     --sidebar-accent-foreground: 30 30% 92%;
     --sidebar-border: 20 15% 20%;
-    --sidebar-ring: 12 80% 62%;
+    --sidebar-ring: 12 90% 58%;
   }
 }
 
@@ -108,6 +124,10 @@
     background: var(--gradient-soft);
   }
 
+  .gradient-candy {
+    background: var(--gradient-candy);
+  }
+
   .shadow-soft {
     box-shadow: var(--shadow-soft);
   }
@@ -120,10 +140,51 @@
     box-shadow: var(--shadow-card-hover);
   }
 
+  .shadow-playful {
+    box-shadow: var(--shadow-playful);
+  }
+
   .text-gradient {
     background: var(--gradient-warm);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .bg-peach {
+    background-color: hsl(var(--peach));
+  }
+
+  .bg-lavender {
+    background-color: hsl(var(--lavender));
+  }
+
+  .bg-mint {
+    background-color: hsl(var(--mint));
+  }
+
+  .bg-sunshine {
+    background-color: hsl(var(--sunshine));
+  }
+
+  .bg-bubblegum {
+    background-color: hsl(var(--bubblegum));
+  }
+
+  .bg-peach-strong {
+    background-color: hsl(var(--peach-strong));
+  }
+
+  /* Subtle pattern background - like WhatsApp two-tone */
+  .bg-pattern-dots {
+    background-image: radial-gradient(circle, hsl(var(--primary) / 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-pattern-skincare {
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(var(--peach)) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsl(var(--lavender)) 0%, transparent 40%),
+      radial-gradient(circle at 60% 80%, hsl(var(--mint)) 0%, transparent 45%);
   }
 }
