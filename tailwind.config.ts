@@ -80,6 +80,10 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-12px)" },
         },
+        "float-rotate": {
+          "0%, 100%": { transform: "translateY(0) rotate(0deg)" },
+          "50%": { transform: "translateY(-10px) rotate(5deg)" },
+        },
         "shimmer": {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
@@ -90,8 +94,17 @@ export default {
         },
         "wiggle": {
           "0%, 100%": { transform: "rotate(0deg)" },
-          "25%": { transform: "rotate(-3deg)" },
-          "75%": { transform: "rotate(3deg)" },
+          "25%": { transform: "rotate(-5deg)" },
+          "75%": { transform: "rotate(5deg)" },
+        },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "pop": {
+          "0%": { transform: "scale(0)" },
+          "80%": { transform: "scale(1.1)" },
+          "100%": { transform: "scale(1)" },
         },
       },
       animation: {
@@ -99,9 +112,12 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 4s ease-in-out infinite",
         "float-delayed": "float 4s ease-in-out 1s infinite",
+        "float-rotate": "float-rotate 5s ease-in-out infinite",
         "shimmer": "shimmer 3s ease-in-out infinite",
         "bounce-gentle": "bounce-gentle 2s ease-in-out infinite",
         "wiggle": "wiggle 1s ease-in-out infinite",
+        "spin-slow": "spin-slow 12s linear infinite",
+        "pop": "pop 0.4s ease-out forwards",
       },
     },
   },
