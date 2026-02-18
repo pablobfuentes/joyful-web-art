@@ -9,4 +9,9 @@ if (!url || !anonKey) {
   );
 }
 
-export const supabase = createClient(url ?? "", anonKey ?? "");
+// Use a placeholder URL when env vars are missing so the client doesn't crash on init.
+// Auth calls will fail gracefully but the app will still render.
+export const supabase = createClient(
+  url || "https://placeholder.supabase.co",
+  anonKey || "placeholder-anon-key"
+);
