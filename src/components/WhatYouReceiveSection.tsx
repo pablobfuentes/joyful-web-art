@@ -1,22 +1,32 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { APP_REGISTRY } from "@/config/app-registry";
-import { FloatingDoodle, DoodleDroplet, DoodleLeaf } from "./Doodles";
+import { FloatingDoodle, DoodleDroplet, DoodleLeaf, DoodleFlower, DoodleSparkle } from "./Doodles";
 
 const data = APP_REGISTRY.whatYouReceive;
-const bgClasses = ["bg-peach", "bg-lavender", "bg-mint", "bg-sunshine", "bg-peach-strong/80"];
+const bgClasses = ["bg-peach", "bg-lavender", "bg-mint", "bg-sunshine", "bg-bubblegum"];
+const emojis = ["🧴", "💧", "🛡️", "☀️", "🌸"];
+const rotations = [-3, 2, -2, 3, -1];
 
 const WhatYouReceiveSection = () => {
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section className="relative py-24 px-6 bg-background overflow-hidden">
-      <FloatingDoodle className="top-24 left-[8%] w-8 h-8 text-primary/20" delay={0}>
+    <section className="relative py-24 px-6 bg-peach overflow-hidden">
+      <div className="absolute inset-0 bg-pattern-skincare opacity-60" />
+
+      <FloatingDoodle className="top-16 left-[6%] w-10 h-10 text-primary/25" delay={0}>
         <DoodleDroplet className="w-full h-full" />
       </FloatingDoodle>
-      <FloatingDoodle className="bottom-40 right-[10%] w-9 h-9 text-accent/20" delay={1.5}>
+      <FloatingDoodle className="bottom-24 right-[8%] w-12 h-12 text-accent/20" delay={1.5}>
         <DoodleLeaf className="w-full h-full" />
+      </FloatingDoodle>
+      <FloatingDoodle className="top-[40%] right-[4%] w-8 h-8 text-secondary/30" delay={0.5}>
+        <DoodleFlower className="w-full h-full" />
+      </FloatingDoodle>
+      <FloatingDoodle className="bottom-40 left-[12%] w-7 h-7 text-primary/20" delay={2}>
+        <DoodleSparkle className="w-full h-full" />
       </FloatingDoodle>
 
       <div className="container mx-auto relative z-10">
@@ -26,27 +36,51 @@ const WhatYouReceiveSection = () => {
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-16"
         >
-          <p className="text-sm font-semibold text-primary mb-2">{data.subtitle}</p>
+          <motion.span
+            className="inline-block bg-sunshine px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            animate={{ rotate: [2, -2, 2] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            📦 {data.subtitle}
+          </motion.span>
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">{data.title}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">{data.description}</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {data.products.map((product, index) => (
             <motion.div
               key={product.number}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 60, rotate: rotations[index] * 2 }}
+              whileInView={{ opacity: 1, y: 0, rotate: rotations[index] }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.08 }}
-              whileHover={{ y: -6, scale: 1.02 }}
-              className={`${bgClasses[index]} rounded-3xl p-6 shadow-playful border-2 border-background`}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              whileHover={{ y: -12, rotate: 0, scale: 1.05 }}
+              className="group relative"
             >
-              <span className="font-display text-4xl font-bold opacity-30 block mb-2">
-                {product.number}
-              </span>
-              <h3 className="font-display text-xl font-bold mb-2">{product.category}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{product.description}</p>
+              <div className={`${bgClasses[index]} rounded-3xl p-6 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover`}>
+                {/* Number badge overlapping top-left */}
+                <motion.div
+                  className="absolute -top-4 -left-4 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10"
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                >
+                  {product.number}
+                </motion.div>
+
+                {/* Floating emoji */}
+                <motion.span
+                  className="absolute -top-3 -right-3 text-3xl drop-shadow-lg"
+                  animate={{ y: [0, -6, 0], rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
+                >
+                  {emojis[index]}
+                </motion.span>
+
+                <div className="pt-4">
+                  <h3 className="font-display text-xl font-bold mb-2">{product.category}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{product.description}</p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>

@@ -18,7 +18,7 @@ const ProblemCard = ({
   style,
   index,
 }: {
-  card: (typeof data.cards)[0];
+  card: (typeof data.cards)[number];
   style: (typeof cardStyle)[0];
   index: number;
 }) => {
