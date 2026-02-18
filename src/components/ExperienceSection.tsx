@@ -1,22 +1,32 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { APP_REGISTRY } from "@/config/app-registry";
-import { FloatingDoodle, DoodleHeart, DoodleSparkle } from "./Doodles";
+import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleLeaf, DoodleDroplet } from "./Doodles";
 
 const data = APP_REGISTRY.experience;
 const bgClasses = ["bg-peach", "bg-lavender", "bg-mint", "bg-sunshine"];
+const emojis = ["📬", "🎯", "📖", "🔄"];
+const rotations = [-3, 2, -2, 3];
 
 const ExperienceSection = () => {
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section id="experience" className="relative py-24 px-6 bg-background overflow-hidden">
-      <FloatingDoodle className="top-20 left-[10%] w-9 h-9 text-primary/20" delay={0}>
+    <section id="experience" className="relative py-24 px-6 bg-mint overflow-hidden">
+      <div className="absolute inset-0 bg-pattern-dots opacity-40" />
+
+      <FloatingDoodle className="top-16 left-[8%] w-11 h-11 text-primary/25" delay={0}>
         <DoodleHeart className="w-full h-full" />
       </FloatingDoodle>
-      <FloatingDoodle className="bottom-28 right-[8%] w-8 h-8 text-secondary/20" delay={1}>
+      <FloatingDoodle className="bottom-20 right-[6%] w-10 h-10 text-secondary/20" delay={1}>
         <DoodleSparkle className="w-full h-full" />
+      </FloatingDoodle>
+      <FloatingDoodle className="top-[45%] right-[3%] w-9 h-9 text-accent/30" delay={2}>
+        <DoodleLeaf className="w-full h-full" />
+      </FloatingDoodle>
+      <FloatingDoodle className="bottom-[35%] left-[4%] w-8 h-8 text-primary/15" delay={0.5}>
+        <DoodleDroplet className="w-full h-full" />
       </FloatingDoodle>
 
       <div className="container mx-auto relative z-10">
@@ -26,15 +36,21 @@ const ExperienceSection = () => {
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-16"
         >
-          <p className="text-sm font-semibold text-primary mb-2">{data.subtitle}</p>
+          <motion.span
+            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            animate={{ rotate: [2, -2, 2] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            🌟 {data.subtitle}
+          </motion.span>
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-6">{data.title}</h2>
           <motion.a
             href={data.ctaButton.href}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="inline-block gradient-warm px-8 py-4 rounded-full font-bold text-primary-foreground shadow-playful"
+            whileHover={{ scale: 1.08, rotate: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-block gradient-warm px-10 py-5 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
           >
-            {data.ctaButton.label}
+            {data.ctaButton.label} ✨
           </motion.a>
         </motion.div>
 
@@ -42,17 +58,36 @@ const ExperienceSection = () => {
           {data.steps.map((step, index) => (
             <motion.div
               key={step.number}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 60, rotate: rotations[index] * 2 }}
+              whileInView={{ opacity: 1, y: 0, rotate: rotations[index] }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`${bgClasses[index]} rounded-3xl p-6 shadow-playful border-2 border-background`}
+              transition={{ duration: 0.6, delay: index * 0.12 }}
+              whileHover={{ y: -10, rotate: 0, scale: 1.04 }}
+              className="group relative"
             >
-              <span className="font-display text-5xl font-bold opacity-25 block mb-2">
-                {step.number}
-              </span>
-              <h3 className="font-display text-xl font-bold mb-2">{step.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+              <div className={`${bgClasses[index]} rounded-3xl p-7 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover`}>
+                {/* Number badge */}
+                <motion.div
+                  className="absolute -top-4 -left-4 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10"
+                  whileHover={{ scale: 1.2, rotate: 10 }}
+                >
+                  {step.number}
+                </motion.div>
+
+                {/* Emoji */}
+                <motion.span
+                  className="absolute -top-3 -right-3 text-3xl drop-shadow-lg"
+                  animate={{ y: [0, -6, 0], rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
+                >
+                  {emojis[index]}
+                </motion.span>
+
+                <div className="pt-4">
+                  <h3 className="font-display text-xl font-bold mb-2">{step.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>

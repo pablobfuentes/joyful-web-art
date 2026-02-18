@@ -1,7 +1,7 @@
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import { APP_REGISTRY } from "@/config/app-registry";
-import { FloatingDoodle, DoodleSparkle } from "./Doodles";
+import { FloatingDoodle, DoodleSparkle, DoodleFlower, DoodleHeart } from "./Doodles";
 
 const data = APP_REGISTRY.faq;
 
@@ -11,9 +11,17 @@ const FAQSection = () => {
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section id="faq" className="relative py-24 px-6 bg-peach/20 overflow-hidden">
-      <FloatingDoodle className="top-28 right-[8%] w-8 h-8 text-primary/20" delay={0}>
+    <section id="faq" className="relative py-24 px-6 bg-lavender overflow-hidden">
+      <div className="absolute inset-0 bg-pattern-dots opacity-30" />
+
+      <FloatingDoodle className="top-20 right-[6%] w-10 h-10 text-primary/25" delay={0}>
         <DoodleSparkle className="w-full h-full" />
+      </FloatingDoodle>
+      <FloatingDoodle className="bottom-24 left-[5%] w-9 h-9 text-secondary/20" delay={1}>
+        <DoodleFlower className="w-full h-full" />
+      </FloatingDoodle>
+      <FloatingDoodle className="top-[50%] left-[3%] w-8 h-8 text-accent/25" delay={2}>
+        <DoodleHeart className="w-full h-full" />
       </FloatingDoodle>
 
       <div className="container mx-auto relative z-10 max-w-3xl">
@@ -23,39 +31,66 @@ const FAQSection = () => {
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-16"
         >
-          <p className="text-sm font-semibold text-primary mb-2">{data.subtitle}</p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold">{data.title}</h2>
+          <motion.span
+            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            animate={{ rotate: [-2, 2, -2] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            🤓 {data.subtitle}
+          </motion.span>
+          <h2 className="font-display text-4xl md:text-6xl font-bold">{data.title}</h2>
         </motion.div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {data.items.map((item, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-background rounded-2xl shadow-playful border-2 border-background overflow-hidden"
+              transition={{ delay: index * 0.06 }}
+              className="group"
             >
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full text-left px-6 py-4 font-display font-bold text-foreground flex justify-between items-center gap-4"
+              <motion.div
+                className={`bg-background rounded-3xl shadow-playful border-4 overflow-hidden transition-all ${
+                  openIndex === index ? "border-primary" : "border-background"
+                }`}
+                whileHover={{ scale: 1.01 }}
               >
-                {item.question}
-                <span className="text-2xl text-primary shrink-0">
-                  {openIndex === index ? "−" : "+"}
-                </span>
-              </button>
-              {openIndex === index && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="px-6 pb-4"
+                <button
+                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                  className="w-full text-left px-6 py-5 font-display font-bold text-foreground flex justify-between items-center gap-4"
                 >
-                  <p className="text-muted-foreground text-sm leading-relaxed">{item.answer}</p>
-                </motion.div>
-              )}
+                  <span className="flex items-center gap-3">
+                    <span className="w-8 h-8 gradient-warm rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold shrink-0 shadow-playful">
+                      {index + 1}
+                    </span>
+                    {item.question}
+                  </span>
+                  <motion.span
+                    className="text-2xl text-primary shrink-0"
+                    animate={{ rotate: openIndex === index ? 45 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    +
+                  </motion.span>
+                </button>
+                <AnimatePresence>
+                  {openIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-6 pb-5 pl-[4.25rem]">
+                        <p className="text-muted-foreground text-sm leading-relaxed">{item.answer}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </motion.div>
           ))}
         </div>
