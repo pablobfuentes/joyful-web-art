@@ -1,0 +1,33 @@
+/**
+ * Custom Font Declarations
+ * 
+ * Add your custom @font-face declarations here.
+ * Font files should be placed in public/fonts/
+ * 
+ * Example:
+ * 
+ * @font-face {
+ *   font-family: 'Your Font Name';
+ *   src: url('/fonts/YourFont-Regular.woff2') format('woff2');
+ *   font-weight: 400;
+ *   font-style: normal;
+ *   font-display: swap;
+ * }
+ * 
+ * @font-face {
+ *   font-family: 'Your Font Name';
+ *   src: url('/fonts/YourFont-Bold.woff2') format('woff2');
+ *   font-weight: 700;
+ *   font-style: normal;
+ *   font-display: swap;
+ * }
+ */
+
+
+ @font-face {
+    font-family: 'Heyam';
+    src: url('/fonts/YHeyam.ttf') format('ttf');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }

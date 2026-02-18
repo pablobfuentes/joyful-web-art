@@ -1,15 +1,26 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-skincare.jpg";
 import { FloatingDoodle, DoodleDroplet, DoodleSparkle, DoodleHeart, DoodleFlower, DoodleLeaf, DoodleStar } from "./Doodles";
+import { APP_REGISTRY } from "@/config/app-registry";
+
+const data = APP_REGISTRY.hero;
+const ROTATE_INTERVAL_MS = 3000;
 
 const HeroSection = () => {
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setQuoteIndex((i) => (i + 1) % data.rotatingQuotes.length);
+    }, ROTATE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-28">
-      {/* Bold colored background instead of just image overlay */}
       <div className="absolute inset-0 bg-peach" />
       <div className="absolute inset-0 bg-pattern-skincare opacity-60" />
 
-      {/* Scattered doodles */}
       <FloatingDoodle className="top-32 left-[8%] w-10 h-10 text-primary/40" delay={0}>
         <DoodleDroplet className="w-full h-full" />
       </FloatingDoodle>
@@ -31,7 +42,6 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Text side */}
           <div>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -43,12 +53,13 @@ const HeroSection = () => {
             </motion.div>
 
             <motion.p
+              key={quoteIndex}
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
+              transition={{ duration: 0.4 }}
               className="font-display italic text-lg text-foreground/70 mb-3"
             >
-              "Hay demasiadas opciones. ¿Por dónde empiezo?"
+              "{data.rotatingQuotes[quoteIndex]}"
             </motion.p>
 
             <motion.h1
@@ -57,28 +68,7 @@ const HeroSection = () => {
               transition={{ delay: 0.6, duration: 0.7 }}
               className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6"
             >
-              Tu ritual coreano,{" "}
-              <span className="relative inline-block">
-                <span className="text-gradient">simplificado</span>
-                <motion.svg
-                  className="absolute -bottom-2 left-0 w-full"
-                  viewBox="0 0 200 12"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ delay: 1.2, duration: 0.8 }}
-                >
-                  <motion.path
-                    d="M2 8 C40 2, 80 12, 120 6 C150 2, 180 10, 198 4"
-                    stroke="hsl(12 90% 58%)"
-                    strokeWidth="3"
-                    fill="none"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 1.2, duration: 0.8 }}
-                  />
-                </motion.svg>
-              </span>
+              {data.heading}
             </motion.h1>
 
             <motion.p
@@ -87,8 +77,7 @@ const HeroSection = () => {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="text-lg text-muted-foreground mb-8 max-w-lg"
             >
-              Una rutina mensual de skincare coreano cuidadosamente seleccionada
-              para adaptarse a tu vida 🌸
+              {data.description}
             </motion.p>
 
             <motion.div
@@ -98,20 +87,20 @@ const HeroSection = () => {
               className="flex flex-wrap gap-4 mb-6"
             >
               <motion.a
-                href="#subscribe"
+                href={data.primaryCta.href}
                 whileHover={{ scale: 1.08, rotate: -1 }}
                 whileTap={{ scale: 0.95 }}
                 className="gradient-warm px-8 py-4 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
               >
-                ¡Quiero Unirme! 🎉
+                {data.primaryCta.label}
               </motion.a>
               <motion.a
-                href="#how-it-works"
+                href={data.secondaryCta.href}
                 whileHover={{ scale: 1.08, rotate: 1 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 rounded-full text-lg font-bold border-3 border-primary text-primary bg-background/80 hover:bg-primary hover:text-primary-foreground transition-colors shadow-card"
               >
-                ¿Cómo Funciona? 🤔
+                {data.secondaryCta.label}
               </motion.a>
             </motion.div>
 
@@ -119,13 +108,9 @@ const HeroSection = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2, duration: 0.6 }}
-              className="flex gap-3 flex-wrap"
+              className="text-sm text-foreground/80"
             >
-              {["Sin contratos", "Envíos mensuales", "Cancela cuando quieras"].map((tag, i) => (
-                <span key={tag} className="bg-background/60 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium text-foreground/80 border border-border">
-                  {["🔓", "📦", "👋"][i]} {tag}
-                </span>
-              ))}
+              {data.footer}
             </motion.div>
           </div>
 

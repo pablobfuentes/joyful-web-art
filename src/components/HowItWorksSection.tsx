@@ -5,47 +5,23 @@ import step2 from "@/assets/step-2.jpg";
 import step3 from "@/assets/step-3.jpg";
 import step4 from "@/assets/step-4.jpg";
 import { FloatingDoodle, DoodleFlower, DoodleLeaf, DoodleStar, DoodleDroplet } from "./Doodles";
+import { APP_REGISTRY } from "@/config/app-registry";
 
-const steps = [
-  {
-    num: "1",
-    title: "Elige tu ritual",
-    desc: "Cuéntanos sobre tu piel, tu estilo de vida y lo que buscas. En dos minutos tienes tu perfil listo y tu primera caja en camino.",
-    image: step1,
-    emoji: "📱",
-    bgClass: "bg-peach",
-  },
-  {
-    num: "2",
-    title: "Seleccionamos para ti",
-    desc: "Nuestro equipo en Seúl elige productos que realmente funcionan juntos. No hay relleno, no hay marcas que pagaron por estar ahí.",
-    image: step2,
-    emoji: "🎁",
-    bgClass: "bg-lavender",
-  },
-  {
-    num: "3",
-    title: "Llega a tu puerta",
-    desc: "Cada mes, una caja con todo lo que necesitas. Incluye una guía personalizada con el orden exacto y los tiempos de aplicación.",
-    image: step3,
-    emoji: "🚪",
-    bgClass: "bg-mint",
-  },
-  {
-    num: "4",
-    title: "Disfruta el ritual",
-    desc: "Cinco minutos. Mañana y noche. Sin pensarlo. Tu piel lo nota desde la primera semana.",
-    image: step4,
-    emoji: "✨",
-    bgClass: "bg-sunshine",
-  },
+const data = APP_REGISTRY.howItWorks;
+const stepImages = [
+  { image: step1, emoji: "📱", bgClass: "bg-peach" },
+  { image: step2, emoji: "🎁", bgClass: "bg-lavender" },
+  { image: step3, emoji: "🚪", bgClass: "bg-mint" },
+  { image: step4, emoji: "✨", bgClass: "bg-sunshine" },
 ];
 
 const StepCard = ({
   step,
+  style,
   index,
 }: {
-  step: (typeof steps)[0];
+  step: (typeof data.steps)[0];
+  style: (typeof stepImages)[0];
   index: number;
 }) => {
   const ref = useRef(null);
@@ -62,50 +38,45 @@ const StepCard = ({
         !isEven ? "md:flex-row-reverse" : ""
       }`}
     >
-      {/* Image in a circle-ish blob with overflow */}
       <motion.div
         whileHover={{ scale: 1.05, rotate: isEven ? 3 : -3 }}
         transition={{ duration: 0.4 }}
         className="flex-1 w-full flex justify-center"
       >
         <div className="relative">
-          {/* Colored circle background */}
-          <div className={`w-64 h-64 md:w-72 md:h-72 rounded-full ${step.bgClass} relative overflow-visible shadow-playful`}>
-            {/* Image slightly overflows the circle */}
+          <div className={`w-64 h-64 md:w-72 md:h-72 rounded-full ${style.bgClass} relative overflow-visible shadow-playful`}>
             <div className="absolute inset-[-12px] rounded-full overflow-hidden">
               <img
-                src={step.image}
+                src={style.image}
                 alt={step.title}
                 className="w-full h-full object-cover"
               />
             </div>
           </div>
-          {/* Number badge overlapping the edge */}
           <motion.div
             className="absolute -top-3 -right-3 w-16 h-16 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-2xl font-bold shadow-playful border-4 border-background"
             initial={{ scale: 0 }}
             animate={isInView ? { scale: 1 } : {}}
             transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
           >
-            {step.num}
+            {index + 1}
           </motion.div>
-          {/* Emoji floating out */}
           <motion.span
             className="absolute -bottom-2 -left-2 text-4xl drop-shadow-md"
             animate={{ y: [0, -6, 0], rotate: [0, -10, 0] }}
             transition={{ duration: 2.5, repeat: Infinity }}
           >
-            {step.emoji}
+            {style.emoji}
           </motion.span>
         </div>
       </motion.div>
 
-      {/* Text side */}
       <div className="flex-1 w-full text-center md:text-left">
+        <span className="inline-block text-sm font-semibold text-primary mb-2">{step.label}</span>
         <h3 className="font-display text-2xl md:text-3xl font-bold mb-3 text-foreground">
           {step.title}
         </h3>
-        <p className="text-muted-foreground leading-relaxed text-lg">{step.desc}</p>
+        <p className="text-muted-foreground leading-relaxed text-lg">{step.description}</p>
       </div>
     </motion.div>
   );
@@ -144,25 +115,22 @@ const HowItWorksSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <motion.span
-            initial={{ opacity: 0, scale: 0 }}
-            animate={headerInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.3, type: "spring" }}
-            className="inline-block bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-bold mb-5 shadow-playful rotate-[2deg]"
-          >
-            🪄 Cómo funciona
-          </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-2">
-            Cuatro pasos.
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-8">
+            {data.title}
           </h2>
-          <p className="font-display text-2xl md:text-3xl text-muted-foreground italic">
-            Cero complicaciones. 😌
-          </p>
+          <motion.a
+            href={data.ctaButton.href}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            className="inline-block gradient-warm px-6 py-3 rounded-full text-sm font-bold text-primary-foreground shadow-playful"
+          >
+            {data.ctaButton.label}
+          </motion.a>
         </motion.div>
 
         <div className="space-y-20 max-w-4xl mx-auto">
-          {steps.map((step, index) => (
-            <StepCard key={step.num} step={step} index={index} />
+          {data.steps.map((step, index) => (
+            <StepCard key={step.label} step={step} style={stepImages[index]} index={index} />
           ))}
         </div>
 
@@ -173,11 +141,8 @@ const HowItWorksSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mt-20"
         >
-          <p className="text-muted-foreground mb-6 text-lg">
-            Sin letra pequeña. Sin permanencia. Solo skincare que funciona. ✌️
-          </p>
           <motion.a
-            href="#subscribe"
+            href="#pricing"
             whileHover={{ scale: 1.08, rotate: -2 }}
             whileTap={{ scale: 0.95 }}
             className="inline-block gradient-warm px-10 py-5 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
