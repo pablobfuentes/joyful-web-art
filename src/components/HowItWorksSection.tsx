@@ -20,7 +20,7 @@ const StepCard = ({
   style,
   index,
 }: {
-  step: (typeof data.steps)[0];
+  step: (typeof data.steps)[number];
   style: (typeof stepImages)[0];
   index: number;
 }) => {

@@ -32,32 +32,57 @@ const Index = () => {
       <HowItWorksSection />
       <WaveDivider
         topColor="hsl(var(--peach-strong))"
-        bottomColor="hsl(var(--background))"
+        bottomColor="hsl(var(--lavender))"
         variant="wave2"
       />
       <CompatibilityTestSection />
       <WaveDivider
-        topColor="hsl(var(--background))"
+        topColor="hsl(var(--lavender))"
         bottomColor="hsl(var(--peach))"
         variant="wave1"
       />
       <WhatYouReceiveSection />
-      <PastEditionsSection />
       <WaveDivider
         topColor="hsl(var(--peach))"
         bottomColor="hsl(var(--background))"
         variant="blob"
       />
+      <PastEditionsSection />
+      <WaveDivider
+        topColor="hsl(var(--background))"
+        bottomColor="hsl(var(--mint))"
+        variant="zigzag"
+      />
       <ExperienceSection />
+      <WaveDivider
+        topColor="hsl(var(--mint))"
+        bottomColor="hsl(var(--sunshine))"
+        variant="wave2"
+      />
       <TestimonialsSection />
+      <WaveDivider
+        topColor="hsl(var(--sunshine))"
+        bottomColor="hsl(var(--peach-strong))"
+        variant="wave1"
+      />
       <PricingSection />
+      <WaveDivider
+        topColor="hsl(var(--peach-strong))"
+        bottomColor="hsl(var(--lavender))"
+        variant="blob"
+      />
       <FAQSection />
       <WaveDivider
-        topColor="hsl(var(--peach))"
+        topColor="hsl(var(--lavender))"
         bottomColor="hsl(var(--peach-strong))"
         variant="wave2"
       />
       <FinalCTASection />
+      <WaveDivider
+        topColor="hsl(var(--peach-strong))"
+        bottomColor="hsl(var(--background))"
+        variant="wave1"
+      />
       <FooterSection />
     </div>
   );
