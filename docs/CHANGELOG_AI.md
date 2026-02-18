@@ -17,3 +17,9 @@
   - Login redirect: after sign-in, redirects to `?redirect=` path when present, else `/`.
   - Reset password: reads session from Supabase (recovery link); invalid/expired link shows message and Back to Login.
   - Tests: `src/pages/Login.test.tsx` (render form with app-registry copy, forgot password link); Supabase mocked in test so no env required.
+
+- **Dashboard profile view and edit**
+  - App registry: dashboard keys for edit profile (editProfileTitle, editProfileButton, profileNameLabel/Placeholder, saveProfile/saveProfileLoading, cancelEdit, profileUpdatedSuccess, profileUpdateError, changePasswordLabel/changePasswordHref).
+  - AuthContext: `updateProfile(fullName)` calling `supabase.auth.updateUser({ data: { full_name } })`.
+  - Dashboard: single Account Information card with view mode (email, name, member since, Edit profile button, Change password link) and edit mode (name input, Save, Cancel); success toast on save, inline error on failure; same style (rounded-lg border bg-card, font-display, primary/outline buttons).
+  - Tests: `src/pages/Dashboard.test.tsx` (renders welcome and account info, shows Edit profile and Change password; Supabase mocked with session user).

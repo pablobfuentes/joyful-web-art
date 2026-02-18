@@ -17,6 +17,7 @@ export type AuthContextValue = {
   signUp: (email: string, password: string, name?: string) => Promise<{ error: Error | null }>;
   resetPasswordForEmail: (email: string) => Promise<{ error: Error | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
+  updateProfile: (fullName: string) => Promise<{ error: Error | null }>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -74,6 +75,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error ? new Error(error.message) : null };
   }, []);
 
+  const updateProfile = useCallback(async (fullName: string) => {
+    const { error } = await supabase.auth.updateUser({
+      data: { full_name: fullName },
+    });
+    return { error: error ? new Error(error.message) : null };
+  }, []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -83,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       resetPasswordForEmail,
       updatePassword,
+      updateProfile,
     }),
     [
       user,
@@ -92,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       resetPasswordForEmail,
       updatePassword,
+      updateProfile,
     ]
   );
 
