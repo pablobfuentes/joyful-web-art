@@ -1,13 +1,27 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { APP_REGISTRY } from "@/config/app-registry";
 import { FloatingDoodle, DoodleHeart, DoodleFlower, DoodleStar, DoodleSparkle } from "./Doodles";
 
 const data = APP_REGISTRY.pricing;
 
+const accentBg: Record<string, string> = {
+  lavender: "bg-lavender",
+  peach: "bg-peach",
+  mint: "bg-mint",
+};
+
+const accentBorder: Record<string, string> = {
+  lavender: "border-[hsl(var(--lavender))]",
+  peach: "border-[hsl(var(--primary))]",
+  mint: "border-[hsl(var(--mint))]",
+};
+
 const PricingSection = () => {
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
+  const navigate = useNavigate();
 
   return (
     <section id="pricing" className="relative py-24 px-6 bg-peach-strong overflow-hidden">
@@ -26,12 +40,12 @@ const PricingSection = () => {
         <DoodleSparkle className="w-full h-full" />
       </FloatingDoodle>
 
-      <div className="container mx-auto relative z-10 max-w-2xl">
+      <div className="container mx-auto relative z-10 max-w-6xl">
         <motion.div
           ref={headerRef}
           initial={{ opacity: 0, y: 30 }}
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
           <motion.span
             className="inline-block bg-sunshine px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
@@ -43,78 +57,103 @@ const PricingSection = () => {
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">{data.title}</h2>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30, rotate: -2 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-          viewport={{ once: true }}
-          transition={{ type: "spring", stiffness: 200 }}
-          whileHover={{ scale: 1.02 }}
-          className="bg-background rounded-3xl p-8 md:p-12 shadow-playful border-4 border-peach relative overflow-visible"
-        >
-          {/* Floating emojis */}
-          <motion.span
-            className="absolute -top-5 -right-4 text-4xl"
-            animate={{ y: [0, -8, 0], rotate: [0, 15, -10, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity }}
-          >
-            🎁
-          </motion.span>
-          <motion.span
-            className="absolute -bottom-4 -left-4 text-3xl"
-            animate={{ y: [0, -6, 0], rotate: [0, -15, 10, 0] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-          >
-            🌸
-          </motion.span>
-
-          <div className="flex items-baseline justify-center gap-2 mb-8">
-            <motion.span
-              className="font-display text-6xl md:text-7xl font-bold text-gradient"
-              initial={{ scale: 0.8 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ type: "spring", stiffness: 200 }}
-            >
-              {data.priceAmount}
-            </motion.span>
-            <span className="text-xl text-muted-foreground font-bold">{data.pricePeriod}</span>
-          </div>
-
-          <ul className="space-y-4 mb-8">
-            {data.features.map((feature, i) => (
-              <motion.li
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+          {data.plans.map((plan, index) => {
+            const isPopular = !!plan.badge && plan.accentColor === "peach";
+            return (
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 40, rotate: index === 0 ? -2 : index === 2 ? 2 : 0 }}
+                whileInView={{ opacity: 1, y: 0, rotate: index === 0 ? -1 : index === 2 ? 1 : 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex items-center gap-3 text-foreground text-lg"
+                transition={{ type: "spring", stiffness: 180, delay: index * 0.12 }}
+                whileHover={{ scale: 1.04, rotate: 0, y: -8 }}
+                className={`relative bg-background rounded-3xl p-8 shadow-playful border-4 ${accentBorder[plan.accentColor]} overflow-visible flex flex-col ${isPopular ? "md:-mt-4 md:mb-[-16px] md:pb-10 ring-4 ring-[hsl(var(--primary)/0.3)]" : ""}`}
               >
-                <span className="w-8 h-8 gradient-warm rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold shadow-playful shrink-0">
-                  ✓
-                </span>
-                {feature}
-              </motion.li>
-            ))}
-          </ul>
+                {/* Badge */}
+                {plan.badge && (
+                  <motion.span
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 bg-sunshine px-4 py-1 rounded-full text-sm font-bold text-foreground shadow-playful whitespace-nowrap z-10"
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {plan.badge}
+                  </motion.span>
+                )}
 
-          <div className="flex flex-wrap gap-6 justify-center text-sm mb-8">
-            <span className="bg-mint px-4 py-2 rounded-full font-bold shadow-playful">
-              {data.shippingLabel}: {data.shippingValue} 🚚
-            </span>
-            <span className="bg-lavender px-4 py-2 rounded-full font-bold shadow-playful">
-              {data.commitmentLabel}: {data.commitmentValue} 🎉
-            </span>
-          </div>
+                {/* Floating emoji */}
+                <motion.span
+                  className="absolute -top-5 -right-4 text-4xl"
+                  animate={{ y: [0, -8, 0], rotate: [0, 15, -10, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
+                >
+                  {plan.emoji}
+                </motion.span>
 
-          <motion.a
-            href="#pricing"
-            whileHover={{ scale: 1.08, rotate: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="block w-full text-center gradient-warm py-5 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
-          >
-            {data.ctaButton} ✨
-          </motion.a>
+                {/* Plan name */}
+                <h3 className="font-display text-xl font-bold mb-2 mt-2">{plan.name}</h3>
+                <p className="text-muted-foreground text-sm mb-6">{plan.description}</p>
+
+                {/* Price */}
+                <div className="flex items-baseline gap-2 mb-6">
+                  <motion.span
+                    className="font-display text-5xl font-bold text-gradient"
+                    initial={{ scale: 0.8 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ type: "spring", stiffness: 200 }}
+                  >
+                    {plan.priceAmount}
+                  </motion.span>
+                  <span className="text-lg text-muted-foreground font-bold">{plan.pricePeriod}</span>
+                </div>
+
+                {/* Features */}
+                <ul className="space-y-3 mb-8 flex-grow">
+                  {plan.features.map((feature, i) => (
+                    <motion.li
+                      key={i}
+                      initial={{ opacity: 0, x: -15 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1 + i * 0.08 }}
+                      className="flex items-center gap-3 text-foreground"
+                    >
+                      <span className={`w-7 h-7 ${accentBg[plan.accentColor]} rounded-full flex items-center justify-center text-sm font-bold shadow-playful shrink-0`}>
+                        ✓
+                      </span>
+                      {feature}
+                    </motion.li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <motion.button
+                  onClick={() => navigate(`/checkout?plan=${plan.id}`)}
+                  whileHover={{ scale: 1.06, rotate: -1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`w-full text-center py-4 rounded-full text-lg font-bold shadow-playful hover:shadow-card-hover transition-shadow ${isPopular ? "gradient-warm text-primary-foreground" : `${accentBg[plan.accentColor]} text-foreground border-2 ${accentBorder[plan.accentColor]}`}`}
+                >
+                  {plan.ctaButton} ✨
+                </motion.button>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Bottom info */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="flex flex-wrap gap-6 justify-center text-sm mt-12"
+        >
+          <span className="bg-mint px-4 py-2 rounded-full font-bold shadow-playful">
+            {data.shippingLabel}: {data.shippingValue} 🚚
+          </span>
+          <span className="bg-lavender px-4 py-2 rounded-full font-bold shadow-playful">
+            {data.commitmentLabel}: {data.commitmentValue} 🎉
+          </span>
         </motion.div>
       </div>
     </section>
