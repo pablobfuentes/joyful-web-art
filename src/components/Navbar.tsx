@@ -1,9 +1,21 @@
 import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
 import { APP_REGISTRY } from "@/config/app-registry";
+import { useAuth } from "@/hooks/useAuth";
 
 const data = APP_REGISTRY.nav;
 
 const Navbar = () => {
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+  const displayName =
+    (user?.user_metadata?.full_name as string | undefined) || user?.email?.split("@")[0] || "Account";
+
+  async function handleLogOut() {
+    await signOut();
+    navigate("/", { replace: true });
+  }
+
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -16,7 +28,7 @@ const Navbar = () => {
       </div>
 
       <div className="container mx-auto flex items-center justify-between py-3 px-6">
-        <a href="#" className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2 group">
           <motion.span
             className="text-3xl"
             animate={{ rotate: [0, -10, 10, 0] }}
@@ -27,7 +39,7 @@ const Navbar = () => {
           <span className="font-display text-2xl font-bold text-gradient">
             {data.logoText}
           </span>
-        </a>
+        </Link>
 
         <div className="hidden md:flex items-center gap-1">
           {data.links.map((item) => (
@@ -42,20 +54,42 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
-          <a
-            href={data.logIn.href}
-            className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
-          >
-            {data.logIn.label}
-          </a>
-          <motion.a
-            href={data.getStarted.href}
-            whileHover={{ scale: 1.08, rotate: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="gradient-warm px-6 py-2.5 rounded-full text-sm font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
-          >
-            {data.getStarted.label}
-          </motion.a>
+          {loading ? (
+            <span className="px-4 py-2 text-sm text-muted-foreground">...</span>
+          ) : user ? (
+            <>
+              <Link
+                to="/account"
+                className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
+              >
+                {displayName}
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogOut}
+                className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
+              >
+                {APP_REGISTRY.dashboard.logOut}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to={data.logIn.href}
+                className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
+              >
+                {data.logIn.label}
+              </Link>
+              <motion.div whileHover={{ scale: 1.08, rotate: -2 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  to={data.getStarted.href}
+                  className="gradient-warm px-6 py-2.5 rounded-full text-sm font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow inline-block"
+                >
+                  {data.getStarted.label}
+                </Link>
+              </motion.div>
+            </>
+          )}
         </div>
       </div>
     </motion.nav>
