@@ -484,7 +484,7 @@ export default function RegistryEditor() {
   // Render section tab
   const renderSectionTab = (sectionKey: string) => {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-6">
         <div>
           <h2 className="text-xl font-semibold mb-4">Controls</h2>
           {renderSectionControls(sectionKey)}
@@ -509,24 +509,29 @@ export default function RegistryEditor() {
           </p>
         </div>
 
-        <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col sm:flex-row gap-6">
+          <TabsList className="flex flex-col h-fit w-full sm:w-52 shrink-0 bg-muted p-1.5 rounded-lg">
             {SECTION_KEYS.map((key) => (
-              <TabsTrigger key={key} value={key}>
+              <TabsTrigger
+                key={key}
+                value={key}
+                className="w-full justify-start data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              >
                 {SECTION_DISPLAY_NAMES[key]}
               </TabsTrigger>
             ))}
           </TabsList>
 
+          <div className="flex-1 min-w-0">
           {/* General Tab */}
-          <TabsContent value="general" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TabsContent value="general" className="mt-0">
+            <div className="flex flex-col gap-6">
               <div>
                 <h2 className="text-xl font-semibold mb-4">Color Palette</h2>
                 <div
-                  className="grid gap-2 border rounded-lg p-4"
+                  className="grid gap-3 border rounded-lg p-4"
                   style={{
-                    gridTemplateColumns: `repeat(${registry.general.palette.cols}, 1fr)`,
+                    gridTemplateColumns: `repeat(${registry.general.palette.cols}, minmax(7.5rem, 1fr))`,
                   }}
                 >
                   {registry.general.palette.cells.map((cell, index) => {
@@ -534,7 +539,7 @@ export default function RegistryEditor() {
                     return (
                       <div
                         key={index}
-                        className="relative aspect-square rounded border border-border cursor-pointer hover:ring-2 hover:ring-ring transition-all"
+                        className="relative min-w-[7.5rem] min-h-[7.5rem] aspect-square rounded border border-border cursor-pointer hover:ring-2 hover:ring-ring transition-all"
                         style={{ backgroundColor: cell.hex }}
                         onClick={() => handleCellClick(index)}
                       >
@@ -691,10 +696,11 @@ export default function RegistryEditor() {
 
           {/* Section/Page Tabs */}
           {SECTION_KEYS.filter((key) => key !== "general").map((sectionKey) => (
-            <TabsContent key={sectionKey} value={sectionKey} className="mt-6">
+            <TabsContent key={sectionKey} value={sectionKey} className="mt-0">
               {renderSectionTab(sectionKey)}
             </TabsContent>
           ))}
+          </div>
         </Tabs>
 
         {/* Color Picker Modal */}
