@@ -24,7 +24,7 @@ const PricingSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section id="pricing" className="relative py-24 px-6 bg-peach-strong overflow-hidden">
+    <section id="pricing" className="relative py-24 px-6 bg-[hsl(var(--pricing-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-50" />
 
       <FloatingDoodle className="top-24 left-[5%] w-12 h-12 text-primary/20" delay={0}>

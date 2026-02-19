@@ -18,8 +18,11 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-28">
-      <div className="absolute inset-0 bg-peach" />
-      <div className="absolute inset-0 bg-pattern-skincare opacity-60" />
+      <div className="absolute inset-0 bg-[hsl(var(--hero-section-bg))]" />
+      <div
+        className="absolute inset-0 bg-pattern-skincare"
+        style={{ opacity: "var(--hero-pattern-opacity, 0.6)" }}
+      />
 
       <FloatingDoodle className="top-32 left-[8%] w-10 h-10 text-primary/40" delay={0}>
         <DoodleDroplet className="w-full h-full" />
@@ -47,7 +50,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
-              className="inline-block bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-bold mb-6 shadow-playful rotate-[-2deg]"
+              className="inline-block px-5 py-2 text-sm font-bold mb-6 shadow-playful rotate-[-2deg] bg-[hsl(var(--hero-badge-bg))] text-[hsl(var(--hero-badge-text))] rounded-[var(--hero-badge-radius)]"
             >
               ✨ Skincare Coreano ✨
             </motion.div>
@@ -57,7 +60,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4 }}
-              className="font-display italic text-lg text-foreground/70 mb-3"
+              className="font-display italic text-lg mb-3 text-[hsl(var(--hero-quote-color))]"
             >
               "{data.rotatingQuotes[quoteIndex]}"
             </motion.p>
@@ -66,7 +69,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.7 }}
-              className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6"
+              className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6 text-[hsl(var(--hero-heading-color))]"
             >
               {data.heading}
             </motion.h1>
@@ -75,7 +78,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.6 }}
-              className="text-lg text-muted-foreground mb-8 max-w-lg"
+              className="text-lg mb-8 max-w-lg text-[hsl(var(--hero-description-color))]"
             >
               {data.description}
             </motion.p>
@@ -90,7 +93,7 @@ const HeroSection = () => {
                 href={data.primaryCta.href}
                 whileHover={{ scale: 1.08, rotate: -1 }}
                 whileTap={{ scale: 0.95 }}
-                className="gradient-warm px-8 py-4 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
+                className="gradient-warm px-8 py-4 text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow rounded-[var(--hero-primary-radius)]"
               >
                 {data.primaryCta.label}
               </motion.a>
@@ -98,7 +101,7 @@ const HeroSection = () => {
                 href={data.secondaryCta.href}
                 whileHover={{ scale: 1.08, rotate: 1 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-full text-lg font-bold border-3 border-primary text-primary bg-background/80 hover:bg-primary hover:text-primary-foreground transition-colors shadow-card"
+                className="px-8 py-4 text-lg font-bold border-3 shadow-card transition-colors rounded-[var(--hero-secondary-radius)] border-[hsl(var(--hero-secondary-border))] text-[hsl(var(--hero-secondary-text))] bg-[hsl(var(--hero-secondary-bg))] hover:bg-primary hover:text-primary-foreground"
               >
                 {data.secondaryCta.label}
               </motion.a>
@@ -108,7 +111,7 @@ const HeroSection = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2, duration: 0.6 }}
-              className="text-sm text-foreground/80"
+              className="text-sm text-[hsl(var(--hero-footer-color))]"
             >
               {data.footer}
             </motion.div>
@@ -121,11 +124,19 @@ const HeroSection = () => {
             transition={{ delay: 0.5, duration: 0.8, type: "spring" }}
             className="relative"
           >
-            <div className="relative rounded-3xl overflow-hidden shadow-playful border-4 border-background">
+            <div
+              className="relative overflow-hidden shadow-playful"
+              style={{
+                borderRadius: "var(--hero-image-radius)",
+                borderWidth: "var(--hero-image-border-width)",
+                borderColor: "hsl(var(--hero-image-border-color))",
+                borderStyle: "solid",
+              }}
+            >
               <img
                 src={heroImage}
                 alt="Productos de skincare coreano KumiBox"
-                className="w-full h-[450px] md:h-[520px] object-cover"
+                className="w-full object-cover h-[var(--hero-image-height)] md:h-[520px]"
               />
             </div>
             {/* Overlapping decorative badge */}

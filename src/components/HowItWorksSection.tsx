@@ -89,7 +89,7 @@ const HowItWorksSection = () => {
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
 
   return (
-    <section id="how-it-works" className="relative py-24 px-6 bg-peach-strong overflow-hidden">
+    <section id="how-it-works" className="relative py-24 px-6 bg-[hsl(var(--howItWorks-section-bg))] overflow-hidden">
       {/* Pattern overlay */}
       <div className="absolute inset-0 bg-pattern-dots opacity-50" />
 

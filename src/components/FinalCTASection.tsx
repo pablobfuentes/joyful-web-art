@@ -10,7 +10,7 @@ const FinalCTASection = () => {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="relative py-32 px-6 bg-peach-strong overflow-hidden">
+    <section className="relative py-32 px-6 bg-[hsl(var(--finalCta-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-skincare opacity-60" />
       <div className="absolute inset-0 bg-pattern-dots opacity-30" />
 

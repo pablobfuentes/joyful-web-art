@@ -75,7 +75,7 @@ const ProblemSection = () => {
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
 
   return (
-    <section id="why" className="relative py-24 px-6 bg-pattern-dots bg-background overflow-hidden">
+    <section id="why" className="relative py-24 px-6 bg-pattern-dots bg-[hsl(var(--why-section-bg))] overflow-hidden">
       {/* Scattered doodles */}
       <FloatingDoodle className="top-16 right-[10%] w-8 h-8 text-secondary/30" delay={0}>
         <DoodleHeart className="w-full h-full" />

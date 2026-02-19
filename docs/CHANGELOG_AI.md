@@ -4,6 +4,30 @@
 
 ### Added
 
+- **Profiles 500 / PostgREST 42P17: documentation and error code in UI**
+  - **Failure:** `/admin/registry-editor` shows "Could not verify admin access"; API log shows `proxy_status: "PostgREST; error=42P17"` (PostgreSQL undefined_object).
+  - **Changes:** (1) `docs/FAILURE_LOG.md`: new entry for 500 on profiles fetch with 42P17; root cause (missing table/column or RLS referencing missing object); fix steps (create table, align column names, fix RLS). (2) `docs/ADMIN_REGISTRY_EDITOR.md`: new §5 "Error 42P17 (undefined_object)" with SQL checks (table exists, column names, RLS), and optional RLS disable to isolate. (3) `src/hooks/useProfile.ts`: profile fetch error now includes Supabase `code` in the message (e.g. `... (code: 42P17)`) so the "Could not verify admin access" screen shows the code.
+  - **Verification:** User follows doc to create/fix `public.profiles` and policies; reload `/admin/registry-editor` to confirm 200 and access.
+
+- **RegistryEditor Phase 2.4, 2.5, 3.1: Section roll-out, dividers from registry, RegistryEditor route**
+  - **Plan:** docs/PLAN_REGISTRY_EDITOR.md.
+  - **2.4 Roll-out:** `apply-style-registry.ts`: section background CSS vars for why, howItWorks, compatibilityTest, whatYouReceive, pastEditions, experience, testimonials, pricing, faq, finalCta, footer; nav vars (--nav-link-color, --nav-link-hover-bg, --nav-link-hover-text, --nav-cta-radius). ProblemSection, HowItWorksSection, CompatibilityTestSection, WhatYouReceiveSection, PastEditionsSection, ExperienceSection, TestimonialsSection, PricingSection, FAQSection, FinalCTASection, FooterSection: section elements use `bg-[hsl(var(--*-section-bg))]`. Navbar: links and CTA use registry vars for color and radius.
+  - **2.5 Section-owned dividers:** `Index.tsx`: each WaveDivider reads from STYLE_REGISTRY (hero, why, howItWorks, compatibilityTest, whatYouReceive, pastEditions, experience, testimonials, pricing, faq, finalCta). topColor/bottomColor use `hsl(var(--palette-N))`; variant mapped from registry style (wavy→wave1, wavy2→wave2, blob→blob, sawtooth→zigzag).
+  - **3.1 RegistryEditor route:** Route `/admin/registry-editor` added. `AdminRoute`: requires auth + `profiles.role = 'admin'` (via `useProfile`); else redirect to login or home. `src/hooks/useProfile.ts`: fetches profile from `public.profiles` by user id. `src/pages/RegistryEditor.tsx`: placeholder page with title and back link. Admin role is set in Supabase `profiles.role` (see docs/supabase_phase1_profiles_orders_rls.sql).
+  - **Verification:** `npm run build` succeeds. No FAILURE_LOG entry.
+
+- **RegistryEditor Phase 2.1–2.3: Runtime bridge + Hero pilot**
+  - **Plan:** docs/PLAN_REGISTRY_EDITOR.md (Phase 2).
+  - **2.1 Runtime bridge:** `src/lib/apply-style-registry.ts`: `applyStyleRegistry(registry)` injects palette as `--palette-N` and semantic vars (--background, --primary, etc.), --radius, --font-display/--font-body, shadows, gradients; injects font `importUrl` via link tag. `src/main.tsx`: calls `applyStyleRegistry(STYLE_REGISTRY)` on bootstrap.
+  - **2.2 Fonts:** Registry fonts applied via link tag and --font-display, --font-body on root.
+  - **2.3 Hero pilot:** `apply-style-registry.ts`: added `getPaletteHsl(cells, index)`; sets hero-specific vars (--hero-section-bg, --hero-pattern-opacity, badge/quote/heading/description/footer/buttons/image). `src/components/HeroSection.tsx`: section background, pattern opacity, badge, quote, heading, description, primary/secondary buttons, footer text, and hero image container use CSS vars from registry. Visual parity preserved (same palette indices as before).
+  - **Verification:** `npm run build` succeeds. No FAILURE_LOG entry.
+
+- **RegistryEditor Phase 1: Style registry and inventory**
+  - **Plan:** docs/PLAN_REGISTRY_EDITOR.md (approved).
+  - **Changes:** (1) `docs/STYLE_VARIABLES_INVENTORY.md`: full audit of stylized elements with proposed registry paths and palette index → “used by” tags for color modal. (2) `src/config/style-registry.ts`: STYLE_REGISTRY with position-based palette (cells with hex, name?, comment?), General (fonts, radius, shadow, gradient), section-owned dividers (wavy/wavy2/sawtooth/blob + top/bottom color index), image style model, and per-section styles (nav, hero, why, howItWorks, compatibilityTest, whatYouReceive, pastEditions, experience, testimonials, pricing, faq, finalCta, footer, login, register, forgotPassword, resetPassword, dashboard, checkout, account). Types: PaletteCell, SectionDivider, ImageStyle, GeneralStyles, section types, StyleRegistry.
+  - **Verification:** `npm run build` succeeds. No FAILURE_LOG entry (no failure).
+
 - **Fix 502 Bad Gateway on create-checkout-session (Stripe errors visible)**
   - **Failure:** 502 when Stripe threw (e.g. wrong Price ID). Function reads secrets from **Supabase Dashboard**, not `.env.local`. Logged in `docs/FAILURE_LOG.md`.
   - **Changes:** (1) `supabase/functions/create-checkout-session/index.ts`: on Stripe `catch`, return **200** with `{ url: null, error: message }` so the client can show the error. (2) `docs/STRIPE_EDGE_FUNCTION_SETUP.md`: step 9 "If you get 502" — clarify that secrets are in Supabase only; use Price IDs (`price_...`); link to function logs. (3) `docs/FAILURE_LOG.md`: 502 entry added.

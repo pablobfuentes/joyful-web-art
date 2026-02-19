@@ -46,7 +46,7 @@ const Navbar = () => {
             <a
               key={item.label}
               href={item.href}
-              className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
+              className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
             >
               {item.label}
             </a>
@@ -60,14 +60,14 @@ const Navbar = () => {
             <>
               <Link
                 to="/account"
-                className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
+                className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
               >
                 {displayName}
               </Link>
               <button
                 type="button"
                 onClick={handleLogOut}
-                className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
+                className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
               >
                 {APP_REGISTRY.dashboard.logOut}
               </button>
@@ -76,14 +76,14 @@ const Navbar = () => {
             <>
               <Link
                 to={data.logIn.href}
-                className="px-4 py-2 rounded-full text-sm font-semibold text-foreground hover:bg-peach hover:text-primary transition-all duration-300"
+                className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
               >
                 {data.logIn.label}
               </Link>
               <motion.div whileHover={{ scale: 1.08, rotate: -2 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   to={data.getStarted.href}
-                  className="gradient-warm px-6 py-2.5 rounded-full text-sm font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow inline-block"
+                  className="gradient-warm px-6 py-2.5 rounded-[var(--nav-cta-radius)] text-sm font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow inline-block"
                 >
                   {data.getStarted.label}
                 </Link>

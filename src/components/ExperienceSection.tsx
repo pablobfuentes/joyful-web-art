@@ -13,7 +13,7 @@ const ExperienceSection = () => {
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section id="experience" className="relative py-24 px-6 bg-mint overflow-hidden">
+    <section id="experience" className="relative py-24 px-6 bg-[hsl(var(--experience-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-40" />
 
       <FloatingDoodle className="top-16 left-[8%] w-11 h-11 text-primary/25" delay={0}>

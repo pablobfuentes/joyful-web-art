@@ -11,7 +11,7 @@ const FAQSection = () => {
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section id="faq" className="relative py-24 px-6 bg-lavender overflow-hidden">
+    <section id="faq" className="relative py-24 px-6 bg-[hsl(var(--faq-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-30" />
 
       <FloatingDoodle className="top-20 right-[6%] w-10 h-10 text-primary/25" delay={0}>

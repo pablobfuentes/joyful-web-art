@@ -34,7 +34,7 @@ const CompatibilityTestSection = () => {
   const progressPercent = ((currentQuestion + (result ? 1 : 0)) / data.questions.length) * 100;
 
   return (
-    <section id="compatibility" className="relative py-24 px-6 bg-lavender overflow-hidden">
+    <section id="compatibility" className="relative py-24 px-6 bg-[hsl(var(--compatibilityTest-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-40" />
 
       <FloatingDoodle className="top-16 right-[8%] w-10 h-10 text-secondary/30" delay={0}>

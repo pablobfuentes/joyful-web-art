@@ -20,3 +20,15 @@
 - **Reproduction:** Checkout → fill form → "Confirmar pedido".
 - **Fix attempt:** (1) Edge Function now returns **200** with `{ url: null, error: "<message>" }` on Stripe errors so the client can show the message. (2) Setup doc updated with "If you get 502" and clarification that secrets are in Supabase only.
 - **Verification:** Redeploy function; set correct Price IDs (`price_...`) in Supabase secrets; re-test checkout.
+
+## 500 on profiles fetch (PostgREST error 42P17)
+
+- **Date:** 2026-02-19
+- **Error:** `GET .../rest/v1/profiles?...` returns 500. API body: `{"code":"42P17","message":"infinite recursion detected in policy for relation \"profiles\""}`.
+- **Root cause:** The RLS policy **profiles_select_admin** does `EXISTS (SELECT 1 FROM public.profiles p WHERE ...)`. Evaluating that runs a SELECT on `profiles` again, which re-applies RLS and re-evaluates the same policy → infinite recursion.
+- **Reproduction:** Log in, open `/admin/registry-editor`; app shows "Could not verify admin access" or redirects home; Network tab shows 500 on the profiles request.
+- **Fix:** Run **docs/fix_profiles_rls_42p17.sql** in Supabase SQL Editor (drops `profiles_select_admin`, keeps `profiles_select_own` and `profiles_update_own`). See **docs/ADMIN_REGISTRY_EDITOR.md** §6. Old fix options for other 42P17 cases:
+  1. **Table missing:** In **SQL Editor** run `SELECT * FROM public.profiles LIMIT 1;`. If you get "relation does not exist", run **docs/supabase_phase1_profiles_orders_rls.sql** (at least the PROFILES TABLE + RLS sections) to create `public.profiles` with columns `user_id`, `role`, etc.
+  2. **Column names differ:** Table Editor may show `id` instead of `user_id`, or different names. The app selects only `user_id, role`. If your table has no `user_id` column, add it or rename to match (or recreate table from the Phase 1 script).
+  3. **RLS policy references missing object:** A policy on `profiles` may call a function or reference a table that doesn’t exist (e.g. `get_user_email`, or another table). Create the missing object from the Phase 1 script, or temporarily disable RLS to confirm the 500 goes away, then fix the policy.
+- **Verification:** After running the script, reload `/admin/registry-editor`; the profiles request should return 200 and the page should load for an admin user.

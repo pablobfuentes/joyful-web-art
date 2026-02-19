@@ -6,7 +6,7 @@ const data = APP_REGISTRY.footer;
 
 const FooterSection = () => {
   return (
-    <footer className="relative bg-background py-16 px-6 overflow-hidden">
+    <footer className="relative bg-[hsl(var(--footer-section-bg))] py-16 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-20" />
 
       <div className="container mx-auto max-w-5xl relative z-10">

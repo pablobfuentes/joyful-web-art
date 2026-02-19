@@ -13,7 +13,7 @@ const WhatYouReceiveSection = () => {
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section className="relative py-24 px-6 bg-peach overflow-hidden">
+    <section className="relative py-24 px-6 bg-[hsl(var(--whatYouReceive-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-skincare opacity-60" />
 
       <FloatingDoodle className="top-16 left-[6%] w-10 h-10 text-primary/25" delay={0}>
