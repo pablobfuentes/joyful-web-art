@@ -36,11 +36,10 @@ export type GeneralStyles = {
     cols: number;
     cells: PaletteCell[];
   };
-  fonts: {
-    display: string;
-    body: string;
-    importUrl?: string;
-  };
+  fonts: Array<{
+    name: string; // Font family name (e.g., "Playfair Display", "DM Sans", "Heyam")
+    isDefault?: boolean; // First font in list is default for all page
+  }>;
   radius: {
     default: string;
   };
@@ -189,12 +188,11 @@ export const STYLE_REGISTRY = {
       cols: 5,
       cells: DEFAULT_PALETTE_CELLS,
     },
-    fonts: {
-      display: "Playfair Display",
-      body: "DM Sans",
-      importUrl:
-        "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap",
-    },
+    fonts: [
+      { name: "Playfair Display", isDefault: true },
+      { name: "DM Sans" },
+      { name: "Heyam" },
+    ],
     radius: { default: "1rem" },
     shadow: {
       soft: "0 4px 20px -4px rgba(242, 107, 77, 0.2)",

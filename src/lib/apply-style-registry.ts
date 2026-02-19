@@ -85,8 +85,12 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
   });
 
   root.style.setProperty("--radius", registry.general.radius.default);
-  root.style.setProperty("--font-display", registry.general.fonts.display);
-  root.style.setProperty("--font-body", registry.general.fonts.body);
+  // Set default font (first in list) as both display and body
+  const defaultFont = registry.general.fonts.find((f) => f.isDefault) || registry.general.fonts[0];
+  if (defaultFont) {
+    root.style.setProperty("--font-display", defaultFont.name);
+    root.style.setProperty("--font-body", defaultFont.name);
+  }
   root.style.setProperty("--shadow-soft", registry.general.shadow.soft);
   root.style.setProperty("--shadow-card", registry.general.shadow.card);
   root.style.setProperty("--shadow-card-hover", registry.general.shadow.cardHover);
