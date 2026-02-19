@@ -491,9 +491,17 @@ export const APP_REGISTRY = {
     zipLabel: "Código postal",
     zipPlaceholder: "00000",
     payButton: "Confirmar pedido 🎉",
+    payButtonSaving: "Redirigiendo a pago seguro…",
     secureNote: "🔒 Pago seguro · Tus datos están protegidos",
+    saveOrderError: "No se pudo iniciar el pago. Intenta de nuevo o contacta soporte.",
+    stripeError: "Error al conectar con el pago. Intenta de nuevo.",
     successTitle: "¡Pedido confirmado! 🎊",
     successMessage: "Tu caja está en camino. Revisa tu email para los detalles.",
+    cancelTitle: "Pago cancelado",
+    cancelMessage: "Has cancelado el pago. Puedes volver a intentar cuando quieras.",
+    cancelBackToCheckout: "Volver al checkout",
+    cancelBackToPricing: "Ver planes",
+    loginRequiredMessage: "Inicia sesión para continuar con este plan.",
   },
 
   account: {

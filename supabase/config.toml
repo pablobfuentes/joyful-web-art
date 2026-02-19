@@ -1,0 +1,7 @@
+# Supabase local and CLI config.
+# See https://supabase.com/docs/guides/cli/config
+
+[functions.create-checkout-session]
+# Allow invocation without JWT verification (e.g. anon key). Used when gateway returns 401
+# despite correct Authorization header. Function only creates Stripe Checkout session; payment is on Stripe.
+verify_jwt = false

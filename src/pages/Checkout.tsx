@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { APP_REGISTRY } from "@/config/app-registry";
 import Navbar from "@/components/Navbar";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleStar } from "@/components/Doodles";
+import { useAuth } from "@/contexts/AuthContext";
+import { createCheckoutSession } from "@/lib/checkout";
 
 const data = APP_REGISTRY.checkout;
 const plans = APP_REGISTRY.pricing.plans;
@@ -17,16 +19,58 @@ const accentBg: Record<string, string> = {
 export default function Checkout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const planId = searchParams.get("plan") || "monthly";
   const selectedPlan = plans.find((p) => p.id === planId) || plans[1];
 
-  const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", address: "", city: "", state: "", zip: "" });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const isGift = selectedPlan.id === "gift";
+  const loginRequired = !isGift && !user && !authLoading;
+
+  useEffect(() => {
+    if (loginRequired) {
+      navigate(`/login?redirect=${encodeURIComponent(`/checkout?plan=${planId}`)}`, { replace: true });
+      return;
+    }
+  }, [loginRequired, navigate, planId]);
+
+  useEffect(() => {
+    if (!user) return;
+    setForm((f) => ({
+      ...f,
+      email: user.email ?? f.email,
+      name: (user.user_metadata?.full_name as string) ?? f.name,
+    }));
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const canSubmit = form.name && form.email && form.address && form.city && form.state && form.zip;
+
+  if (authLoading && !isGift) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Cargando…</p>
+      </div>
+    );
+  }
+
+  const handleSubmit = async () => {
+    if (!canSubmit || saving) return;
+    setError(null);
+    setSaving(true);
+    const { url, error: err } = await createCheckoutSession({ planId: selectedPlan.id });
+    setSaving(false);
+    if (err) {
+      setError(err);
+      return;
+    }
+    if (url) window.location.href = url;
+  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -57,13 +101,12 @@ export default function Checkout() {
           </motion.button>
 
           <AnimatePresence mode="wait">
-            {!submitted ? (
-              <motion.div
-                key="form"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
                 {/* Header */}
                 <motion.h1
                   className="font-display text-3xl md:text-5xl font-bold mb-2"
@@ -169,14 +212,19 @@ export default function Checkout() {
                     </motion.div>
 
                     {/* Submit */}
+                    {error && (
+                      <p className="text-sm text-destructive font-medium text-center" role="alert">
+                        {error}
+                      </p>
+                    )}
                     <motion.button
-                      onClick={() => setSubmitted(true)}
-                      disabled={!canSubmit}
-                      whileHover={canSubmit ? { scale: 1.04, rotate: -1 } : {}}
-                      whileTap={canSubmit ? { scale: 0.96 } : {}}
-                      className={`w-full py-5 rounded-full text-lg font-bold shadow-playful transition-all ${canSubmit ? "gradient-warm text-primary-foreground hover:shadow-card-hover cursor-pointer" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
+                      onClick={handleSubmit}
+                      disabled={!canSubmit || saving}
+                      whileHover={canSubmit && !saving ? { scale: 1.04, rotate: -1 } : {}}
+                      whileTap={canSubmit && !saving ? { scale: 0.96 } : {}}
+                      className={`w-full py-5 rounded-full text-lg font-bold shadow-playful transition-all ${canSubmit && !saving ? "gradient-warm text-primary-foreground hover:shadow-card-hover cursor-pointer" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
                     >
-                      {data.payButton}
+                      {saving ? data.payButtonSaving : data.payButton}
                     </motion.button>
                     <p className="text-center text-sm text-muted-foreground">{data.secureNote}</p>
                   </div>
@@ -249,34 +297,6 @@ export default function Checkout() {
                   </motion.div>
                 </div>
               </motion.div>
-            ) : (
-              /* Success state */
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-                className="max-w-lg mx-auto text-center py-16"
-              >
-                <motion.span
-                  className="text-7xl inline-block mb-6"
-                  animate={{ y: [0, -12, 0], rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  🎉
-                </motion.span>
-                <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">{data.successTitle}</h2>
-                <p className="text-muted-foreground text-lg mb-8">{data.successMessage}</p>
-                <motion.button
-                  onClick={() => navigate("/")}
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="gradient-warm px-8 py-4 rounded-full text-lg font-bold text-primary-foreground shadow-playful"
-                >
-                  Volver al inicio ✨
-                </motion.button>
-              </motion.div>
-            )}
           </AnimatePresence>
         </div>
       </main>
