@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import Navbar from "@/components/Navbar";
 import { STYLE_REGISTRY, type StyleRegistry, type PaletteCell } from "@/config/style-registry";
+import { APP_REGISTRY } from "@/config/app-registry";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,11 +48,131 @@ const DIVIDER_STYLE_OPTIONS = [
   { value: "blob", label: "Blob" },
 ];
 
+const STYLE_STORAGE_KEY = "app_registry_style_overrides";
+const CONTENT_STORAGE_KEY = "app_registry_content_overrides";
+const CONTENT_MODIFIERS_STORAGE_KEY = "app_registry_content_modifiers";
+
+export type ContentModifiers = Record<
+  string,
+  { fontFamily?: string; fontSize?: string; colorIndex?: number }
+>;
+
+const FONT_SIZE_PRESETS = [
+  "0.75rem",
+  "0.875rem",
+  "1rem",
+  "1.125rem",
+  "1.25rem",
+  "1.5rem",
+  "1.875rem",
+  "2rem",
+  "2.25rem",
+  "3rem",
+];
+
+/** Deep-clone for mutable content state from APP_REGISTRY. */
+function getDefaultContent(): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(APP_REGISTRY)) as Record<string, unknown>;
+}
+
+/** Walk content tree and collect all string leaves as { path, label, value }. */
+function getContentEntries(
+  node: unknown,
+  path: string[] = [],
+  labelParts: string[] = []
+): Array<{ path: string[]; label: string; value: string }> {
+  if (node === null || node === undefined) return [];
+  if (typeof node === "string") {
+    const label = labelParts.length > 0 ? labelParts.join(" › ") : path[path.length - 1] ?? "Text";
+    return [{ path, label, value: node }];
+  }
+  if (typeof node === "number") return [];
+  if (Array.isArray(node)) {
+    const entries: Array<{ path: string[]; label: string; value: string }> = [];
+    node.forEach((item, i) => {
+      entries.push(
+        ...getContentEntries(item, [...path, String(i)], [...labelParts, `[${i}]`])
+      );
+    });
+    return entries;
+  }
+  if (typeof node === "object") {
+    const entries: Array<{ path: string[]; label: string; value: string }> = [];
+    for (const [key, val] of Object.entries(node)) {
+      const humanKey = key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()).trim();
+      entries.push(...getContentEntries(val, [...path, key], [...labelParts, humanKey]));
+    }
+    return entries;
+  }
+  return [];
+}
+
+/** Deep set by path; returns new root (immutable update). Handles arrays by numeric path segments. */
+function deepSetByPath(root: unknown, path: string[], value: string): unknown {
+  if (path.length === 0) return value;
+  const [head, ...rest] = path;
+  if (rest.length === 0) {
+    if (typeof root === "object" && root !== null && !Array.isArray(root)) {
+      return { ...(root as Record<string, unknown>), [head]: value };
+    }
+    return { [head]: value };
+  }
+  const current = root as Record<string, unknown>;
+  const child = current[head];
+  const index = parseInt(head, 10);
+  const isArrayIndex = !Number.isNaN(index) && head === String(index);
+  let nextChild: unknown;
+  if (isArrayIndex && Array.isArray(child)) {
+    const arr = [...child];
+    if (rest.length === 1) {
+      arr[index] = value;
+    } else {
+      arr[index] = deepSetByPath(arr[index], rest, value) as string;
+    }
+    nextChild = arr;
+  } else {
+    nextChild = deepSetByPath(child ?? {}, rest, value);
+  }
+  if (typeof root === "object" && root !== null && !Array.isArray(root)) {
+    return { ...(root as Record<string, unknown>), [head]: nextChild };
+  }
+  return { [head]: nextChild };
+}
+
 export default function RegistryEditor() {
-  const [registry, setRegistry] = useState<StyleRegistry>(STYLE_REGISTRY);
+  const [registry, setRegistry] = useState<StyleRegistry>(() => {
+    try {
+      const raw = localStorage.getItem(STYLE_STORAGE_KEY);
+      if (raw) {
+        const overrides = JSON.parse(raw) as Partial<StyleRegistry>;
+        return { ...STYLE_REGISTRY, ...overrides } as StyleRegistry;
+      }
+    } catch (_) {}
+    return STYLE_REGISTRY;
+  });
+  const [content, setContent] = useState<Record<string, unknown>>(() => {
+    try {
+      const raw = localStorage.getItem(CONTENT_STORAGE_KEY);
+      if (raw) {
+        const overrides = JSON.parse(raw) as Record<string, unknown>;
+        const base = getDefaultContent();
+        return { ...base, ...overrides };
+      }
+    } catch (_) {}
+    return getDefaultContent();
+  });
+  const [contentModifiers, setContentModifiers] = useState<ContentModifiers>(() => {
+    try {
+      const raw = localStorage.getItem(CONTENT_MODIFIERS_STORAGE_KEY);
+      if (raw) return JSON.parse(raw) as ContentModifiers;
+    } catch (_) {}
+    return {};
+  });
   const [selectedTab, setSelectedTab] = useState("general");
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
+  /** When set, modal is in "pick color for content modifier" mode; right column shows matrix. */
+  const [contentColorPathKey, setContentColorPathKey] = useState<string | null>(null);
   const [tempColor, setTempColor] = useState("#000000");
   const [tempName, setTempName] = useState("");
   const [tempComment, setTempComment] = useState("");
@@ -144,6 +265,7 @@ export default function RegistryEditor() {
 
   // Handle color cell click
   const handleCellClick = useCallback((index: number) => {
+    setContentColorPathKey(null);
     const cell = registry.general.palette.cells[index];
     setSelectedColorIndex(index);
     setTempColor(cell.hex);
@@ -151,6 +273,26 @@ export default function RegistryEditor() {
     setTempComment(cell.comment || "");
     setColorPickerOpen(true);
   }, [registry.general.palette.cells]);
+
+  /** Open color modal for a content row's color modifier; right column will show matrix to pick from. */
+  const openContentColorModal = useCallback(
+    (pathKey: string) => {
+      const colorIndex = contentModifiers[pathKey]?.colorIndex ?? 0;
+      const cell = registry.general.palette.cells[colorIndex];
+      setContentColorPathKey(pathKey);
+      setSelectedColorIndex(colorIndex);
+      setTempColor(cell?.hex ?? "#000000");
+      setTempName(cell?.name ?? "");
+      setTempComment(cell?.comment ?? "");
+      setColorPickerOpen(true);
+    },
+    [contentModifiers, registry.general.palette.cells]
+  );
+
+  const handleColorModalOpenChange = useCallback((open: boolean) => {
+    if (!open) setContentColorPathKey(null);
+    setColorPickerOpen(open);
+  }, []);
 
   // Handle color change in picker
   const handleColorChange = useCallback((color: string) => {
@@ -198,6 +340,48 @@ export default function RegistryEditor() {
       current[path[path.length - 1]] = value;
       return newRegistry as StyleRegistry;
     });
+  }, []);
+
+  // Update content (APP_REGISTRY text) by path
+  const updateContent = useCallback((path: string[], value: string) => {
+    setContent((prev) => deepSetByPath(prev, path, value) as Record<string, unknown>);
+  }, []);
+
+  // Update a single content modifier (font/size/color) for a content path
+  const updateContentModifier = useCallback(
+    (pathKey: string, key: "fontFamily" | "fontSize" | "colorIndex", value: string | number) => {
+      setContentModifiers((prev) => ({
+        ...prev,
+        [pathKey]: {
+          ...prev[pathKey],
+          [key]: value,
+        },
+      }));
+    },
+    []
+  );
+
+  // Persist style, content, and content modifiers to localStorage
+  const handleSave = useCallback(() => {
+    try {
+      localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
+      localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
+      localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
+    } catch (e) {
+      console.error("Failed to save registry", e);
+    }
+  }, [registry, content, contentModifiers]);
+
+  // Reset to defaults
+  const handleReset = useCallback(() => {
+    setRegistry(STYLE_REGISTRY);
+    setContent(getDefaultContent());
+    setContentModifiers({});
+    try {
+      localStorage.removeItem(STYLE_STORAGE_KEY);
+      localStorage.removeItem(CONTENT_STORAGE_KEY);
+      localStorage.removeItem(CONTENT_MODIFIERS_STORAGE_KEY);
+    } catch (_) {}
   }, []);
 
   // Render palette select
@@ -481,14 +665,101 @@ export default function RegistryEditor() {
     return controls.length > 0 ? <div className="space-y-4">{controls}</div> : null;
   };
 
+  // Render content (text) controls for a section from APP_REGISTRY, with font/size/color modifiers per row
+  const renderContentControls = (sectionKey: string) => {
+    const sectionContent = content[sectionKey];
+    if (sectionContent === undefined) return null;
+    const entries = getContentEntries(sectionContent, [sectionKey], [SECTION_DISPLAY_NAMES[sectionKey] ?? sectionKey]);
+    if (entries.length === 0) return null;
+    const fontOptions = getFontOptions();
+    const paletteOptions = getPaletteOptions();
+    return (
+      <Card key={`${sectionKey}-content`}>
+        <CardHeader>
+          <CardTitle className="text-lg">Content (text)</CardTitle>
+          <p className="text-sm text-muted-foreground">All user-facing strings. Each row: text, font family, size, color.</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {entries.map(({ path, label, value }) => {
+            const pathKey = path.join(".");
+            const mod = contentModifiers[pathKey] ?? {};
+            const fontFamily = mod.fontFamily ?? registry.general.fonts[0]?.name ?? "";
+            const fontSize = mod.fontSize ?? "1rem";
+            const colorIndex = mod.colorIndex ?? 0;
+            return (
+              <div key={pathKey} className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">{label}</Label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    className="flex-1 min-w-[140px]"
+                    value={value}
+                    onChange={(e) => updateContent(path, e.target.value)}
+                    placeholder={label}
+                  />
+                  <Select
+                    value={fontFamily}
+                    onValueChange={(v) => updateContentModifier(pathKey, "fontFamily", v)}
+                  >
+                    <SelectTrigger className="w-[140px] shrink-0">
+                      <SelectValue placeholder="Font" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fontOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={fontSize}
+                    onValueChange={(v) => updateContentModifier(pathKey, "fontSize", v)}
+                  >
+                    <SelectTrigger className="w-[100px] shrink-0">
+                      <SelectValue placeholder="Size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FONT_SIZE_PRESETS.map((preset) => (
+                        <SelectItem key={preset} value={preset}>
+                          {preset}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <button
+                    type="button"
+                    onClick={() => openContentColorModal(pathKey)}
+                    className="shrink-0 inline-flex items-center justify-center min-w-[4rem] px-3 py-1.5 rounded-full text-sm font-medium border border-border focus:outline-none focus:ring-2 focus:ring-ring"
+                    style={{
+                      backgroundColor: registry.general.palette.cells[colorIndex]?.hex ?? "#000000",
+                      color: getContrastColor(registry.general.palette.cells[colorIndex]?.hex ?? "#000000"),
+                    }}
+                  >
+                    {colorIndex}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+    );
+  };
+
   // Render section tab
   const renderSectionTab = (sectionKey: string) => {
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="text-xl font-semibold mb-4">Controls</h2>
+          <h2 className="text-xl font-semibold mb-4">Style</h2>
           {renderSectionControls(sectionKey)}
         </div>
+        {content[sectionKey] !== undefined && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Content</h2>
+            {renderContentControls(sectionKey)}
+          </div>
+        )}
         <div>
           {renderSectionPreview(sectionKey)}
         </div>
@@ -500,13 +771,23 @@ export default function RegistryEditor() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto py-12 px-6 max-w-6xl">
-        <div className="mb-6">
-          <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-            Registry Editor
-          </h1>
-          <p className="text-muted-foreground">
-            Edit style and text variables for the entire application.
-          </p>
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-foreground mb-2">
+              Registry Editor
+            </h1>
+            <p className="text-muted-foreground">
+              Edit style and text variables for the entire application.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <Button variant="outline" onClick={handleReset}>
+              Reset
+            </Button>
+            <Button onClick={handleSave}>
+              Save
+            </Button>
+          </div>
         </div>
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col sm:flex-row gap-6">
@@ -703,45 +984,76 @@ export default function RegistryEditor() {
           </div>
         </Tabs>
 
-        {/* Color Picker Modal */}
-        <Dialog open={colorPickerOpen} onOpenChange={setColorPickerOpen}>
+        {/* Color Picker Modal (palette edit from General matrix, or pick color for content from pill) */}
+        <Dialog open={colorPickerOpen} onOpenChange={handleColorModalOpenChange}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Edit Color</DialogTitle>
+              <DialogTitle>{contentColorPathKey ? "Pick color for text" : "Edit Color"}</DialogTitle>
               <DialogDescription>
-                Edit color, name, and comment for palette index {selectedColorIndex}
+                {contentColorPathKey
+                  ? "Choose a palette color below or use the picker on the left for a specific color."
+                  : `Edit color, name, and comment for palette index ${selectedColorIndex}`}
               </DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-6 mt-4">
               <div>
                 <Label className="text-sm font-medium mb-2 block">Color Picker</Label>
                 <HexColorPicker color={tempColor} onChange={handleColorChange} />
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Hex Value</Label>
+                <div className="mt-2">
+                  <Label className="text-sm font-medium mb-1 block">Hex Value</Label>
                   <Input
                     value={tempColor}
                     onChange={(e) => handleColorChange(e.target.value)}
                   />
                 </div>
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Name</Label>
-                  <Input
-                    value={tempName}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder="Color name"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Comment</Label>
-                  <Input
-                    value={tempComment}
-                    onChange={(e) => handleCommentChange(e.target.value)}
-                    placeholder="Usage notes"
-                  />
-                </div>
               </div>
+              {contentColorPathKey ? (
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">General color matrix</Label>
+                  <p className="text-muted-foreground text-sm mb-2">Click a cell to use that color for this text.</p>
+                  <div className="grid grid-cols-4 gap-2 max-h-[280px] overflow-auto">
+                    {registry.general.palette.cells.map((cell, index) => {
+                      const contrastColor = getContrastColor(cell.hex);
+                      return (
+                        <button
+                          key={index}
+                          type="button"
+                          className="relative min-w-[4rem] min-h-[4rem] rounded-lg border-2 border-border hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                          style={{ backgroundColor: cell.hex }}
+                          onClick={() => {
+                            updateContentModifier(contentColorPathKey, "colorIndex", index);
+                            setColorPickerOpen(false);
+                            setContentColorPathKey(null);
+                          }}
+                        >
+                          <span className="absolute bottom-0.5 left-0.5 text-xs font-bold px-1 rounded" style={{ color: contrastColor }}>
+                            {index}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Name</Label>
+                    <Input
+                      value={tempName}
+                      onChange={(e) => handleNameChange(e.target.value)}
+                      placeholder="Color name"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Comment</Label>
+                    <Input
+                      value={tempComment}
+                      onChange={(e) => handleCommentChange(e.target.value)}
+                      placeholder="Usage notes"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>

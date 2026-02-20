@@ -31,21 +31,22 @@
 ### Phase 3 – RegistryEditor UI
 
 - [x] **3.1** Add **RegistryEditor** page route (e.g. `/admin/registry-editor`). Protect by **Supabase role**: only users with admin role can access; reject others (redirect or 403). Document how admin role is set (e.g. `profiles.role` or Supabase custom claim).
-- [ ] **3.2** Build **General** tab — **color palette as a matrix of squares**:
+- [x] **3.2** Build **General** tab — **color palette as a matrix of squares**:
   - **Matrix**: grid of cells, each cell large enough for readable text inside. Per cell display: **color name** (editable via modal), **hex color**, **comment** (editable via modal).
   - **Click a cell** → open **modal**. Left side: **full color picker** (hex/hsl). Right side: **notes** field (the comment shown in the square) and a **pool of tags** listing which elements use that color (e.g. “Hero background”, “Nav hover”, “Button primary”). Tags are derived from STYLE_VARIABLES_INVENTORY / registry (each style entry that references this palette index gets a tag). Name and comment editable in this modal.
   - Also in General tab: font import URL(s) and family names + display/body modifiers; global radius, shadow/gradient presets. Live preview “style tile” (heading, body, button, card) using palette and fonts.
-- [ ] **3.3** Build **section/page tabs**: one tab per major section (Nav, Hero, Why, Compatibility Test, How It Works, What You Receive, Past Editions, Experience, Testimonials, Pricing, FAQ, Final CTA, Footer) plus pages (Login, Register, Forgot/Reset Password, Dashboard, Checkout). Each tab lists the section’s style and text variables with:
+- [x] **3.3** Build **section/page tabs**: one tab per major section (Nav, Hero, Why, Compatibility Test, How It Works, What You Receive, Past Editions, Experience, Testimonials, Pricing, FAQ, Final CTA, Footer) plus pages (Login, Register, Forgot/Reset Password, Dashboard, Checkout). Each tab lists the section’s style and text variables with:
   - **Preview**: small iframe or isolated preview of that section (or a representative element) that updates as the user edits.
   - **Controls**: inputs per variable (text inputs for copy; number/select/color for style). Every stylized element must be editable (text size, color as palette index, font family; button fill, border, roundness; section background; **section’s divider**: style wavy/sawtooth/straight + properties; image path, size, border; etc.).
+  - **Text variables**: All user-facing text from **APP_REGISTRY** is editable per tab via **Content** controls (headings, labels, CTAs, links, descriptions, etc.).
 - [ ] **3.4** Implement **two-way sync**: editor reads from app-registry (or from a “live” store that initializes from registry); on change, update the in-memory store and persist to **localStorage** (see 4.1). Apply changes to the same runtime bridge used in Phase 2 so the rest of the app sees updates immediately (transparent integration).
 - [ ] **3.5** Add **Save / Reset**: “Save” persists current editor state to **localStorage**; “Reset” restores last saved or default registry. Optional “Export / Import” JSON for backup and restore.
 
 ### Phase 4 – Persistence & wiring
 
-- [ ] **4.1** **Persistence = localStorage** (for now). Key(s) for theme overrides (e.g. `app_registry_overrides` or `site_theme`). Implement read on app load and write on Save. Document key format and JSON shape. No backend table for theme in this phase.
-- [ ] **4.2** On app bootstrap: load saved overrides from localStorage (if any), merge with default registry, then apply to CSS vars (and any context). RegistryEditor reads and writes the same merged source.
-- [ ] **4.3** Ensure **text variables** remain editable in the same editor (existing APP_REGISTRY content). Either extend current registry with content in the same UI (tabs by section with text + style together) or keep content in app-registry and only add style tabs; requirement is “all style and text variables” so both must be editable in one place.
+- [x] **4.1** **Persistence = localStorage** (for now). Keys: `app_registry_style_overrides` (style), `app_registry_content_overrides` (text). RegistryEditor reads on mount and writes on **Save**; **Reset** restores defaults and clears stored overrides.
+- [ ] **4.2** On app bootstrap: load saved overrides from localStorage (if any), merge with default registry, then apply to CSS vars (and any context). RegistryEditor reads and writes the same merged source. _Note:_ Main app still reads APP_REGISTRY directly; wiring a context to provide merged content so the site reflects saved text is pending.
+- [x] **4.3** Ensure **text variables** remain editable in the same editor (existing APP_REGISTRY content). Either extend current registry with content in the same UI (tabs by section with text + style together) or keep content in app-registry and only add style tabs; requirement is “all style and text variables” so both must be editable in one place.
 
 ### Phase 5 – Testing & docs
 

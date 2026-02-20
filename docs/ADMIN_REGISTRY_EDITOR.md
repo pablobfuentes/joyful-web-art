@@ -3,6 +3,14 @@
 - **Route:** `/admin/registry-editor`
 - **Protection:** `AdminRoute` requires an authenticated user and `profiles.role = 'admin'`. If not signed in, you are sent to `/login`. If signed in but not admin, you see an **"Admin access required"** screen (with the reason: no profile row or role is not admin) and a link back to home—no silent redirect.
 
+## Editor features
+
+- **General tab:** Color palette (position-based matrix, click to edit hex/name/comment), fonts list (first = default, add/refresh from `public/fonts`), radius, shadows, gradients.
+- **Section tabs:** One tab per section/page (Nav, Hero, Why, How It Works, Pricing, FAQ, Login, etc.). Each tab has:
+  - **Style:** Section background, divider (style + top/bottom color), and section-specific style controls (e.g. hero heading font/size/color).
+  - **Content:** All user-facing text strings from `APP_REGISTRY` for that section. **Each row** shows: **text input** (the copy), **Font family** dropdown, **Font size** dropdown (preset rem values), and **Color** dropdown (palette index). Modifiers are stored per content path and persisted with **Save**.
+- **Save / Reset:** **Save** writes style overrides, content overrides, and content modifiers to `localStorage` (`app_registry_style_overrides`, `app_registry_content_overrides`, `app_registry_content_modifiers`). **Reset** restores defaults and clears stored overrides.
+
 ## How admin role is set
 
 Admin access is determined by the **Supabase `public.profiles`** table:
