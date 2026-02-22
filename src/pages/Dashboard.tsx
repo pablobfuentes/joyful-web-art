@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
-
-const data = APP_REGISTRY.dashboard;
 
 function formatDate(iso: string | undefined) {
   if (!iso) return "—";
@@ -24,6 +22,8 @@ function formatDate(iso: string | undefined) {
 }
 
 export default function Dashboard() {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("dashboard");
   const { user, signOut, updateProfile } = useAuth();
   const navigate = useNavigate();
   const name = user?.user_metadata?.full_name as string | undefined;

@@ -1,11 +1,11 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleSparkle, DoodleFlower, DoodleHeart } from "./Doodles";
 
-const data = APP_REGISTRY.faq;
-
 const FAQSection = () => {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("faq");
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });

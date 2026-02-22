@@ -4,7 +4,27 @@
  * See docs/STYLE_VARIABLES_INVENTORY.md for palette index → semantic var mapping.
  */
 
-import type { StyleRegistry } from "@/config/style-registry";
+import { STYLE_REGISTRY, type StyleRegistry } from "@/config/style-registry";
+
+/** localStorage key used by RegistryEditor for style overrides. */
+export const STYLE_STORAGE_KEY = "app_registry_style_overrides";
+
+/**
+ * Load saved style overrides from localStorage and merge with default STYLE_REGISTRY.
+ * Used at app bootstrap (main.tsx) so the site reflects saved theme without opening the editor.
+ */
+export function getMergedStyleRegistry(): StyleRegistry {
+  try {
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem(STYLE_STORAGE_KEY) : null;
+    if (raw) {
+      const overrides = JSON.parse(raw) as Partial<StyleRegistry>;
+      return { ...STYLE_REGISTRY, ...overrides } as StyleRegistry;
+    }
+  } catch (_) {
+    // ignore
+  }
+  return STYLE_REGISTRY;
+}
 
 /** Convert hex to HSL; return "H S% L%" for CSS var (Tailwind uses hsl(var(--x))). */
 function hexToHslString(hex: string): string {
@@ -137,14 +157,4 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
   root.style.setProperty("--nav-link-hover-text", getPaletteHsl(cells, nav.link.hoverTextIndex));
   root.style.setProperty("--nav-cta-radius", nav.cta.borderRadius);
 
-  if (registry.general.fonts.importUrl) {
-    let link = document.querySelector<HTMLLinkElement>('link[data-style-registry-fonts="true"]');
-    if (!link) {
-      link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.setAttribute("data-style-registry-fonts", "true");
-      document.head.appendChild(link);
-    }
-    link.href = registry.general.fonts.importUrl;
-  }
 }

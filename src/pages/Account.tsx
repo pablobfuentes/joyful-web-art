@@ -1,9 +1,9 @@
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import Navbar from "@/components/Navbar";
 
-const data = APP_REGISTRY.account;
-
 export default function Account() {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("account");
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

@@ -1,11 +1,11 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleStar, DoodleFlower, DoodleDroplet } from "./Doodles";
 
-const data = APP_REGISTRY.finalCta;
-
 const FinalCTASection = () => {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("finalCta");
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 

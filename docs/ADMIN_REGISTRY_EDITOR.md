@@ -149,3 +149,9 @@ CREATE POLICY "profiles_update_own"
 ```
 
 Then reload `http://localhost:8081/admin/registry-editor`. The app only needs **profiles_select_own** to fetch your row and see `role = 'admin'`. If the 500 goes away, the problem was one of the old policies (e.g. the self-referential admin policy). You can add **profiles_select_admin** back later if you need admin-only views that read other users’ profiles.
+
+---
+
+## Failsafe / registry-first rule
+
+To keep the editor and the app in sync, follow the **registry-first** rule: new variables go into the registry (and inventory) first; removed features get registry entries removed. Full details: **docs/REGISTRY_EDITOR_FAILSAFE.md** and **docs/PLAN_REGISTRY_EDITOR.md** §6.

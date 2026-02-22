@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import Navbar from "@/components/Navbar";
 
-const data = APP_REGISTRY.checkout;
-
 export default function CheckoutCancel() {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("checkout");
   const navigate = useNavigate();
 
   return (

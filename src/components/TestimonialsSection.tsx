@@ -1,14 +1,15 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleStar, DoodleHeart, DoodleSparkle } from "./Doodles";
 
-const data = APP_REGISTRY.testimonials;
 const bgClasses = ["bg-peach", "bg-lavender", "bg-mint"];
 const emojis = ["💖", "🌟", "✨"];
 const rotations = [-2, 3, -3];
 
 const TestimonialsSection = () => {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("testimonials");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 

@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useAuth } from "@/hooks/useAuth";
 
-const data = APP_REGISTRY.nav;
-
 const Navbar = () => {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("nav");
+  const dashboardData = getSectionContent("dashboard");
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const displayName =
@@ -69,7 +70,7 @@ const Navbar = () => {
                 onClick={handleLogOut}
                 className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
               >
-                {APP_REGISTRY.dashboard.logOut}
+                {dashboardData.logOut}
               </button>
             </>
           ) : (

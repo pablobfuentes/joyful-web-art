@@ -1,11 +1,11 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleFlower, DoodleStar } from "./Doodles";
 
-const data = APP_REGISTRY.compatibilityTest;
-
 const CompatibilityTestSection = () => {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("compatibilityTest");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<(boolean | null)[]>(data.questions.map(() => null));
   const [result, setResult] = useState<"dermatologist" | "goodfit" | null>(null);

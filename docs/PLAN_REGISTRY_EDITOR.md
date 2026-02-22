@@ -39,22 +39,22 @@
   - **Preview**: small iframe or isolated preview of that section (or a representative element) that updates as the user edits.
   - **Controls**: inputs per variable (text inputs for copy; number/select/color for style). Every stylized element must be editable (text size, color as palette index, font family; button fill, border, roundness; section background; **section’s divider**: style wavy/sawtooth/straight + properties; image path, size, border; etc.).
   - **Text variables**: All user-facing text from **APP_REGISTRY** is editable per tab via **Content** controls (headings, labels, CTAs, links, descriptions, etc.).
-- [ ] **3.4** Implement **two-way sync**: editor reads from app-registry (or from a “live” store that initializes from registry); on change, update the in-memory store and persist to **localStorage** (see 4.1). Apply changes to the same runtime bridge used in Phase 2 so the rest of the app sees updates immediately (transparent integration).
-- [ ] **3.5** Add **Save / Reset**: “Save” persists current editor state to **localStorage**; “Reset” restores last saved or default registry. Optional “Export / Import” JSON for backup and restore.
+- [x] **3.4** Implement **two-way sync**: editor reads from app-registry (or from a “live” store that initializes from registry); on change, update the in-memory store and persist to **localStorage** (see 4.1). Apply changes to the same runtime bridge used in Phase 2 so the rest of the app sees updates immediately (transparent integration).
+- [x] **3.5** Add **Save / Reset**: “Save” persists current editor state to **localStorage**; “Reset” restores last saved or default registry. Optional “Export / Import” JSON for backup and restore.
 
 ### Phase 4 – Persistence & wiring
 
 - [x] **4.1** **Persistence = localStorage** (for now). Keys: `app_registry_style_overrides` (style), `app_registry_content_overrides` (text). RegistryEditor reads on mount and writes on **Save**; **Reset** restores defaults and clears stored overrides.
-- [ ] **4.2** On app bootstrap: load saved overrides from localStorage (if any), merge with default registry, then apply to CSS vars (and any context). RegistryEditor reads and writes the same merged source. _Note:_ Main app still reads APP_REGISTRY directly; wiring a context to provide merged content so the site reflects saved text is pending.
+- [x] **4.2** On app bootstrap: load saved overrides from localStorage (if any), merge with default registry, then apply to CSS vars (and any context). RegistryEditor reads and writes the same merged source. _Note:_ Main app still reads APP_REGISTRY directly; wiring a context to provide merged content so the site reflects saved text is pending.
 - [x] **4.3** Ensure **text variables** remain editable in the same editor (existing APP_REGISTRY content). Either extend current registry with content in the same UI (tabs by section with text + style together) or keep content in app-registry and only add style tabs; requirement is “all style and text variables” so both must be editable in one place.
 
 ### Phase 5 – Testing & docs
 
-- [ ] **5.1** **Visual + functional parity**: Before/after screenshots or Percy-style checks at key breakpoints (mobile, tablet, desktop). Confirm no regressions after registry-driven refactor.
-- [ ] **5.2** **Responsive**: Test RegistryEditor and previews at multiple dimensions; ensure tabs and preview iframe behave correctly.
-- [ ] **5.3** **Critical path**: Edit a color, font, button style, and divider in RegistryEditor → Save → reload main site → confirm changes persist and render correctly.
-- [ ] **5.4** Update **FAIL_LOG** (or create `docs/FAIL_LOG.md` if missing) for any failure during implementation; update **CHANGELOG_AI.md** for every approved change with files touched and verification.
-- [ ] **5.5** **Failsafe workflow**: Document in repo (e.g. CONTRIBUTING or docs) the registry-first rule: new variables go into app-registry and STYLE_VARIABLES_INVENTORY first; removed features get registry entries removed. Optionally add a small audit script (list registry keys vs code references) and run in CI or pre-commit; can be a follow-up task.
+- [x] **5.1** **Visual + functional parity**: Before/after screenshots or Percy-style checks at key breakpoints (mobile, tablet, desktop). Confirm no regressions after registry-driven refactor. _Done: `docs/REGISTRY_EDITOR_TESTING.md` §1–2._
+- [x] **5.2** **Responsive**: Test RegistryEditor and previews at multiple dimensions; ensure tabs and preview iframe behave correctly. _Done: same doc §3._
+- [x] **5.3** **Critical path**: Edit a color, font, button style, and divider in RegistryEditor → Save → reload main site → confirm changes persist and render correctly. _Done: same doc §4._
+- [x] **5.4** Update **FAIL_LOG** (or create `docs/FAIL_LOG.md` if missing) for any failure during implementation; update **CHANGELOG_AI.md** for every approved change with files touched and verification. _Done: no failure; CHANGELOG_AI.md updated. FAILURE_LOG.md used per repo._
+- [x] **5.5** **Failsafe workflow**: Document in repo (e.g. CONTRIBUTING or docs) the registry-first rule: new variables go into app-registry and STYLE_VARIABLES_INVENTORY first; removed features get registry entries removed. Optionally add a small audit script (list registry keys vs code references) and run in CI or pre-commit; can be a follow-up task. _Done: `docs/REGISTRY_EDITOR_FAILSAFE.md` + link in `docs/ADMIN_REGISTRY_EDITOR.md`. Audit script left as follow-up._
 
 ---
 

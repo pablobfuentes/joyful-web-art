@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import ProblemSection from "@/components/ProblemSection";
@@ -12,7 +13,9 @@ import FAQSection from "@/components/FAQSection";
 import FinalCTASection from "@/components/FinalCTASection";
 import FooterSection from "@/components/FooterSection";
 import WaveDivider from "@/components/WaveDivider";
-import { STYLE_REGISTRY } from "@/config/style-registry";
+import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { applyStyleRegistry, getMergedStyleRegistry } from "@/lib/apply-style-registry";
 
 const DIVIDER_VARIANT_MAP: Record<string, "wave1" | "wave2" | "blob" | "zigzag"> = {
   wavy: "wave1",
@@ -22,17 +25,26 @@ const DIVIDER_VARIANT_MAP: Record<string, "wave1" | "wave2" | "blob" | "zigzag">
 };
 
 const Index = () => {
-  const heroDiv = STYLE_REGISTRY.hero.divider!;
-  const whyDiv = STYLE_REGISTRY.why.divider!;
-  const howDiv = STYLE_REGISTRY.howItWorks.divider!;
-  const compatDiv = STYLE_REGISTRY.compatibilityTest.divider!;
-  const whatDiv = STYLE_REGISTRY.whatYouReceive.divider!;
-  const pastDiv = STYLE_REGISTRY.pastEditions.divider!;
-  const expDiv = STYLE_REGISTRY.experience.divider!;
-  const testDiv = STYLE_REGISTRY.testimonials.divider!;
-  const priceDiv = STYLE_REGISTRY.pricing.divider!;
-  const faqDiv = STYLE_REGISTRY.faq.divider!;
-  const finalDiv = STYLE_REGISTRY.finalCta.divider!;
+  const { registry, refreshStyleRegistry } = useStyleRegistry();
+  const { refresh } = useRegistryContent();
+
+  useEffect(() => {
+    applyStyleRegistry(getMergedStyleRegistry());
+    refresh();
+    refreshStyleRegistry();
+  }, [refresh, refreshStyleRegistry]);
+
+  const heroDiv = registry.hero.divider!;
+  const whyDiv = registry.why.divider!;
+  const howDiv = registry.howItWorks.divider!;
+  const compatDiv = registry.compatibilityTest.divider!;
+  const whatDiv = registry.whatYouReceive.divider!;
+  const pastDiv = registry.pastEditions.divider!;
+  const expDiv = registry.experience.divider!;
+  const testDiv = registry.testimonials.divider!;
+  const priceDiv = registry.pricing.divider!;
+  const faqDiv = registry.faq.divider!;
+  const finalDiv = registry.finalCta.divider!;
 
   return (
     <div className="min-h-screen bg-background">

@@ -1,14 +1,15 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleDroplet, DoodleLeaf, DoodleFlower, DoodleSparkle } from "./Doodles";
 
-const data = APP_REGISTRY.whatYouReceive;
 const bgClasses = ["bg-peach", "bg-lavender", "bg-mint", "bg-sunshine", "bg-bubblegum"];
 const emojis = ["🧴", "💧", "🛡️", "☀️", "🌸"];
 const rotations = [-3, 2, -2, 3, -1];
 
 const WhatYouReceiveSection = () => {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("whatYouReceive");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 

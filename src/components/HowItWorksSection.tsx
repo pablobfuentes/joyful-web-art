@@ -4,24 +4,28 @@ import step1 from "@/assets/step-1.jpg";
 import step2 from "@/assets/step-2.jpg";
 import step3 from "@/assets/step-3.jpg";
 import step4 from "@/assets/step-4.jpg";
+import { resolveRegistryImageSrc } from "@/lib/registry-images";
 import { FloatingDoodle, DoodleFlower, DoodleLeaf, DoodleStar, DoodleDroplet } from "./Doodles";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 
-const data = APP_REGISTRY.howItWorks;
-const stepImages = [
-  { image: step1, emoji: "📱", bgClass: "bg-peach" },
-  { image: step2, emoji: "🎁", bgClass: "bg-lavender" },
-  { image: step3, emoji: "🚪", bgClass: "bg-mint" },
-  { image: step4, emoji: "✨", bgClass: "bg-sunshine" },
+const FALLBACK_STEP_IMAGES = [step1, step2, step3, step4];
+const STEP_META = [
+  { emoji: "📱", bgClass: "bg-peach" },
+  { emoji: "🎁", bgClass: "bg-lavender" },
+  { emoji: "🚪", bgClass: "bg-mint" },
+  { emoji: "✨", bgClass: "bg-sunshine" },
 ];
 
 const StepCard = ({
   step,
+  imageSrc,
   style,
   index,
 }: {
-  step: (typeof data.steps)[number];
-  style: (typeof stepImages)[0];
+  step: { label: string; title: string; description: string };
+  imageSrc: string;
+  style: (typeof STEP_META)[0];
   index: number;
 }) => {
   const ref = useRef(null);
@@ -47,7 +51,7 @@ const StepCard = ({
           <div className={`w-64 h-64 md:w-72 md:h-72 rounded-full ${style.bgClass} relative overflow-visible shadow-playful`}>
             <div className="absolute inset-[-12px] rounded-full overflow-hidden">
               <img
-                src={style.image}
+                src={imageSrc}
                 alt={step.title}
                 className="w-full h-full object-cover"
               />
@@ -83,10 +87,18 @@ const StepCard = ({
 };
 
 const HowItWorksSection = () => {
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
+  const { registry } = useStyleRegistry();
+  const data = getSectionContent("howItWorks");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-100px" });
   const ctaRef = useRef(null);
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
+
+  const stepStyles = STEP_META.map((meta, i) => ({
+    ...meta,
+    imageSrc: resolveRegistryImageSrc(registry.howItWorks?.images?.[i]?.path, FALLBACK_STEP_IMAGES[i]),
+  }));
 
   return (
     <section id="how-it-works" className="relative py-24 px-6 bg-[hsl(var(--howItWorks-section-bg))] overflow-hidden">
@@ -115,7 +127,7 @@ const HowItWorksSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-8">
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-8" style={getStyleForPath("howItWorks.title")}>
             {data.title}
           </h2>
           <motion.a
@@ -123,6 +135,7 @@ const HowItWorksSection = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
             className="inline-block gradient-warm px-6 py-3 rounded-full text-sm font-bold text-primary-foreground shadow-playful"
+            style={getStyleForPath("howItWorks.ctaButton")}
           >
             {data.ctaButton.label}
           </motion.a>
@@ -130,7 +143,7 @@ const HowItWorksSection = () => {
 
         <div className="space-y-20 max-w-4xl mx-auto">
           {data.steps.map((step, index) => (
-            <StepCard key={step.label} step={step} style={stepImages[index]} index={index} />
+            <StepCard key={step.label} step={step} imageSrc={stepStyles[index].imageSrc} style={STEP_META[index]} index={index} />
           ))}
         </div>
 

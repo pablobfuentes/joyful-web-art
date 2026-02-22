@@ -1,10 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleFlower, DoodleStar, DoodleSparkle } from "./Doodles";
-
-const data = APP_REGISTRY.pricing;
 
 const accentBg: Record<string, string> = {
   lavender: "bg-lavender",
@@ -19,6 +17,8 @@ const accentBorder: Record<string, string> = {
 };
 
 const PricingSection = () => {
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
+  const data = getSectionContent("pricing");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
   const navigate = useNavigate();
@@ -51,14 +51,17 @@ const PricingSection = () => {
             className="inline-block bg-sunshine px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
             animate={{ rotate: [2, -2, 2] }}
             transition={{ duration: 3, repeat: Infinity }}
+            style={getStyleForPath("pricing.subtitle", "--foreground")}
           >
             💰 {data.subtitle}
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">{data.title}</h2>
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("pricing.title", "--foreground")}>
+            {data.title}
+          </h2>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {data.plans.map((plan, index) => {
+          {(Array.isArray(data.plans) ? data.plans : []).map((plan, index) => {
             const isPopular = !!plan.badge && plan.accentColor === "peach";
             return (
               <motion.div
@@ -76,6 +79,7 @@ const PricingSection = () => {
                     className="absolute -top-4 left-1/2 -translate-x-1/2 bg-sunshine px-4 py-1 rounded-full text-sm font-bold text-foreground shadow-playful whitespace-nowrap z-10"
                     animate={{ y: [0, -4, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
+                    style={getStyleForPath(`pricing.plans.${index}.badge`, "--foreground")}
                   >
                     {plan.badge}
                   </motion.span>
@@ -91,8 +95,12 @@ const PricingSection = () => {
                 </motion.span>
 
                 {/* Plan name */}
-                <h3 className="font-display text-xl font-bold mb-2 mt-2">{plan.name}</h3>
-                <p className="text-muted-foreground text-sm mb-6">{plan.description}</p>
+                <h3 className="font-display text-xl font-bold mb-2 mt-2" style={getStyleForPath(`pricing.plans.${index}.name`, "--foreground")}>
+                  {plan.name}
+                </h3>
+                <p className="text-muted-foreground text-sm mb-6" style={getStyleForPath(`pricing.plans.${index}.description`, "--muted-foreground")}>
+                  {plan.description}
+                </p>
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-6">
@@ -102,10 +110,13 @@ const PricingSection = () => {
                     whileInView={{ scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ type: "spring", stiffness: 200 }}
+                    style={getStyleForPath(`pricing.plans.${index}.priceAmount`)}
                   >
                     {plan.priceAmount}
                   </motion.span>
-                  <span className="text-lg text-muted-foreground font-bold">{plan.pricePeriod}</span>
+                  <span className="text-lg text-muted-foreground font-bold" style={getStyleForPath(`pricing.plans.${index}.pricePeriod`, "--muted-foreground")}>
+                    {plan.pricePeriod}
+                  </span>
                 </div>
 
                 {/* Features */}
@@ -118,6 +129,7 @@ const PricingSection = () => {
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1 + i * 0.08 }}
                       className="flex items-center gap-3 text-foreground"
+                      style={getStyleForPath(`pricing.plans.${index}.features.${i}`, "--foreground")}
                     >
                       <span className={`w-7 h-7 ${accentBg[plan.accentColor]} rounded-full flex items-center justify-center text-sm font-bold shadow-playful shrink-0`}>
                         ✓
@@ -133,6 +145,7 @@ const PricingSection = () => {
                   whileHover={{ scale: 1.06, rotate: -1 }}
                   whileTap={{ scale: 0.95 }}
                   className={`w-full text-center py-4 rounded-full text-lg font-bold shadow-playful hover:shadow-card-hover transition-shadow ${isPopular ? "gradient-warm text-primary-foreground" : `${accentBg[plan.accentColor]} text-foreground border-2 ${accentBorder[plan.accentColor]}`}`}
+                  style={getStyleForPath(`pricing.plans.${index}.ctaButton`)}
                 >
                   {plan.ctaButton} ✨
                 </motion.button>
@@ -148,11 +161,11 @@ const PricingSection = () => {
           viewport={{ once: true }}
           className="flex flex-wrap gap-6 justify-center text-sm mt-12"
         >
-          <span className="bg-mint px-4 py-2 rounded-full font-bold shadow-playful">
-            {data.shippingLabel}: {data.shippingValue} 🚚
+          <span className="bg-mint px-4 py-2 rounded-full font-bold shadow-playful" style={getStyleForPath("pricing.shippingLabel", "--foreground")}>
+            {data.shippingLabel}: <span style={getStyleForPath("pricing.shippingValue", "--foreground")}>{data.shippingValue}</span> 🚚
           </span>
-          <span className="bg-lavender px-4 py-2 rounded-full font-bold shadow-playful">
-            {data.commitmentLabel}: {data.commitmentValue} 🎉
+          <span className="bg-lavender px-4 py-2 rounded-full font-bold shadow-playful" style={getStyleForPath("pricing.commitmentLabel", "--foreground")}>
+            {data.commitmentLabel}: <span style={getStyleForPath("pricing.commitmentValue", "--foreground")}>{data.commitmentValue}</span> 🎉
           </span>
         </motion.div>
       </div>

@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import Navbar from "@/components/Navbar";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleStar } from "@/components/Doodles";
 import { useAuth } from "@/contexts/AuthContext";
 import { createCheckoutSession } from "@/lib/checkout";
-
-const data = APP_REGISTRY.checkout;
-const plans = APP_REGISTRY.pricing.plans;
 
 const accentBg: Record<string, string> = {
   lavender: "bg-lavender",
@@ -17,6 +14,9 @@ const accentBg: Record<string, string> = {
 };
 
 export default function Checkout() {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("checkout");
+  const plans = getSectionContent("pricing").plans;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();

@@ -1,20 +1,27 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-skincare.jpg";
+import { resolveRegistryImageSrc } from "@/lib/registry-images";
 import { FloatingDoodle, DoodleDroplet, DoodleSparkle, DoodleHeart, DoodleFlower, DoodleLeaf, DoodleStar } from "./Doodles";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 
-const data = APP_REGISTRY.hero;
 const ROTATE_INTERVAL_MS = 3000;
 
 const HeroSection = () => {
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
+  const { registry } = useStyleRegistry();
+  const data = getSectionContent("hero");
   const [quoteIndex, setQuoteIndex] = useState(0);
+  const heroImagePath = registry.hero?.image?.path;
+  const heroSrc = resolveRegistryImageSrc(heroImagePath, heroImage);
+
   useEffect(() => {
     const id = setInterval(() => {
       setQuoteIndex((i) => (i + 1) % data.rotatingQuotes.length);
     }, ROTATE_INTERVAL_MS);
     return () => clearInterval(id);
-  }, []);
+  }, [data.rotatingQuotes.length]);
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-28">
@@ -60,7 +67,8 @@ const HeroSection = () => {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4 }}
-              className="font-display italic text-lg mb-3 text-[hsl(var(--hero-quote-color))]"
+              className="font-display italic text-lg mb-3"
+              style={getStyleForPath(`hero.rotatingQuotes.${quoteIndex}`, "--hero-quote-color")}
             >
               "{data.rotatingQuotes[quoteIndex]}"
             </motion.p>
@@ -69,7 +77,8 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.7 }}
-              className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6 text-[hsl(var(--hero-heading-color))]"
+              className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6"
+              style={getStyleForPath("hero.heading", "--hero-heading-color")}
             >
               {data.heading}
             </motion.h1>
@@ -78,7 +87,8 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.6 }}
-              className="text-lg mb-8 max-w-lg text-[hsl(var(--hero-description-color))]"
+              className="text-lg mb-8 max-w-lg"
+              style={getStyleForPath("hero.description", "--hero-description-color")}
             >
               {data.description}
             </motion.p>
@@ -111,7 +121,8 @@ const HeroSection = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2, duration: 0.6 }}
-              className="text-sm text-[hsl(var(--hero-footer-color))]"
+              className="text-sm"
+              style={getStyleForPath("hero.footer", "--hero-footer-color")}
             >
               {data.footer}
             </motion.div>
@@ -134,7 +145,7 @@ const HeroSection = () => {
               }}
             >
               <img
-                src={heroImage}
+                src={heroSrc}
                 alt="Productos de skincare coreano KumiBox"
                 className="w-full object-cover h-[var(--hero-image-height)] md:h-[520px]"
               />

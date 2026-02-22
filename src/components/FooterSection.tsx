@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { DoodleHeart, DoodleSparkle } from "./Doodles";
 
-const data = APP_REGISTRY.footer;
-
 const FooterSection = () => {
+  const { getSectionContent } = useRegistryContent();
+  const data = getSectionContent("footer");
   return (
     <footer className="relative bg-[hsl(var(--footer-section-bg))] py-16 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-20" />

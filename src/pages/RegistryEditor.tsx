@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import Navbar from "@/components/Navbar";
 import { STYLE_REGISTRY, type StyleRegistry, type PaletteCell } from "@/config/style-registry";
+import { applyStyleRegistry, STYLE_STORAGE_KEY } from "@/lib/apply-style-registry";
 import { APP_REGISTRY } from "@/config/app-registry";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 // Section display names
 const SECTION_DISPLAY_NAMES: Record<string, string> = {
@@ -48,7 +50,6 @@ const DIVIDER_STYLE_OPTIONS = [
   { value: "blob", label: "Blob" },
 ];
 
-const STYLE_STORAGE_KEY = "app_registry_style_overrides";
 const CONTENT_STORAGE_KEY = "app_registry_content_overrides";
 const CONTENT_MODIFIERS_STORAGE_KEY = "app_registry_content_modifiers";
 
@@ -73,6 +74,52 @@ const FONT_SIZE_PRESETS = [
 /** Deep-clone for mutable content state from APP_REGISTRY. */
 function getDefaultContent(): Record<string, unknown> {
   return JSON.parse(JSON.stringify(APP_REGISTRY)) as Record<string, unknown>;
+}
+
+/** Deep merge over onto base so sparse overrides (e.g. plans.0.name) apply; same logic as RegistryContentContext. */
+function deepMergeSection(base: unknown, over: unknown): unknown {
+  if (over == null || over === undefined) return base;
+  if (Array.isArray(base) && typeof over === "object" && over !== null && !Array.isArray(over)) {
+    const o = over as Record<string, unknown>;
+    return (base as unknown[]).map((item, i) =>
+      deepMergeSection(item, o[i] ?? o[String(i)])
+    );
+  }
+  if (
+    typeof base === "object" &&
+    base !== null &&
+    !Array.isArray(base) &&
+    typeof over === "object" &&
+    over !== null &&
+    !Array.isArray(over)
+  ) {
+    const b = base as Record<string, unknown>;
+    const o = over as Record<string, unknown>;
+    const merged = { ...b };
+    for (const [k, v] of Object.entries(o)) {
+      if (v === undefined) continue;
+      const baseVal = b[k];
+      if (Array.isArray(baseVal) && !Array.isArray(v)) {
+        merged[k] = (baseVal as unknown[]).map((item, i) =>
+          deepMergeSection(item, (v as Record<string, unknown>)[i] ?? (v as Record<string, unknown>)[String(i)])
+        );
+        continue;
+      }
+      merged[k] = deepMergeSection(baseVal, v) as unknown;
+    }
+    return merged;
+  }
+  return over !== undefined ? over : base;
+}
+
+function getMergedSectionContent(
+  sectionKey: string,
+  contentOverrides: Record<string, unknown>
+): Record<string, unknown> {
+  const base = (APP_REGISTRY as Record<string, unknown>)[sectionKey];
+  const over = contentOverrides[sectionKey];
+  const merged = deepMergeSection(base, over);
+  return (merged && typeof merged === "object" && !Array.isArray(merged) ? merged : {}) as Record<string, unknown>;
 }
 
 /** Walk content tree and collect all string leaves as { path, label, value }. */
@@ -212,6 +259,11 @@ export default function RegistryEditor() {
   useEffect(() => {
     scanAvailableFonts();
   }, []);
+
+  // Two-way sync (plan 3.4): apply current registry to DOM so the rest of the app sees updates immediately
+  useEffect(() => {
+    applyStyleRegistry(registry);
+  }, [registry]);
 
   // Helper: Get palette options for selects
   const getPaletteOptions = useCallback(() => {
@@ -367,8 +419,10 @@ export default function RegistryEditor() {
       localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
       localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
       localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
+      toast.success("Saved. Style changes apply site-wide. Refresh the home page if it’s open in another tab.");
     } catch (e) {
       console.error("Failed to save registry", e);
+      toast.error("Failed to save.");
     }
   }, [registry, content, contentModifiers]);
 
@@ -425,6 +479,54 @@ export default function RegistryEditor() {
           onChange={(e) => updateSection(path, e.target.value)}
           placeholder={placeholder}
         />
+      </div>
+    );
+  };
+
+  // Render image path with file picker (pick from /public or type path)
+  const renderImagePathInput = (
+    label: string,
+    value: string,
+    onValueChange: (path: string) => void,
+    placeholder: string,
+    inputId?: string
+  ) => {
+    const id = inputId ?? `img-path-${label.replace(/\s/g, "-")}`;
+    return (
+      <div>
+        <Label className="text-sm font-medium text-foreground mb-2 block">{label}</Label>
+        <div className="flex gap-2">
+          <Input
+            id={id}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                onValueChange(file.name);
+                e.target.value = "";
+              }
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => document.getElementById(id)?.click()}
+          >
+            Browse…
+          </Button>
+          <Input
+            className="flex-1"
+            value={value}
+            onChange={(e) => onValueChange(e.target.value)}
+            placeholder={placeholder}
+          />
+        </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          Browse to pick a file (use filename in /public) or type path e.g. hero-skincare.jpg
+        </p>
       </div>
     );
   };
@@ -612,10 +714,129 @@ export default function RegistryEditor() {
           </Card>
         );
       }
+      const image = sectionData.image as Record<string, unknown> | undefined;
+      if (image) {
+        controls.push(
+          <Card key="hero-image">
+            <CardHeader>
+              <CardTitle className="text-lg">Hero Image</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {renderImagePathInput(
+                "Image path",
+                (image.path as string) || "",
+                (path) => updateSection([sectionKey, "image", "path"], path),
+                "e.g. hero-skincare.jpg",
+                "hero-image-path"
+              )}
+              {renderTextInput("Height", [sectionKey, "image", "height"], (image.height as string) || "")}
+              {renderTextInput("Border radius", [sectionKey, "image", "borderRadius"], (image.borderRadius as string) || "")}
+              {renderPaletteSelect("Border color", [sectionKey, "image", "borderColorIndex"], (image.borderColorIndex as number) ?? 0)}
+              <div key="hero-image-borderWidth">
+                <Label className="text-sm font-medium text-foreground mb-2 block">Border width (px)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={(image.borderWidth as number) ?? 0}
+                  onChange={(e) => updateSection([sectionKey, "image", "borderWidth"], parseInt(e.target.value, 10) || 0)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        );
+      }
       if (sectionData.divider) {
         controls.push(renderDividerControls(sectionKey, sectionData.divider as Record<string, unknown>));
       }
-    } else if (sectionKey === "why" || sectionKey === "howItWorks" || sectionKey === "compatibilityTest" || sectionKey === "pricing" || sectionKey === "finalCta" || sectionKey === "faq" || sectionKey === "whatYouReceive" || sectionKey === "pastEditions" || sectionKey === "experience" || sectionKey === "testimonials") {
+    } else if (sectionKey === "why") {
+      const section = sectionData.section as Record<string, unknown> | undefined;
+      if (section && typeof section.backgroundIndex === "number") {
+        controls.push(
+          <Card key={`${sectionKey}-section`}>
+            <CardHeader>
+              <CardTitle className="text-lg">Section</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {renderPaletteSelect("Background", [sectionKey, "section", "backgroundIndex"], section.backgroundIndex)}
+            </CardContent>
+          </Card>
+        );
+      }
+      const images = sectionData.images as Array<{ path?: string }> | undefined;
+      if (images?.length) {
+        controls.push(
+          <Card key="why-images">
+            <CardHeader>
+              <CardTitle className="text-lg">Why / Problem images</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {images.map((img, i) => (
+                <div key={`why-img-${i}`}>
+                  {renderImagePathInput(
+                    `Image ${i + 1} path`,
+                    (img.path as string) ?? "",
+                    (path) => {
+                      const next = [...images];
+                      next[i] = { ...next[i], path };
+                      setRegistry((prev) => ({ ...prev, why: { ...prev.why, images: next } } as StyleRegistry));
+                    },
+                    "e.g. problem-1.jpg",
+                    `why-image-${i}`
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        );
+      }
+      if (sectionData.divider) {
+        controls.push(renderDividerControls(sectionKey, sectionData.divider as Record<string, unknown>));
+      }
+    } else if (sectionKey === "howItWorks") {
+      const section = sectionData.section as Record<string, unknown> | undefined;
+      if (section && typeof section.backgroundIndex === "number") {
+        controls.push(
+          <Card key={`${sectionKey}-section`}>
+            <CardHeader>
+              <CardTitle className="text-lg">Section</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {renderPaletteSelect("Background", [sectionKey, "section", "backgroundIndex"], section.backgroundIndex)}
+            </CardContent>
+          </Card>
+        );
+      }
+      const images = sectionData.images as Array<{ path?: string }> | undefined;
+      if (images?.length) {
+        controls.push(
+          <Card key="howItWorks-images">
+            <CardHeader>
+              <CardTitle className="text-lg">How it works step images</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {images.map((img, i) => (
+                <div key={`how-img-${i}`}>
+                  {renderImagePathInput(
+                    `Step ${i + 1} image path`,
+                    (img.path as string) ?? "",
+                    (path) => {
+                      const next = [...images];
+                      next[i] = { ...next[i], path };
+                      setRegistry((prev) => ({ ...prev, howItWorks: { ...prev.howItWorks, images: next } } as StyleRegistry));
+                    },
+                    "e.g. step-1.jpg",
+                    `how-image-${i}`
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        );
+      }
+      if (sectionData.divider) {
+        controls.push(renderDividerControls(sectionKey, sectionData.divider as Record<string, unknown>));
+      }
+    } else if (sectionKey === "compatibilityTest" || sectionKey === "pricing" || sectionKey === "finalCta" || sectionKey === "faq" || sectionKey === "whatYouReceive" || sectionKey === "pastEditions" || sectionKey === "experience" || sectionKey === "testimonials") {
       const section = sectionData.section as Record<string, unknown> | undefined;
       if (section && typeof section.backgroundIndex === "number") {
         controls.push(
@@ -665,10 +886,10 @@ export default function RegistryEditor() {
     return controls.length > 0 ? <div className="space-y-4">{controls}</div> : null;
   };
 
-  // Render content (text) controls for a section from APP_REGISTRY, with font/size/color modifiers per row
+  // Render content (text) controls for a section: merged base (APP_REGISTRY) + overrides so all variables (e.g. all 3 pricing plans) appear
   const renderContentControls = (sectionKey: string) => {
-    const sectionContent = content[sectionKey];
-    if (sectionContent === undefined) return null;
+    const sectionContent = getMergedSectionContent(sectionKey, content);
+    if (!sectionContent || typeof sectionContent !== "object" || Array.isArray(sectionContent)) return null;
     const entries = getContentEntries(sectionContent, [sectionKey], [SECTION_DISPLAY_NAMES[sectionKey] ?? sectionKey]);
     if (entries.length === 0) return null;
     const fontOptions = getFontOptions();
@@ -754,7 +975,7 @@ export default function RegistryEditor() {
           <h2 className="text-xl font-semibold mb-4">Style</h2>
           {renderSectionControls(sectionKey)}
         </div>
-        {content[sectionKey] !== undefined && (
+        {(APP_REGISTRY as Record<string, unknown>)[sectionKey] !== undefined && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Content</h2>
             {renderContentControls(sectionKey)}
@@ -770,7 +991,8 @@ export default function RegistryEditor() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto py-12 px-6 max-w-6xl">
+      {/* Spacer so content (including Save/Reset) is not hidden under fixed navbar */}
+      <main className="container mx-auto pt-24 pb-12 px-6 max-w-6xl">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">

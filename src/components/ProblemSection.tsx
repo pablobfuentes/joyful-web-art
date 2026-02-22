@@ -3,23 +3,27 @@ import { useRef } from "react";
 import problem1 from "@/assets/problem-1.jpg";
 import problem2 from "@/assets/problem-2.jpg";
 import problem3 from "@/assets/problem-3.jpg";
+import { resolveRegistryImageSrc } from "@/lib/registry-images";
 import { FloatingDoodle, DoodleDroplet, DoodleSparkle, DoodleHeart } from "./Doodles";
-import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 
-const data = APP_REGISTRY.why;
-const cardStyle = [
-  { image: problem1, emoji: "😵‍💫", bgClass: "bg-peach", accentColor: "text-primary" },
-  { image: problem2, emoji: "💸", bgClass: "bg-lavender", accentColor: "text-secondary" },
-  { image: problem3, emoji: "😴", bgClass: "bg-mint", accentColor: "text-accent" },
+const FALLBACK_IMAGES = [problem1, problem2, problem3];
+const CARD_META = [
+  { emoji: "😵‍💫", bgClass: "bg-peach", accentColor: "text-primary" },
+  { emoji: "💸", bgClass: "bg-lavender", accentColor: "text-secondary" },
+  { emoji: "😴", bgClass: "bg-mint", accentColor: "text-accent" },
 ];
 
 const ProblemCard = ({
   card,
+  imageSrc,
   style,
   index,
 }: {
-  card: (typeof data.cards)[number];
-  style: (typeof cardStyle)[0];
+  card: { beforeText: string; frictionText: string; costText: string };
+  imageSrc: string;
+  style: (typeof CARD_META)[0];
   index: number;
 }) => {
   const ref = useRef(null);
@@ -38,7 +42,7 @@ const ProblemCard = ({
       <div className={`${style.bgClass} rounded-3xl overflow-hidden shadow-playful border-2 border-background transition-shadow duration-500 hover:shadow-card-hover`}>
         <div className="relative h-52 overflow-visible">
           <img
-            src={style.image}
+            src={imageSrc}
             alt={card.beforeText}
             className="w-full h-full object-cover rounded-t-3xl"
           />
@@ -69,10 +73,18 @@ const ProblemCard = ({
 };
 
 const ProblemSection = () => {
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
+  const { registry } = useStyleRegistry();
+  const data = getSectionContent("why");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-100px" });
   const ctaRef = useRef(null);
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
+
+  const cardStyles = CARD_META.map((meta, i) => ({
+    ...meta,
+    imageSrc: resolveRegistryImageSrc(registry.why?.images?.[i]?.path, FALLBACK_IMAGES[i]),
+  }));
 
   return (
     <section id="why" className="relative py-24 px-6 bg-pattern-dots bg-[hsl(var(--why-section-bg))] overflow-hidden">
@@ -95,20 +107,20 @@ const ProblemSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-4"
         >
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("why.title")}>
             {data.title}
           </h2>
-          <p className="font-display text-2xl md:text-3xl text-muted-foreground italic mb-2">
+          <p className="font-display text-2xl md:text-3xl text-muted-foreground italic mb-2" style={getStyleForPath("why.impactLine1")}>
             {data.impactLine1}
           </p>
-          <p className="font-display text-2xl md:text-3xl text-muted-foreground italic">
+          <p className="font-display text-2xl md:text-3xl text-muted-foreground italic" style={getStyleForPath("why.impactLine2")}>
             {data.impactLine2}
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 mt-16">
           {data.cards.map((card, index) => (
-            <ProblemCard key={index} card={card} style={cardStyle[index]} index={index} />
+            <ProblemCard key={index} card={card} imageSrc={cardStyles[index].imageSrc} style={CARD_META[index]} index={index} />
           ))}
         </div>
 
@@ -124,6 +136,7 @@ const ProblemSection = () => {
             whileHover={{ scale: 1.08, rotate: -2 }}
             whileTap={{ scale: 0.95 }}
             className="inline-block gradient-warm px-10 py-5 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
+            style={getStyleForPath("why.ctaButton")}
           >
             {data.ctaButton}
           </motion.a>
