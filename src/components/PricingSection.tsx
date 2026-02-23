@@ -4,17 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleFlower, DoodleStar, DoodleSparkle } from "./Doodles";
 
-const accentBg: Record<string, string> = {
-  lavender: "bg-lavender",
-  peach: "bg-peach",
-  mint: "bg-mint",
-};
-
-const accentBorder: Record<string, string> = {
-  lavender: "border-[hsl(var(--lavender))]",
-  peach: "border-[hsl(var(--primary))]",
-  mint: "border-[hsl(var(--mint))]",
-};
+const ACCENT_KEYS = ["lavender", "peach", "mint"] as const;
 
 const PricingSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
@@ -71,7 +61,13 @@ const PricingSection = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 180, delay: index * 0.12 }}
                 whileHover={{ scale: 1.04, rotate: 0, y: -8 }}
-                className={`relative bg-background rounded-3xl p-8 shadow-playful border-4 ${accentBorder[plan.accentColor]} overflow-visible flex flex-col ${isPopular ? "md:-mt-4 md:mb-[-16px] md:pb-10 ring-4 ring-[hsl(var(--primary)/0.3)]" : ""}`}
+                className={`relative rounded-3xl p-8 shadow-playful border-4 overflow-visible flex flex-col ${isPopular ? "md:-mt-4 md:mb-[-16px] md:pb-10 ring-4 ring-[hsl(var(--primary)/0.3)]" : ""}`}
+                style={{
+                  backgroundColor: "hsl(var(--pricing-card-bg))",
+                  borderColor: ACCENT_KEYS.includes(plan.accentColor as (typeof ACCENT_KEYS)[number])
+                    ? "hsl(var(--pricing-card-border-" + plan.accentColor + "))"
+                    : "hsl(var(--border))",
+                }}
               >
                 {/* Badge */}
                 {plan.badge && (
@@ -131,7 +127,14 @@ const PricingSection = () => {
                       className="flex items-center gap-3 text-foreground"
                       style={getStyleForPath(`pricing.plans.${index}.features.${i}`, "--foreground")}
                     >
-                      <span className={`w-7 h-7 ${accentBg[plan.accentColor]} rounded-full flex items-center justify-center text-sm font-bold shadow-playful shrink-0`}>
+                      <span
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shadow-playful shrink-0"
+                        style={{
+                          backgroundColor: ACCENT_KEYS.includes(plan.accentColor as (typeof ACCENT_KEYS)[number])
+                            ? "hsl(var(--pricing-card-border-" + plan.accentColor + "))"
+                            : "hsl(var(--muted))",
+                        }}
+                      >
                         ✓
                       </span>
                       {feature}
@@ -144,8 +147,20 @@ const PricingSection = () => {
                   onClick={() => navigate(`/checkout?plan=${plan.id}`)}
                   whileHover={{ scale: 1.06, rotate: -1 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`w-full text-center py-4 rounded-full text-lg font-bold shadow-playful hover:shadow-card-hover transition-shadow ${isPopular ? "gradient-warm text-primary-foreground" : `${accentBg[plan.accentColor]} text-foreground border-2 ${accentBorder[plan.accentColor]}`}`}
-                  style={getStyleForPath(`pricing.plans.${index}.ctaButton`)}
+                  className={`w-full text-center py-4 rounded-full text-lg font-bold shadow-playful hover:shadow-card-hover transition-shadow ${isPopular ? "gradient-warm text-primary-foreground" : "text-foreground border-2"}`}
+                  style={{
+                    ...(getStyleForPath(`pricing.plans.${index}.ctaButton`) ?? {}),
+                    ...(!isPopular
+                      ? {
+                          backgroundColor: ACCENT_KEYS.includes(plan.accentColor as (typeof ACCENT_KEYS)[number])
+                            ? "hsl(var(--pricing-card-border-" + plan.accentColor + "))"
+                            : "hsl(var(--muted))",
+                          borderColor: ACCENT_KEYS.includes(plan.accentColor as (typeof ACCENT_KEYS)[number])
+                            ? "hsl(var(--pricing-card-border-" + plan.accentColor + "))"
+                            : "hsl(var(--border))",
+                        }
+                      : {}),
+                  }}
                 >
                   {plan.ctaButton} ✨
                 </motion.button>

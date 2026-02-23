@@ -140,7 +140,16 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
   root.style.setProperty("--hero-secondary-radius", h.secondaryButton.borderRadius);
 
   root.style.setProperty("--why-section-bg", getPaletteHsl(cells, registry.why.section.backgroundIndex));
+  const whyCards = registry.why.card ?? STYLE_REGISTRY.why.card ?? [];
+  whyCards.forEach((card: { backgroundIndex: number; accentColorIndex: number }, i: number) => {
+    root.style.setProperty(`--why-card-${i}-bg`, getPaletteHsl(cells, card.backgroundIndex));
+    root.style.setProperty(`--why-card-${i}-accent`, getPaletteHsl(cells, card.accentColorIndex));
+  });
   root.style.setProperty("--howItWorks-section-bg", getPaletteHsl(cells, registry.howItWorks.section.backgroundIndex));
+  const stepCards = registry.howItWorks.stepCard ?? STYLE_REGISTRY.howItWorks.stepCard ?? [];
+  stepCards.forEach((card: { circleBackgroundIndex: number }, i: number) => {
+    root.style.setProperty(`--howItWorks-step-card-${i}-bg`, getPaletteHsl(cells, card.circleBackgroundIndex));
+  });
   root.style.setProperty("--compatibilityTest-section-bg", getPaletteHsl(cells, registry.compatibilityTest.section.backgroundIndex));
   root.style.setProperty("--whatYouReceive-section-bg", getPaletteHsl(cells, registry.whatYouReceive.section.backgroundIndex));
   const wyrCards = registry.whatYouReceive.cards ?? STYLE_REGISTRY.whatYouReceive.cards ?? [];
@@ -151,6 +160,16 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
   root.style.setProperty("--experience-section-bg", getPaletteHsl(cells, registry.experience.section.backgroundIndex));
   root.style.setProperty("--testimonials-section-bg", getPaletteHsl(cells, registry.testimonials.section.backgroundIndex));
   root.style.setProperty("--pricing-section-bg", getPaletteHsl(cells, registry.pricing.section.backgroundIndex));
+  const pricingCard = registry.pricing.card ?? STYLE_REGISTRY.pricing.card;
+  if (pricingCard) {
+    root.style.setProperty("--pricing-card-bg", getPaletteHsl(cells, pricingCard.backgroundIndex));
+  }
+  const cardBorderByAccent = registry.pricing.cardBorderByAccent ?? STYLE_REGISTRY.pricing.cardBorderByAccent ?? {};
+  (["lavender", "peach", "mint"] as const).forEach((key) => {
+    if (typeof cardBorderByAccent[key] === "number") {
+      root.style.setProperty(`--pricing-card-border-${key}`, getPaletteHsl(cells, cardBorderByAccent[key] as number));
+    }
+  });
   root.style.setProperty("--faq-section-bg", getPaletteHsl(cells, registry.faq.section.backgroundIndex));
   root.style.setProperty("--finalCta-section-bg", getPaletteHsl(cells, registry.finalCta.section.backgroundIndex));
   root.style.setProperty("--footer-section-bg", getPaletteHsl(cells, registry.footer.section.backgroundIndex));

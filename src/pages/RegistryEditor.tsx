@@ -829,6 +829,58 @@ export default function RegistryEditor() {
           </Card>
         );
       }
+      const whyCards = (sectionData.card ?? STYLE_REGISTRY.why.card) as Array<{ backgroundIndex: number; accentColorIndex: number }>;
+      if (whyCards?.length) {
+        controls.push(
+          <Card key="why-cards">
+            <CardHeader>
+              <CardTitle className="text-lg">Card colors</CardTitle>
+              <p className="text-sm text-muted-foreground">Background and accent for each problem card.</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {whyCards.map((card, i) => (
+                <div key={`why-card-${i}`} className="space-y-2 rounded-lg border p-3">
+                  <span className="text-sm font-medium">Card {i + 1}</span>
+                  <div className="grid grid-cols-2 gap-3">
+                    {renderPaletteSelect(
+                      "Background",
+                      [sectionKey, "card", String(i), "backgroundIndex"],
+                      card.backgroundIndex ?? 8,
+                      (val) => {
+                        setRegistry((prev) => ({
+                          ...prev,
+                          why: {
+                            ...prev.why,
+                            card: prev.why.card.map((c, j) =>
+                              j === i ? { ...c, backgroundIndex: val } : c
+                            ),
+                          },
+                        }));
+                      }
+                    )}
+                    {renderPaletteSelect(
+                      "Accent",
+                      [sectionKey, "card", String(i), "accentColorIndex"],
+                      card.accentColorIndex ?? 2,
+                      (val) => {
+                        setRegistry((prev) => ({
+                          ...prev,
+                          why: {
+                            ...prev.why,
+                            card: prev.why.card.map((c, j) =>
+                              j === i ? { ...c, accentColorIndex: val } : c
+                            ),
+                          },
+                        }));
+                      }
+                    )}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        );
+      }
       const images = sectionData.images as Array<{ path?: string }> | undefined;
       if (images?.length) {
         controls.push(
@@ -900,6 +952,39 @@ export default function RegistryEditor() {
           </Card>
         );
       }
+      const stepCards = (sectionData.stepCard ?? STYLE_REGISTRY.howItWorks.stepCard) as Array<{ circleBackgroundIndex: number }>;
+      if (stepCards?.length) {
+        controls.push(
+          <Card key="howItWorks-stepCards">
+            <CardHeader>
+              <CardTitle className="text-lg">Step card circle colors</CardTitle>
+              <p className="text-sm text-muted-foreground">Palette index for each step circle background.</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {stepCards.map((card, i) => (
+                <div key={`step-card-${i}`}>
+                  {renderPaletteSelect(
+                    `Step ${i + 1} circle`,
+                    [sectionKey, "stepCard", String(i), "circleBackgroundIndex"],
+                    card.circleBackgroundIndex ?? 8,
+                    (val) => {
+                      setRegistry((prev) => ({
+                        ...prev,
+                        howItWorks: {
+                          ...prev.howItWorks,
+                          stepCard: prev.howItWorks.stepCard.map((c, j) =>
+                            j === i ? { ...c, circleBackgroundIndex: val } : c
+                          ),
+                        },
+                      }));
+                    }
+                  )}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        );
+      }
       if (sectionData.divider) {
         controls.push(renderDividerControls(sectionKey, sectionData.divider as Record<string, unknown>));
       }
@@ -916,6 +1001,49 @@ export default function RegistryEditor() {
             </CardContent>
           </Card>
         );
+      }
+      if (sectionKey === "pricing") {
+        const pricingCard = (sectionData.card ?? STYLE_REGISTRY.pricing.card) as { backgroundIndex: number; borderRadius?: string; shadow?: string };
+        const cardBorderByAccent = (sectionData.cardBorderByAccent ?? STYLE_REGISTRY.pricing.cardBorderByAccent) as Record<string, number>;
+        if (pricingCard) {
+          controls.push(
+            <Card key="pricing-card">
+              <CardHeader>
+                <CardTitle className="text-lg">Pricing card colors</CardTitle>
+                <p className="text-sm text-muted-foreground">Card background and border color by plan accent.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {renderPaletteSelect("Card background", [sectionKey, "card", "backgroundIndex"], pricingCard.backgroundIndex ?? 13, (val) => {
+                  setRegistry((prev) => ({
+                    ...prev,
+                    pricing: { ...prev.pricing, card: { ...prev.pricing.card, backgroundIndex: val } },
+                  }));
+                })}
+                <div className="space-y-2 pt-2">
+                  <span className="text-sm font-medium">Card border by accent</span>
+                  {(["lavender", "peach", "mint"] as const).map((key) => (
+                    <div key={key}>
+                      {renderPaletteSelect(
+                        key.charAt(0).toUpperCase() + key.slice(1),
+                        [sectionKey, "cardBorderByAccent", key],
+                        typeof cardBorderByAccent[key] === "number" ? cardBorderByAccent[key] : (key === "lavender" ? 10 : key === "peach" ? 2 : 11),
+                        (val) => {
+                          setRegistry((prev) => ({
+                            ...prev,
+                            pricing: {
+                              ...prev.pricing,
+                              cardBorderByAccent: { ...prev.pricing.cardBorderByAccent, [key]: val },
+                            },
+                          }));
+                        }
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        }
       }
       if (sectionKey === "whatYouReceive") {
         const cards = (sectionData.cards ?? STYLE_REGISTRY.whatYouReceive.cards) as Array<{ backgroundIndex: number }>;

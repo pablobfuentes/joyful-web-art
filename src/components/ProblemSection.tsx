@@ -10,9 +10,9 @@ import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 
 const FALLBACK_IMAGES = [problem1, problem2, problem3];
 const CARD_META = [
-  { emoji: "😵‍💫", bgClass: "bg-peach", accentColor: "text-primary" },
-  { emoji: "💸", bgClass: "bg-lavender", accentColor: "text-secondary" },
-  { emoji: "😴", bgClass: "bg-mint", accentColor: "text-accent" },
+  { emoji: "😵‍💫" },
+  { emoji: "💸" },
+  { emoji: "😴" },
 ];
 
 const ProblemCard = ({
@@ -39,7 +39,10 @@ const ProblemCard = ({
       whileHover={{ y: -12, rotate: 0, scale: 1.03 }}
       className="group relative"
     >
-      <div className={`${style.bgClass} rounded-3xl overflow-hidden shadow-playful border-2 border-background transition-shadow duration-500 hover:shadow-card-hover`}>
+      <div
+        className="rounded-3xl overflow-hidden shadow-playful border-2 border-background transition-shadow duration-500 hover:shadow-card-hover"
+        style={{ backgroundColor: "hsl(var(--why-card-" + index + "-bg))" }}
+      >
         <div className="relative h-52 overflow-visible">
           <img
             src={imageSrc}
@@ -56,7 +59,10 @@ const ProblemCard = ({
         </div>
 
         <div className="p-6 pt-8">
-          <span className={`inline-block ${style.accentColor} font-display text-5xl font-bold opacity-25 leading-none mb-1`}>
+          <span
+            className="inline-block font-display text-5xl font-bold opacity-25 leading-none mb-1"
+            style={{ color: "hsl(var(--why-card-" + index + "-accent))" }}
+          >
             0{index + 1}
           </span>
           <h3 className="font-display text-xl font-bold mb-2 text-foreground">

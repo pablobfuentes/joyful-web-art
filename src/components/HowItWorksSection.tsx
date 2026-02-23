@@ -11,10 +11,10 @@ import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 
 const FALLBACK_STEP_IMAGES = [step1, step2, step3, step4];
 const STEP_META = [
-  { emoji: "📱", bgClass: "bg-peach" },
-  { emoji: "🎁", bgClass: "bg-lavender" },
-  { emoji: "🚪", bgClass: "bg-mint" },
-  { emoji: "✨", bgClass: "bg-sunshine" },
+  { emoji: "📱" },
+  { emoji: "🎁" },
+  { emoji: "🚪" },
+  { emoji: "✨" },
 ];
 
 const StepCard = ({
@@ -48,7 +48,10 @@ const StepCard = ({
         className="flex-1 w-full flex justify-center"
       >
         <div className="relative">
-          <div className={`w-64 h-64 md:w-72 md:h-72 rounded-full ${style.bgClass} relative overflow-visible shadow-playful`}>
+          <div
+            className="w-64 h-64 md:w-72 md:h-72 rounded-full relative overflow-visible shadow-playful"
+            style={{ backgroundColor: "hsl(var(--howItWorks-step-card-" + index + "-bg))" }}
+          >
             <div className="absolute inset-[-12px] rounded-full overflow-hidden">
               <img
                 src={imageSrc}
