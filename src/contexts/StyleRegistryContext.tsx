@@ -1,7 +1,6 @@
 /**
- * Provides the merged style registry (default + localStorage overrides) so the main app
- * can read style values in React (e.g. image paths, divider config). Updates on storage
- * event and when refreshStyleRegistry() is called (e.g. Index mount for same-tab).
+ * Provides the style registry. When initialStyle is provided (e.g. from registry.json), uses it.
+ * Otherwise uses merged default + localStorage overrides. Updates on storage event and refreshStyleRegistry().
  */
 
 import {
@@ -24,12 +23,22 @@ type StyleRegistryState = {
 
 const StyleRegistryContext = createContext<StyleRegistryState | null>(null);
 
-export function StyleRegistryProvider({ children }: { children: ReactNode }) {
-  const [registry, setRegistry] = useState<StyleRegistry>(() => getMergedStyleRegistry());
+type StyleRegistryProviderProps = {
+  children: ReactNode;
+  /** When provided (e.g. from registry.json), used as initial registry instead of localStorage merge. */
+  initialStyle?: StyleRegistry;
+};
+
+export function StyleRegistryProvider({ children, initialStyle }: StyleRegistryProviderProps) {
+  const fromFile = initialStyle != null;
+  const [registry, setRegistry] = useState<StyleRegistry>(() =>
+    initialStyle ?? getMergedStyleRegistry()
+  );
 
   const refreshStyleRegistry = useCallback(() => {
+    if (fromFile) return;
     setRegistry(getMergedStyleRegistry());
-  }, []);
+  }, [fromFile]);
 
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {

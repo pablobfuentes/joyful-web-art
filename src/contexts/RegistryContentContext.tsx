@@ -1,7 +1,8 @@
 /**
- * Provides saved content overrides and content modifiers (font/size/color per content path)
- * from localStorage so the main site reflects RegistryEditor saves.
- * Listens to storage events so the other tab updates when the editor saves.
+ * Provides registry content and content modifiers.
+ * When initialContent/initialContentModifiers are provided (from registry.json), uses them as the full source.
+ * Otherwise uses localStorage overrides merged with APP_REGISTRY.
+ * Listens to storage events so the other tab updates when the editor saves (localStorage mode).
  */
 
 import React, {
@@ -23,6 +24,13 @@ export type ContentModifiers = Record<
   { fontFamily?: string; fontSize?: string; colorIndex?: number }
 >;
 
+type RegistryContentProviderProps = {
+  children: ReactNode;
+  /** When provided (e.g. from registry.json), used as full content; no localStorage merge. */
+  initialContent?: AppRegistry | Record<string, unknown>;
+  initialContentModifiers?: ContentModifiers;
+};
+
 /** Build inline style from a content modifier so pill color and page text match. */
 export function styleFromModifier(
   mod: { colorIndex?: number; fontFamily?: string; fontSize?: string } | undefined,
@@ -42,11 +50,15 @@ export function styleFromModifier(
 type RegistryContentState = {
   content: Record<string, unknown> | null;
   contentModifiers: ContentModifiers;
+  /** True when content was loaded from registry.json (file); do not overwrite with localStorage. */
+  fromFile: boolean;
+  /** Full content for editor (merged when from localStorage). */
+  fullContentForEditor: Record<string, unknown>;
   /** Merged section content (saved overrides + APP_REGISTRY). Use for all text in components. */
   getSectionContent: <K extends keyof AppRegistry>(sectionKey: K) => AppRegistry[K];
   /** Style for a content path (modifier + optional default color var). Use so pill and page text match. */
   getStyleForPath: (pathKey: string, defaultColorVar?: string) => React.CSSProperties;
-  /** Re-read from localStorage (e.g. after storage event). */
+  /** Re-read from localStorage (e.g. after storage event). No-op when fromFile. */
   refresh: () => void;
 };
 
@@ -69,14 +81,24 @@ function readContentModifiers(): ContentModifiers {
   return {};
 }
 
-export function RegistryContentProvider({ children }: { children: ReactNode }) {
-  const [content, setContent] = useState<Record<string, unknown> | null>(() => readContentOverrides());
-  const [contentModifiers, setContentModifiers] = useState<ContentModifiers>(() => readContentModifiers());
+export function RegistryContentProvider({
+  children,
+  initialContent,
+  initialContentModifiers,
+}: RegistryContentProviderProps) {
+  const fromFile = initialContent != null;
+  const [content, setContent] = useState<Record<string, unknown> | null>(() =>
+    fromFile ? (initialContent as Record<string, unknown>) : readContentOverrides()
+  );
+  const [contentModifiers, setContentModifiers] = useState<ContentModifiers>(() =>
+    fromFile ? (initialContentModifiers ?? {}) : readContentModifiers()
+  );
 
   const refresh = useCallback(() => {
+    if (fromFile) return;
     setContent(readContentOverrides());
     setContentModifiers(readContentModifiers());
-  }, []);
+  }, [fromFile]);
 
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -125,12 +147,24 @@ export function RegistryContentProvider({ children }: { children: ReactNode }) {
 
   const getSectionContent = useCallback(
     <K extends keyof AppRegistry>(sectionKey: K): AppRegistry[K] => {
+      if (fromFile && content != null && sectionKey in content) {
+        return content[sectionKey] as AppRegistry[K];
+      }
       const base = APP_REGISTRY[sectionKey];
       const over = content?.[sectionKey];
       return deepMergeSection(base, over) as AppRegistry[K];
     },
-    [content, deepMergeSection]
+    [fromFile, content, deepMergeSection]
   );
+
+  const fullContentForEditor = useMemo<Record<string, unknown>>(() => {
+    if (fromFile && content != null) return content;
+    const out: Record<string, unknown> = {};
+    for (const k of Object.keys(APP_REGISTRY) as (keyof AppRegistry)[]) {
+      out[k] = getSectionContent(k);
+    }
+    return out;
+  }, [fromFile, content, getSectionContent]);
 
   const getStyleForPath = useCallback(
     (pathKey: string, defaultColorVar?: string) =>
@@ -139,8 +173,16 @@ export function RegistryContentProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<RegistryContentState>(
-    () => ({ content, contentModifiers, getSectionContent, getStyleForPath, refresh }),
-    [content, contentModifiers, getSectionContent, getStyleForPath, refresh]
+    () => ({
+      content,
+      contentModifiers,
+      fromFile,
+      fullContentForEditor,
+      getSectionContent,
+      getStyleForPath,
+      refresh,
+    }),
+    [content, contentModifiers, fromFile, fullContentForEditor, getSectionContent, getStyleForPath, refresh]
   );
 
   return (
@@ -156,6 +198,8 @@ export function useRegistryContent() {
     return {
       content: null,
       contentModifiers: {},
+      fromFile: false,
+      fullContentForEditor: JSON.parse(JSON.stringify(APP_REGISTRY)) as Record<string, unknown>,
       getSectionContent: <K extends keyof AppRegistry>(sectionKey: K) => APP_REGISTRY[sectionKey],
       getModifier: () => undefined,
       getStyleForPath: (_pathKey: string, _defaultColorVar?: string) => ({}),
@@ -164,6 +208,8 @@ export function useRegistryContent() {
   return {
     content: ctx.content,
     contentModifiers: ctx.contentModifiers,
+    fromFile: ctx.fromFile,
+    fullContentForEditor: ctx.fullContentForEditor,
     getSectionContent: ctx.getSectionContent,
     getModifier: useCallback(
       (pathKey: string) => ctx.contentModifiers[pathKey],

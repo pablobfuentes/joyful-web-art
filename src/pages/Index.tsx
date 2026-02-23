@@ -26,13 +26,14 @@ const DIVIDER_VARIANT_MAP: Record<string, "wave1" | "wave2" | "blob" | "zigzag">
 
 const Index = () => {
   const { registry, refreshStyleRegistry } = useStyleRegistry();
-  const { refresh } = useRegistryContent();
+  const { refresh, fromFile } = useRegistryContent();
 
   useEffect(() => {
+    if (fromFile) return;
     applyStyleRegistry(getMergedStyleRegistry());
     refresh();
     refreshStyleRegistry();
-  }, [refresh, refreshStyleRegistry]);
+  }, [fromFile, refresh, refreshStyleRegistry]);
 
   const heroDiv = registry.hero.divider!;
   const whyDiv = registry.why.divider!;

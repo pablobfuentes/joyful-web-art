@@ -9,7 +9,28 @@
 - **Section tabs:** One tab per section/page (Nav, Hero, Why, How It Works, Pricing, FAQ, Login, etc.). Each tab has:
   - **Style:** Section background, divider (style + top/bottom color), and section-specific style controls (e.g. hero heading font/size/color).
   - **Content:** All user-facing text strings from `APP_REGISTRY` for that section. **Each row** shows: **text input** (the copy), **Font family** dropdown, **Font size** dropdown (preset rem values), and **Color** dropdown (palette index). Modifiers are stored per content path and persisted with **Save**.
-- **Save / Reset:** **Save** writes style overrides, content overrides, and content modifiers to `localStorage` (`app_registry_style_overrides`, `app_registry_content_overrides`, `app_registry_content_modifiers`). **Reset** restores defaults and clears stored overrides.
+- **Save / Reset:** In **development**, **Save** writes the full registry (content, style, contentModifiers) to **`public/registry.json`** via a dev-only endpoint (`POST /__registry-save`), then reloads the page so the app loads from the file. In production, Save is not available (no such endpoint). **Reset** restores defaults in the editor only; click **Save** to persist the reset to the file.
+- **Export / Import:** **Export** downloads a JSON backup of your current style, content, and modifiers. **Import** loads a previously exported file into the editor (then use **Save** to persist). Use Export after big edits so you can restore if the file is lost.
+
+## Where the registry is loaded from
+
+- **On load:** The app fetches **`/registry.json`** (from `public/registry.json`). If the file exists and is valid, it is used as the single source of content, style, and content modifiers. If the file is missing or the fetch fails (e.g. 404), the app uses built-in defaults from `app-registry.ts` and `style-registry.ts`.
+- **Dev only:** Saving from the Registry Editor (dev server) writes to `public/registry.json`. The next load (any browser or tab) will use that file. Production builds do not include the save endpoint; Save in production shows an error.
+
+## Why your saved copy might disappear (and how to prevent it)
+
+If you are **not** using `registry.json` (e.g. no file yet, or production), the app falls back to **localStorage** for backward compatibility. In that case saves go to the **current browser** for the **exact origin**. So your changes can be gone if:
+
+1. **Different URL or port** – You edited on `http://localhost:8080` but today opened `http://localhost:5173` (or the opposite). Each origin has its own localStorage.
+2. **Different browser or device** – Chrome and Edge (and another PC) each have separate storage.
+3. **Browser data cleared** – “Clear browsing data”, “Clear site data”, or “Clear on exit” for this site removes the keys.
+4. **Private / Incognito** – In many browsers, private windows don’t keep localStorage after you close the window.
+5. **Reset clicked** – **Reset** in the editor deletes all saved overrides.
+
+**To make sure your edits are positively saved:**
+
+- **Dev + registry.json (recommended):** Run the app in development (`npm run dev`). Use the Registry Editor and click **Save**. The app writes to `public/registry.json` and reloads; any browser or tab opening the app will then load from that file. Commit `public/registry.json` to git if you want the same copy everywhere.
+- **Export after important edits:** Use **Export** to download a backup JSON. If the file or storage is ever lost, use **Import** and then **Save** to restore.
 
 ## How admin role is set
 

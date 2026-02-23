@@ -59,7 +59,7 @@ const HeroSection = () => {
               transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
               className="inline-block px-5 py-2 text-sm font-bold mb-6 shadow-playful rotate-[-2deg] bg-[hsl(var(--hero-badge-bg))] text-[hsl(var(--hero-badge-text))] rounded-[var(--hero-badge-radius)]"
             >
-              ✨ Skincare Coreano ✨
+              {data.badgeText ?? "✨ Skincare Coreano ✨"}
             </motion.div>
 
             <motion.p
@@ -156,14 +156,14 @@ const HeroSection = () => {
               animate={{ rotate: [-5, -3, -5] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              🇰🇷 Directo de Seúl
+              {data.imageBadgeLeft ?? "🇰🇷 Directo de Seúl"}
             </motion.div>
             <motion.div
               className="absolute -top-3 -right-3 bg-sunshine px-4 py-2 rounded-full font-bold text-sm text-foreground shadow-playful rotate-[8deg]"
               animate={{ rotate: [8, 12, 8], scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              ⭐ 4.9/5
+              {data.imageBadgeRight ?? "⭐ 4.9/5"}
             </motion.div>
           </motion.div>
         </div>

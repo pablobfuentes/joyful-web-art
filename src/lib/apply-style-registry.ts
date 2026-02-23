@@ -143,6 +143,10 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
   root.style.setProperty("--howItWorks-section-bg", getPaletteHsl(cells, registry.howItWorks.section.backgroundIndex));
   root.style.setProperty("--compatibilityTest-section-bg", getPaletteHsl(cells, registry.compatibilityTest.section.backgroundIndex));
   root.style.setProperty("--whatYouReceive-section-bg", getPaletteHsl(cells, registry.whatYouReceive.section.backgroundIndex));
+  const wyrCards = registry.whatYouReceive.cards ?? STYLE_REGISTRY.whatYouReceive.cards ?? [];
+  wyrCards.forEach((card, i) => {
+    root.style.setProperty(`--whatYouReceive-card-${i}-bg`, getPaletteHsl(cells, card.backgroundIndex));
+  });
   root.style.setProperty("--pastEditions-section-bg", getPaletteHsl(cells, registry.pastEditions.section.backgroundIndex));
   root.style.setProperty("--experience-section-bg", getPaletteHsl(cells, registry.experience.section.backgroundIndex));
   root.style.setProperty("--testimonials-section-bg", getPaletteHsl(cells, registry.testimonials.section.backgroundIndex));

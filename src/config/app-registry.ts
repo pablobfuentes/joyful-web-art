@@ -7,7 +7,9 @@
 export const APP_REGISTRY = {
   nav: {
     logoText: "KumiBox",
+    logoEmoji: "🦊",
     announcementBar: "¡Envío GRATIS en tu primera caja! · Más de 500 ⭐⭐⭐⭐⭐ reseñas",
+    announcementBarEmoji: "🎉",
     links: [
       { label: "Shop", href: "#how-it-works" },
       { label: "Our Story", href: "#why" },
@@ -18,6 +20,9 @@ export const APP_REGISTRY = {
   },
 
   hero: {
+    badgeText: "✨ Skincare Coreano ✨",
+    imageBadgeLeft: "🇰🇷 Directo de Seúl",
+    imageBadgeRight: "⭐ 4.9/5",
     rotatingQuotes: [
       "¿Estoy eligiendo lo correcto para mi piel?",
       "He probado tanto… y nada se siente claro.",
@@ -106,36 +111,42 @@ export const APP_REGISTRY = {
 
   whatYouReceive: {
     subtitle: "What You Receive",
+    subtitleBadgeEmoji: "📦",
     title: "Lo que recibes cada mes",
     description:
       "Cinco productos coreanos. Una rutina completa. Diseñada para acompañarte hasta tu próxima entrega.",
     products: [
       {
         number: "1",
+        emoji: "🧴",
         category: "Limpia",
         description:
           "Un limpiador suave de uso diario, pensado para mantener equilibrio sin alterar tu piel",
       },
       {
         number: "2",
+        emoji: "💧",
         category: "Prepara o Trata",
         description:
           "Un paso ligero — tónico, esencia o suero — que aporta hidratación y soporte diario",
       },
       {
         number: "3",
+        emoji: "🛡️",
         category: "Refuerza",
         description:
           "Un producto que fortalece la barrera y mantiene la piel cómoda y estable",
       },
       {
         number: "4",
+        emoji: "☀️",
         category: "Sella o Protege",
         description:
           "Una crema o paso final que integra la rutina y mantiene los beneficios durante el día",
       },
       {
         number: "5",
+        emoji: "🌸",
         category: "Complementa",
         description:
           "Un producto de uso ocasional que potencia la rutina sin complicarla. Nunca recibirás pasos repetidos o innecesarios",

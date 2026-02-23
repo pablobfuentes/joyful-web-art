@@ -86,6 +86,12 @@
 - **Validation** in editor: color contrast (a11y), font load check.
 - **Export theme as JSON** for version control or backup.
 
+**Improvements for next phases (registry variables follow-up, 2026-02-18):**
+
+- **Emoji / decorative-text preset:** In RegistryEditor Content tabs, add a preset dropdown (or picker) for emoji/decorative text per field (nav emojis, hero badges, What You Receive product emojis) instead of free-text only.
+- **Hero doodles (optional):** If FloatingDoodles or hero “bubbles” are later made configurable, add doodle type/position (or enable/disable) to style-registry hero section; leave as-is for now.
+- **Unify section card styles (optional):** Why, How It Works, What You Receive (and any other card-based sections) could share one pattern in style-registry (e.g. card fill by index, border, radius) for consistency and fewer duplicate keys.
+
 ---
 
 ## 5. Things to consider

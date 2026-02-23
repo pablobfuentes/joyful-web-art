@@ -3,8 +3,6 @@ import { useRef } from "react";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleDroplet, DoodleLeaf, DoodleFlower, DoodleSparkle } from "./Doodles";
 
-const bgClasses = ["bg-peach", "bg-lavender", "bg-mint", "bg-sunshine", "bg-bubblegum"];
-const emojis = ["🧴", "💧", "🛡️", "☀️", "🌸"];
 const rotations = [-3, 2, -2, 3, -1];
 
 const WhatYouReceiveSection = () => {
@@ -42,7 +40,7 @@ const WhatYouReceiveSection = () => {
             animate={{ rotate: [2, -2, 2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            📦 {data.subtitle}
+            {data.subtitleBadgeEmoji ?? "📦"} {data.subtitle}
           </motion.span>
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">{data.title}</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">{data.description}</p>
@@ -59,7 +57,10 @@ const WhatYouReceiveSection = () => {
               whileHover={{ y: -12, rotate: 0, scale: 1.05 }}
               className="group relative"
             >
-              <div className={`${bgClasses[index]} rounded-3xl p-6 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover`}>
+              <div
+                className="rounded-3xl p-6 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover"
+                style={{ backgroundColor: "hsl(var(--whatYouReceive-card-" + index + "-bg))" }}
+              >
                 {/* Number badge overlapping top-left */}
                 <motion.div
                   className="absolute -top-4 -left-4 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10"
@@ -74,7 +75,7 @@ const WhatYouReceiveSection = () => {
                   animate={{ y: [0, -6, 0], rotate: [0, -10, 10, 0] }}
                   transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
                 >
-                  {emojis[index]}
+                  {product.emoji ?? ["🧴", "💧", "🛡️", "☀️", "🌸"][index]}
                 </motion.span>
 
                 <div className="pt-4">

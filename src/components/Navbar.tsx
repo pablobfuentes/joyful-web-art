@@ -25,7 +25,7 @@ const Navbar = () => {
       className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md"
     >
       <div className="gradient-warm text-primary-foreground text-center py-1.5 text-xs font-semibold tracking-wide">
-        🎉 {data.announcementBar}
+        {data.announcementBarEmoji ?? "🎉"} {data.announcementBar}
       </div>
 
       <div className="container mx-auto flex items-center justify-between py-3 px-6">
@@ -35,7 +35,7 @@ const Navbar = () => {
             animate={{ rotate: [0, -10, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
           >
-            🦊
+            {data.logoEmoji ?? "🦊"}
           </motion.span>
           <span className="font-display text-2xl font-bold text-gradient">
             {data.logoText}

@@ -104,6 +104,8 @@ export type CompatibilityTestStyles = SectionStyleBase & {
 
 export type WhatYouReceiveStyles = SectionStyleBase & {
   section: { backgroundIndex: number };
+  /** Palette index per product card (fill color). */
+  cards: Array<{ backgroundIndex: number }>;
 };
 
 export type PastEditionsStyles = SectionStyleBase & {
@@ -283,6 +285,13 @@ export const STYLE_REGISTRY = {
 
   whatYouReceive: {
     section: { backgroundIndex: 8 },
+    cards: [
+      { backgroundIndex: 8 },  // peach
+      { backgroundIndex: 10 }, // lavender
+      { backgroundIndex: 11 }, // mint
+      { backgroundIndex: 12 }, // sunshine
+      { backgroundIndex: 16 }, // bubblegum
+    ],
     divider: DEFAULT_DIVIDER(8, 0, "blob"),
   } satisfies WhatYouReceiveStyles,
 

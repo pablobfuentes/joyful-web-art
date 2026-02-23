@@ -1,9 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { HexColorPicker } from "react-colorful";
 import Navbar from "@/components/Navbar";
 import { STYLE_REGISTRY, type StyleRegistry, type PaletteCell } from "@/config/style-registry";
-import { applyStyleRegistry, STYLE_STORAGE_KEY } from "@/lib/apply-style-registry";
+import { applyStyleRegistry } from "@/lib/apply-style-registry";
 import { APP_REGISTRY } from "@/config/app-registry";
+import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -49,9 +51,6 @@ const DIVIDER_STYLE_OPTIONS = [
   { value: "sawtooth", label: "Sawtooth" },
   { value: "blob", label: "Blob" },
 ];
-
-const CONTENT_STORAGE_KEY = "app_registry_content_overrides";
-const CONTENT_MODIFIERS_STORAGE_KEY = "app_registry_content_modifiers";
 
 export type ContentModifiers = Record<
   string,
@@ -186,35 +185,31 @@ function deepSetByPath(root: unknown, path: string[], value: string): unknown {
   return { [head]: nextChild };
 }
 
+const REGISTRY_SAVE_URL = "/__registry-save";
+
 export default function RegistryEditor() {
-  const [registry, setRegistry] = useState<StyleRegistry>(() => {
-    try {
-      const raw = localStorage.getItem(STYLE_STORAGE_KEY);
-      if (raw) {
-        const overrides = JSON.parse(raw) as Partial<StyleRegistry>;
-        return { ...STYLE_REGISTRY, ...overrides } as StyleRegistry;
-      }
-    } catch (_) {}
-    return STYLE_REGISTRY;
-  });
-  const [content, setContent] = useState<Record<string, unknown>>(() => {
-    try {
-      const raw = localStorage.getItem(CONTENT_STORAGE_KEY);
-      if (raw) {
-        const overrides = JSON.parse(raw) as Record<string, unknown>;
-        const base = getDefaultContent();
-        return { ...base, ...overrides };
-      }
-    } catch (_) {}
-    return getDefaultContent();
-  });
-  const [contentModifiers, setContentModifiers] = useState<ContentModifiers>(() => {
-    try {
-      const raw = localStorage.getItem(CONTENT_MODIFIERS_STORAGE_KEY);
-      if (raw) return JSON.parse(raw) as ContentModifiers;
-    } catch (_) {}
-    return {};
-  });
+  const { fullContentForEditor, contentModifiers: ctxContentModifiers } = useRegistryContent();
+  const { registry: ctxRegistry } = useStyleRegistry();
+  const syncedFromContext = useRef(false);
+
+  const [registry, setRegistry] = useState<StyleRegistry>(() => ({ ...STYLE_REGISTRY }));
+  const [content, setContent] = useState<Record<string, unknown>>(() => getDefaultContent());
+  const [contentModifiers, setContentModifiers] = useState<ContentModifiers>(() => ({}));
+
+  useEffect(() => {
+    if (syncedFromContext.current) return;
+    let did = false;
+    if (ctxRegistry && Object.keys(ctxRegistry).length > 0) {
+      setRegistry(JSON.parse(JSON.stringify(ctxRegistry)));
+      did = true;
+    }
+    if (fullContentForEditor && Object.keys(fullContentForEditor).length > 0) {
+      setContent(JSON.parse(JSON.stringify(fullContentForEditor)));
+      setContentModifiers(JSON.parse(JSON.stringify(ctxContentModifiers ?? {})));
+      did = true;
+    }
+    if (did) syncedFromContext.current = true;
+  }, [ctxRegistry, fullContentForEditor, ctxContentModifiers]);
   const [selectedTab, setSelectedTab] = useState("general");
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
@@ -413,40 +408,96 @@ export default function RegistryEditor() {
     []
   );
 
-  // Persist style, content, and content modifiers to localStorage
-  const handleSave = useCallback(() => {
+  // Persist to registry.json (dev server writes to public/registry.json) then reload
+  const handleSave = useCallback(async () => {
     try {
-      localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
-      localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
-      localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
-      toast.success("Saved. Style changes apply site-wide. Refresh the home page if it’s open in another tab.");
+      const payload = { content, style: registry, contentModifiers };
+      const res = await fetch(REGISTRY_SAVE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { error?: string }).error ?? res.statusText);
+      }
+      toast.success("Saved. Reloading so the site uses the new registry.");
+      window.location.reload();
     } catch (e) {
       console.error("Failed to save registry", e);
-      toast.error("Failed to save.");
+      toast.error("Failed to save. (Registry save is only available in dev.)");
     }
   }, [registry, content, contentModifiers]);
 
   // Reset to defaults
   const handleReset = useCallback(() => {
-    setRegistry(STYLE_REGISTRY);
+    setRegistry(JSON.parse(JSON.stringify(STYLE_REGISTRY)));
     setContent(getDefaultContent());
     setContentModifiers({});
-    try {
-      localStorage.removeItem(STYLE_STORAGE_KEY);
-      localStorage.removeItem(CONTENT_STORAGE_KEY);
-      localStorage.removeItem(CONTENT_MODIFIERS_STORAGE_KEY);
-    } catch (_) {}
   }, []);
 
-  // Render palette select
-  const renderPaletteSelect = (label: string, path: string[], value: number) => {
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = useCallback(() => {
+    const backup = {
+      style: registry,
+      content,
+      contentModifiers,
+      exportedAt: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `registry-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Backup downloaded. Use Import + Save to restore on another browser or after clearing data.");
+  }, [registry, content, contentModifiers]);
+
+  const handleImport = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const raw = reader.result as string;
+          const data = JSON.parse(raw) as {
+            style?: StyleRegistry;
+            content?: Record<string, unknown>;
+            contentModifiers?: ContentModifiers;
+          };
+          if (data.style) setRegistry(data.style);
+          if (data.content) setContent(data.content);
+          if (data.contentModifiers) setContentModifiers(data.contentModifiers ?? {});
+          toast.success("Imported. Click Save to persist to this browser.");
+        } catch (err) {
+          console.error("Import failed", err);
+          toast.error("Invalid backup file.");
+        }
+        e.target.value = "";
+      };
+      reader.readAsText(file);
+    },
+    []
+  );
+
+  // Render palette select (optional custom onChange for e.g. array items)
+  const renderPaletteSelect = (
+    label: string,
+    path: string[],
+    value: number,
+    onValueChange?: (value: number) => void
+  ) => {
     const paletteOptions = getPaletteOptions();
+    const handleChange = onValueChange ?? ((val: number) => updateSection(path, val));
     return (
       <div key={path.join(".")}>
         <Label className="text-sm font-medium text-foreground mb-2 block">{label}</Label>
         <Select
           value={value.toString()}
-          onValueChange={(val) => updateSection(path, parseInt(val, 10))}
+          onValueChange={(val) => handleChange(parseInt(val, 10))}
         >
           <SelectTrigger>
             <SelectValue />
@@ -850,6 +901,41 @@ export default function RegistryEditor() {
           </Card>
         );
       }
+      if (sectionKey === "whatYouReceive") {
+        const cards = (sectionData.cards ?? STYLE_REGISTRY.whatYouReceive.cards) as Array<{ backgroundIndex: number }>;
+        if (cards?.length) {
+          controls.push(
+            <Card key="whatYouReceive-cards">
+              <CardHeader>
+                <CardTitle className="text-lg">Product card fill colors</CardTitle>
+                <p className="text-sm text-muted-foreground">Palette index for each product card background.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {cards.map((card, i) => (
+                  <div key={`wyr-card-${i}`}>
+                    {renderPaletteSelect(
+                      `Card ${i + 1} background`,
+                      [sectionKey, "cards", String(i), "backgroundIndex"],
+                      card.backgroundIndex ?? 8,
+                      (val) => {
+                        setRegistry((prev) => ({
+                          ...prev,
+                          whatYouReceive: {
+                            ...prev.whatYouReceive,
+                            cards: prev.whatYouReceive.cards.map((c, j) =>
+                              j === i ? { ...c, backgroundIndex: val } : c
+                            ),
+                          },
+                        }));
+                      }
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        }
+      }
       if (sectionData.divider) {
         controls.push(renderDividerControls(sectionKey, sectionData.divider as Record<string, unknown>));
       }
@@ -989,43 +1075,67 @@ export default function RegistryEditor() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       <Navbar />
-      {/* Spacer so content (including Save/Reset) is not hidden under fixed navbar */}
-      <main className="container mx-auto pt-24 pb-12 px-6 max-w-6xl">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-              Registry Editor
-            </h1>
-            <p className="text-muted-foreground">
-              Edit style and text variables for the entire application.
-            </p>
-          </div>
-          <div className="flex gap-2 shrink-0">
-            <Button variant="outline" onClick={handleReset}>
-              Reset
-            </Button>
-            <Button onClick={handleSave}>
-              Save
-            </Button>
+      {/* Sticky header: title + Save/Reset */}
+      <header className="shrink-0 border-b bg-background z-10">
+        <div className="container mx-auto pt-24 pb-4 px-6 max-w-6xl">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="font-display text-3xl font-bold text-foreground mb-2">
+                Registry Editor
+              </h1>
+              <p className="text-muted-foreground">
+                Edit style and text variables for the entire application.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 shrink-0">
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                Export
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => importInputRef.current?.click()}
+              >
+                Import
+              </Button>
+              <input
+                ref={importInputRef}
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={handleImport}
+              />
+              <Button variant="outline" onClick={handleReset}>
+                Reset
+              </Button>
+              <Button onClick={handleSave}>
+                Save
+              </Button>
+            </div>
           </div>
         </div>
+      </header>
 
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-col sm:flex-row gap-6">
-          <TabsList className="flex flex-col h-fit w-full sm:w-52 shrink-0 bg-muted p-1.5 rounded-lg">
-            {SECTION_KEYS.map((key) => (
-              <TabsTrigger
-                key={key}
-                value={key}
-                className="w-full justify-start data-[state=active]:bg-background data-[state=active]:shadow-sm"
-              >
-                {SECTION_DISPLAY_NAMES[key]}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+      {/* Main: left nav (fixed) + scrollable content */}
+      <main className="flex-1 min-h-0 flex overflow-hidden">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex flex-1 min-h-0 min-w-0">
+          <div className="shrink-0 border-r bg-muted/50 py-4 pl-4 pr-2">
+            <TabsList className="flex flex-col h-fit w-52 bg-muted p-1.5 rounded-lg">
+              {SECTION_KEYS.map((key) => (
+                <TabsTrigger
+                  key={key}
+                  value={key}
+                  className="w-full justify-start data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                >
+                  {SECTION_DISPLAY_NAMES[key]}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-y-auto py-6 pr-6 pl-6 max-w-4xl">
           {/* General Tab */}
           <TabsContent value="general" className="mt-0">
             <div className="flex flex-col gap-6">
@@ -1205,9 +1315,10 @@ export default function RegistryEditor() {
           ))}
           </div>
         </Tabs>
+      </main>
 
-        {/* Color Picker Modal (palette edit from General matrix, or pick color for content from pill) */}
-        <Dialog open={colorPickerOpen} onOpenChange={handleColorModalOpenChange}>
+      {/* Color Picker Modal (palette edit from General matrix, or pick color for content from pill) */}
+      <Dialog open={colorPickerOpen} onOpenChange={handleColorModalOpenChange}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>{contentColorPathKey ? "Pick color for text" : "Edit Color"}</DialogTitle>
@@ -1278,8 +1389,7 @@ export default function RegistryEditor() {
               )}
             </div>
           </DialogContent>
-        </Dialog>
-      </main>
+      </Dialog>
     </div>
   );
 }
