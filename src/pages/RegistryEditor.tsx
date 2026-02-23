@@ -4,8 +4,9 @@ import Navbar from "@/components/Navbar";
 import { STYLE_REGISTRY, type StyleRegistry, type PaletteCell } from "@/config/style-registry";
 import { applyStyleRegistry } from "@/lib/apply-style-registry";
 import { APP_REGISTRY } from "@/config/app-registry";
-import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { useRegistryContent, CONTENT_STORAGE_KEY, CONTENT_MODIFIERS_STORAGE_KEY } from "@/contexts/RegistryContentContext";
 import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
+import { STYLE_STORAGE_KEY } from "@/lib/apply-style-registry";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -184,8 +185,6 @@ function deepSetByPath(root: unknown, path: string[], value: string): unknown {
   }
   return { [head]: nextChild };
 }
-
-const REGISTRY_SAVE_URL = "/__registry-save";
 
 export default function RegistryEditor() {
   const { fullContentForEditor, contentModifiers: ctxContentModifiers } = useRegistryContent();
@@ -408,24 +407,41 @@ export default function RegistryEditor() {
     []
   );
 
-  // Persist to registry.json (dev server writes to public/registry.json) then reload
-  const handleSave = useCallback(async () => {
+  // Apply in browser only (localStorage + reload). Does not write to app-registry.ts or style-registry.ts.
+  const handlePreview = useCallback(() => {
     try {
-      const payload = { content, style: registry, contentModifiers };
-      const res = await fetch(REGISTRY_SAVE_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as { error?: string }).error ?? res.statusText);
-      }
-      toast.success("Saved. Reloading so the site uses the new registry.");
+      localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
+      localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
+      localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
+      toast.success("Preview applied. Reloading so the site uses the new registry.");
       window.location.reload();
     } catch (e) {
-      console.error("Failed to save registry", e);
-      toast.error("Failed to save. (Registry save is only available in dev.)");
+      console.error("Failed to preview registry", e);
+      toast.error("Failed to apply preview.");
+    }
+  }, [registry, content, contentModifiers]);
+
+  // Write to app-registry.ts and style-registry.ts (dev only, with date-stamped backups). Also persists to localStorage and reloads.
+  const handleSave = useCallback(async () => {
+    try {
+      const res = await fetch("/__registry-save-source", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content, style: registry }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(data?.error ?? "Could not save to source files. Try Preview to apply in browser only.");
+        return;
+      }
+      localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
+      localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
+      localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
+      toast.success("Saved to app-registry.ts and style-registry.ts. Reloading.");
+      window.location.reload();
+    } catch (e) {
+      console.error("Failed to save registry to source", e);
+      toast.error("Could not save to source files. Try Preview to apply in browser only.");
     }
   }, [registry, content, contentModifiers]);
 
@@ -1109,6 +1125,9 @@ export default function RegistryEditor() {
               />
               <Button variant="outline" onClick={handleReset}>
                 Reset
+              </Button>
+              <Button variant="outline" onClick={handlePreview}>
+                Preview
               </Button>
               <Button onClick={handleSave}>
                 Save

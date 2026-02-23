@@ -8,7 +8,6 @@ import { RegistryContentProvider } from "@/contexts/RegistryContentContext";
 import { StyleRegistryProvider } from "@/contexts/StyleRegistryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
-import type { RegistrySnapshot } from "@/config/get-default-registry";
 import Index from "./pages/Index";
 import RegistryEditor from "./pages/RegistryEditor";
 import Login from "./pages/Login";
@@ -24,20 +23,15 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-type AppProps = { initialRegistry?: RegistrySnapshot };
-
-const App = ({ initialRegistry }: AppProps) => (
+const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <RegistryContentProvider
-            initialContent={initialRegistry?.content}
-            initialContentModifiers={initialRegistry?.contentModifiers}
-          >
-          <StyleRegistryProvider initialStyle={initialRegistry?.style}>
+          <RegistryContentProvider>
+          <StyleRegistryProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />

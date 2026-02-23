@@ -9,7 +9,10 @@
 - **Section tabs:** One tab per section/page (Nav, Hero, Why, How It Works, Pricing, FAQ, Login, etc.). Each tab has:
   - **Style:** Section background, divider (style + top/bottom color), and section-specific style controls (e.g. hero heading font/size/color).
   - **Content:** All user-facing text strings from `APP_REGISTRY` for that section. **Each row** shows: **text input** (the copy), **Font family** dropdown, **Font size** dropdown (preset rem values), and **Color** dropdown (palette index). Modifiers are stored per content path and persisted with **Save**.
-- **Save / Reset:** In **development**, **Save** writes the full registry (content, style, contentModifiers) to **`public/registry.json`** via a dev-only endpoint (`POST /__registry-save`), then reloads the page so the app loads from the file. In production, Save is not available (no such endpoint). **Reset** restores defaults in the editor only; click **Save** to persist the reset to the file.
+- **Preview / Save / Reset:**
+  - **Preview:** Applies the current edits in the browser only (writes content, style, and contentModifiers to localStorage and reloads). Use this to see changes without writing to source files.
+  - **Save (dev only):** Writes **content** to **`src/config/app-registry.ts`** and **style** to **`src/config/style-registry.ts`**. Before overwriting, if there is no backup with **today’s date**, the dev server creates **`src/config/backups/app-registry.YYYY-MM-DD.ts`** and **`src/config/backups/style-registry.YYYY-MM-DD.ts`** (one backup per calendar day). Then it overwrites the two source files and reloads the page. In production, Save is not available (no such endpoint).
+  - **Reset:** Restores defaults in the editor only; click **Save** to persist the reset to the source files.
 - **Export / Import:** **Export** downloads a JSON backup of your current style, content, and modifiers. **Import** loads a previously exported file into the editor (then use **Save** to persist). Use Export after big edits so you can restore if the file is lost.
 
 ## Where the registry is loaded from

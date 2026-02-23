@@ -1,5 +1,5 @@
 /**
- * Provides the style registry. When initialStyle is provided (e.g. from registry.json), uses it.
+ * Provides the style registry. When initialStyle is provided, uses it.
  * Otherwise uses merged default + localStorage overrides. Updates on storage event and refreshStyleRegistry().
  */
 
@@ -25,7 +25,7 @@ const StyleRegistryContext = createContext<StyleRegistryState | null>(null);
 
 type StyleRegistryProviderProps = {
   children: ReactNode;
-  /** When provided (e.g. from registry.json), used as initial registry instead of localStorage merge. */
+  /** When provided, used as initial registry instead of localStorage merge. */
   initialStyle?: StyleRegistry;
 };
 

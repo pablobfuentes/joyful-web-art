@@ -8,31 +8,17 @@ export const APP_REGISTRY = {
   nav: {
     logoText: "KumiBox",
     logoEmoji: "🦊",
-    announcementBar: "¡Envío GRATIS a todo México!",
+    announcementBar: "¡Envío GRATIS en tu primera caja! · Más de 500 ⭐⭐⭐⭐⭐ reseñas",
     announcementBarEmoji: "🎉",
     links: [
-      {
-        label: "Shop",
-        href: "#how-it-works"
-      },
-      {
-        label: "Our Story",
-        href: "#why"
-      },
-      {
-        label: "Science",
-        href: "#faq"
-      }
+      { label: "Shop", href: "#how-it-works" },
+      { label: "Our Story", href: "#why" },
+      { label: "Science", href: "#faq" },
     ],
-    logIn: {
-      label: "Log In",
-      href: "/login"
-    },
-    getStarted: {
-      label: "Get Started",
-      href: "/register"
-    }
+    logIn: { label: "Log In", href: "/login" },
+    getStarted: { label: "Get Started", href: "/register" },
   },
+
   hero: {
     badgeText: "✨ Skincare Coreano ✨",
     imageBadgeLeft: "🇰🇷 Directo de Seúl",
@@ -40,20 +26,16 @@ export const APP_REGISTRY = {
     rotatingQuotes: [
       "¿Estoy eligiendo lo correcto para mi piel?",
       "He probado tanto… y nada se siente claro.",
-      "Hay demasiadas opciones. ¿Por dónde empiezo?"
+      "Hay demasiadas opciones. ¿Por dónde empiezo?",
     ],
     heading: "Descubre el ritual coreano que simplifica el cuidado de tu piel.",
-    description: "Una rutina mensual de skincare coreano cuidadosamente seleccionada para adaptarse a tu vida — sin confusión, sin exceso, sin productos que no usarás.",
-    primaryCta: {
-      label: "Quiero unirme",
-      href: "#pricing"
-    },
-    secondaryCta: {
-      label: "¿Cómo funciona?",
-      href: "#how-it-works"
-    },
-    footer: "Cancela cuando quieras · Envíos mensuales · Sin contratos"
+    description:
+      "Una rutina mensual de skincare coreano cuidadosamente seleccionada para adaptarse a tu vida — sin confusión, sin exceso, sin productos que no usarás.",
+    primaryCta: { label: "Quiero unirme", href: "#pricing" },
+    secondaryCta: { label: "¿Cómo funciona?", href: "#how-it-works" },
+    footer: "Cancela cuando quieras · Envíos mensuales · Sin contratos",
   },
+
   why: {
     title: "Por eso existimos",
     ctaButton: "Descubre si esta experiencia es para ti",
@@ -62,21 +44,25 @@ export const APP_REGISTRY = {
     cards: [
       {
         beforeText: "Buscas algo que realmente funcione para tu piel.",
-        frictionText: "Pero cada recomendación suena distinta. Cada tendencia promete lo mismo.",
-        costText: "Y elegir se vuelve más complicado de lo que debería ser."
+        frictionText:
+          "Pero cada recomendación suena distinta. Cada tendencia promete lo mismo.",
+        costText: "Y elegir se vuelve más complicado de lo que debería ser.",
       },
       {
         beforeText: "Compras con ilusión.",
         frictionText: "Algunos productos funcionan. Otros se quedan a medias.",
-        costText: "Tu repisa se llena, pero tu rutina no se siente clara."
+        costText: "Tu repisa se llena, pero tu rutina no se siente clara.",
       },
       {
         beforeText: "Con el tiempo, lo simple se vuelve confuso.",
-        frictionText: "Entre consejos, pasos y opiniones, la constancia se pierde.",
-        costText: "Y el cuidado personal deja de sentirse como un ritual y se vuelve una tarea abrumadora."
-      }
-    ]
+        frictionText:
+          "Entre consejos, pasos y opiniones, la constancia se pierde.",
+        costText:
+          "Y el cuidado personal deja de sentirse como un ritual… y empieza a sentirse como una tarea.",
+      },
+    ],
   },
+
   compatibilityTest: {
     subtitle: "Test de Compatibilidad",
     title: "¿Es esta experiencia para ti?",
@@ -85,172 +71,156 @@ export const APP_REGISTRY = {
       "¿Estás actualmente bajo tratamiento dermatológico especializado?",
       "¿Te sientes cómoda usando fórmulas suaves y sin fragancia en tu rutina diaria?",
       "¿Buscas hidratación, luminosidad y cuidado de la barrera más que tratamientos intensivos?",
-      "¿Puedes dedicar alrededor de 4 minutos al día a una rutina sencilla?"
+      "¿Puedes dedicar alrededor de 4 minutos al día a una rutina sencilla?",
     ],
-    resultDermatologist: "Te recomendamos consultar a tu dermatólogo antes de probar nuevos productos",
-    resultGoodFit: "Perfecto. Esta experiencia fue diseñada para alguien como tú",
-    ctaButton: "Quiero acceso anticipado"
+    resultDermatologist:
+      "Te recomendamos consultar a tu dermatólogo antes de probar nuevos productos",
+    resultGoodFit:
+      "Perfecto. Esta experiencia fue diseñada para alguien como tú",
+    ctaButton: "Quiero acceso anticipado",
   },
+
   howItWorks: {
     title: "Como Funciona",
-    ctaButton: {
-      label: "Ve un ejemplo de rutina",
-      href: "#experience"
-    },
+    ctaButton: { label: "Ve un ejemplo de rutina", href: "#experience" },
     steps: [
       {
         label: "Subscribe",
         title: "Únete y comienza tu ritual coreano",
-        description: "Te acompañamos paso a paso, desde el primer día"
+        description: "Te acompañamos paso a paso, desde el primer día",
       },
       {
         label: "We Curate",
         title: "Seleccionamos productos originales, suaves y compatibles",
-        description: "Fórmulas pensadas para funcionar en la mayoria de los tipos de piel"
+        description:
+          "Fórmulas pensadas para funcionar en la mayoria de los tipos de piel",
       },
       {
         label: "Receive",
         title: "Cada caja sigue una rutina clara y fácil de integrar",
-        description: "Limpia · Trata · Protege — productos diseñados para trabajar juntos"
+        description:
+          "Limpia · Trata · Protege — productos diseñados para trabajar juntos",
       },
       {
         label: "Enjoy",
         title: "Descubre nuevos productos sin abrumarte",
-        description: "Instrucciones claras. Pasos simples. Sin culpa"
-      }
-    ]
+        description: "Instrucciones claras. Pasos simples. Sin culpa",
+      },
+    ],
   },
+
   whatYouReceive: {
     subtitle: "What You Receive",
     subtitleBadgeEmoji: "📦",
     title: "Lo que recibes cada mes",
-    description: "Cinco productos coreanos. Una rutina completa. Diseñada para acompañarte hasta tu próxima entrega.",
+    description:
+      "Cinco productos coreanos. Una rutina completa. Diseñada para acompañarte hasta tu próxima entrega.",
     products: [
       {
         number: "1",
         emoji: "🧴",
         category: "Limpia",
-        description: "Un limpiador suave de uso diario, pensado para mantener equilibrio sin alterar tu piel"
+        description:
+          "Un limpiador suave de uso diario, pensado para mantener equilibrio sin alterar tu piel",
       },
       {
         number: "2",
         emoji: "💧",
         category: "Prepara o Trata",
-        description: "Un paso ligero — tónico, esencia o suero — que aporta hidratación y soporte diario"
+        description:
+          "Un paso ligero — tónico, esencia o suero — que aporta hidratación y soporte diario",
       },
       {
         number: "3",
         emoji: "🛡️",
         category: "Refuerza",
-        description: "Un producto que fortalece la barrera y mantiene la piel cómoda y estable"
+        description:
+          "Un producto que fortalece la barrera y mantiene la piel cómoda y estable",
       },
       {
         number: "4",
         emoji: "☀️",
         category: "Sella o Protege",
-        description: "Una crema o paso final que integra la rutina y mantiene los beneficios durante el día"
+        description:
+          "Una crema o paso final que integra la rutina y mantiene los beneficios durante el día",
       },
       {
         number: "5",
         emoji: "🌸",
         category: "Complementa",
-        description: "Un producto de uso ocasional que potencia la rutina sin complicarla. Nunca recibirás pasos repetidos o innecesarios"
-      }
-    ]
+        description:
+          "Un producto de uso ocasional que potencia la rutina sin complicarla. Nunca recibirás pasos repetidos o innecesarios",
+      },
+    ],
   },
+
   pastEditions: {
     subtitle: "Past Editions",
     title: "See what we've curated",
     editions: [
-      {
-        name: "Hydration Boost",
-        category: "Moisturizing",
-        month: "January 2024"
-      },
-      {
-        name: "Glow Essentials",
-        category: "Brightening",
-        month: "February 2024"
-      },
-      {
-        name: "Barrier Repair",
-        category: "Repair",
-        month: "March 2024"
-      },
-      {
-        name: "Gentle Cleanse",
-        category: "Cleansing",
-        month: "April 2024"
-      },
-      {
-        name: "Summer Glow",
-        category: "Protection",
-        month: "May 2024"
-      },
-      {
-        name: "Deep Hydration",
-        category: "Moisturizing",
-        month: "June 2024"
-      },
-      {
-        name: "Calming Routine",
-        category: "Sensitive",
-        month: "July 2024"
-      },
-      {
-        name: "Autumn Prep",
-        category: "Repair",
-        month: "August 2024"
-      }
-    ]
+      { name: "Hydration Boost", category: "Moisturizing", month: "January 2024" },
+      { name: "Glow Essentials", category: "Brightening", month: "February 2024" },
+      { name: "Barrier Repair", category: "Repair", month: "March 2024" },
+      { name: "Gentle Cleanse", category: "Cleansing", month: "April 2024" },
+      { name: "Summer Glow", category: "Protection", month: "May 2024" },
+      { name: "Deep Hydration", category: "Moisturizing", month: "June 2024" },
+      { name: "Calming Routine", category: "Sensitive", month: "July 2024" },
+      { name: "Autumn Prep", category: "Repair", month: "August 2024" },
+    ],
   },
+
   experience: {
     subtitle: "The Experience",
     title: "Más que una caja. Un reinicio mensual",
-    ctaButton: {
-      label: "Quiero vivir esta experiencia",
-      href: "#pricing"
-    },
+    ctaButton: { label: "Quiero vivir esta experiencia", href: "#pricing" },
     steps: [
       {
         number: "1",
         title: "Llega cuando lo esperas",
-        description: "Sin incertidumbre. Sin perseguir envíos. Se integra naturalmente en tu mes."
+        description:
+          "Sin incertidumbre. Sin perseguir envíos. Se integra naturalmente en tu mes.",
       },
       {
         number: "2",
         title: "Todo tiene un propósito",
-        description: "Cada producto cumple una función dentro de la rutina. Nada sobra. Nada confunde."
+        description:
+          "Cada producto cumple una función dentro de la rutina. Nada sobra. Nada confunde.",
       },
       {
         number: "3",
         title: "Sabes exactamente cómo usarlo",
-        description: "Instrucciones claras. Pasos simples. Sin presión por hacerlo perfecto."
+        description:
+          "Instrucciones claras. Pasos simples. Sin presión por hacerlo perfecto.",
       },
       {
         number: "4",
         title: "La rutina se completa. Justo a tiempo para tu siguiente mes",
-        description: "Usas lo necesario. Sin acumulación. La continuidad se vuelve parte de tu cuidado."
-      }
-    ]
+        description:
+          "Usas lo necesario. Sin acumulación. La continuidad se vuelve parte de tu cuidado.",
+      },
+    ],
   },
+
   testimonials: {
     subtitle: "Trusted by Skincare Enthusiasts",
     items: [
       {
-        quote: "Finally, a skincare routine that doesn't overwhelm me. Everything just works together.",
-        author: "Sarah M."
+        quote:
+          "Finally, a skincare routine that doesn't overwhelm me. Everything just works together.",
+        author: "Sarah M.",
       },
       {
-        quote: "I've tried so many products, but this is the first time I've actually stuck with a routine.",
-        author: "Jessica L."
+        quote:
+          "I've tried so many products, but this is the first time I've actually stuck with a routine.",
+        author: "Jessica L.",
       },
       {
         quote: "No more decision fatigue. My skin has never looked better.",
-        author: "Emily K."
-      }
-    ]
+        author: "Emily K.",
+      },
+    ],
   },
+
   pricing: {
     subtitle: "Elige tu experiencia",
     title: "Tu ritual, a tu medida",
@@ -265,11 +235,11 @@ export const APP_REGISTRY = {
         features: [
           "5 productos coreanos premium",
           "Guía de rutina paso a paso",
-          "Empaque especial de regalo"
+          "Empaque especial de regalo",
         ],
         badge: null,
         ctaButton: "Regalar ahora",
-        accentColor: "lavender"
+        accentColor: "lavender",
       },
       {
         id: "monthly",
@@ -282,11 +252,11 @@ export const APP_REGISTRY = {
           "5 productos complementarios",
           "Rutina completa sin repeticiones",
           "Tamaños que duran hasta tu próxima caja",
-          "Envío incluido"
+          "Envío incluido",
         ],
         badge: "Más popular 🔥",
         ctaButton: "Comenzar mi rutina",
-        accentColor: "peach"
+        accentColor: "peach",
       },
       {
         id: "premium",
@@ -300,131 +270,110 @@ export const APP_REGISTRY = {
           "2 productos extra cada caja",
           "Acceso a ediciones limitadas",
           "Descuento exclusivo en tienda",
-          "Envío prioritario"
+          "Envío prioritario",
         ],
         badge: "Mejor valor 💎",
         ctaButton: "Unirme al club",
-        accentColor: "mint"
-      }
+        accentColor: "mint",
+      },
     ],
     shippingLabel: "Envío",
     shippingValue: "Incluido",
     commitmentLabel: "Compromiso",
-    commitmentValue: "Ninguno"
+    commitmentValue: "Ninguno",
   },
+
   faq: {
     subtitle: "Preguntas",
     title: "Preguntas frecuentes, respuestas claras",
     items: [
       {
         question: "¿Los productos están personalizados para mi tipo de piel?",
-        answer: "Cada caja está diseñada como una rutina universal, equilibrada y suave, pensada para la mayoría de pieles sanas. En lugar de complejidad, priorizamos compatibilidad y claridad."
+        answer:
+          "Cada caja está diseñada como una rutina universal, equilibrada y suave, pensada para la mayoría de pieles sanas. En lugar de complejidad, priorizamos compatibilidad y claridad.",
       },
       {
         question: "¿Son tamaño completo o muestras?",
-        answer: "Sizes may vary. What matters is duration — each product is selected to last until your next box arrives with normal use. You'll never receive two single-use products."
+        answer:
+          "Sizes may vary. What matters is duration — each product is selected to last until your next box arrives with normal use. You'll never receive two single-use products.",
       },
       {
         question: "Will I receive the same type of product twice?",
-        answer: "No. Each box includes five different product categories that work together as one routine. No repeated categories in the same box."
+        answer:
+          "No. Each box includes five different product categories that work together as one routine. No repeated categories in the same box.",
       },
       {
         question: "What if a product doesn't work for me?",
-        answer: "We focus on gentle, daily-use skincare to minimize irritation and incompatibility. If something feels off, reach out — we're here to help."
+        answer:
+          "We focus on gentle, daily-use skincare to minimize irritation and incompatibility. If something feels off, reach out — we're here to help.",
       },
       {
         question: "When does my box ship?",
-        answer: "Boxes ship monthly, on a predictable schedule. You'll receive tracking information as soon as your box is on the way."
+        answer:
+          "Boxes ship monthly, on a predictable schedule. You'll receive tracking information as soon as your box is on the way.",
       },
       {
         question: "Can I cancel or skip a month?",
-        answer: "Yes. You can cancel anytime or skip a month if you need to — no penalties, no questions asked."
+        answer:
+          "Yes. You can cancel anytime or skip a month if you need to — no penalties, no questions asked.",
       },
       {
         question: "Is there a long-term commitment?",
-        answer: "No. Your subscription is month-to-month."
+        answer: "No. Your subscription is month-to-month.",
       },
       {
         question: "Are the products safe to use together?",
-        answer: "Yes. Each box is built as a cohesive routine, not a random assortment of products."
-      }
-    ]
+        answer:
+          "Yes. Each box is built as a cohesive routine, not a random assortment of products.",
+      },
+    ],
   },
+
   finalCta: {
     title: "Ready to simplify your skincare?",
     descriptionPrimary: "A complete routine. Delivered monthly.",
     descriptionSecondary: "Designed to be finished — not forgotten.",
-    ctaButton: {
-      label: "Reserve my spot",
-      href: "#pricing"
-    },
-    footer: "Cancel anytime · No commitments · Ships monthly"
+    ctaButton: { label: "Reserve my spot", href: "#pricing" },
+    footer: "Cancel anytime · No commitments · Ships monthly",
   },
+
   footer: {
     mission: {
       title: "Ritual",
-      description: "Thoughtful skincare routines, delivered with intention."
+      description:
+        "Thoughtful skincare routines, delivered with intention.",
     },
     navigate: {
       title: "Navigate",
       links: [
-        {
-          label: "Shop",
-          href: "#"
-        },
-        {
-          label: "Our Story",
-          href: "#why"
-        },
-        {
-          label: "How It Works",
-          href: "#how-it-works"
-        },
-        {
-          label: "FAQ",
-          href: "#faq"
-        },
-        {
-          label: "Shipping",
-          href: "#"
-        }
-      ]
+        { label: "Shop", href: "#" },
+        { label: "Our Story", href: "#why" },
+        { label: "How It Works", href: "#how-it-works" },
+        { label: "FAQ", href: "#faq" },
+        { label: "Shipping", href: "#" },
+      ],
     },
     connect: {
       title: "Connect",
       links: [
-        {
-          label: "Instagram",
-          href: "#"
-        },
-        {
-          label: "TikTok",
-          href: "#"
-        }
-      ]
+        { label: "Instagram", href: "#" },
+        { label: "TikTok", href: "#" },
+      ],
     },
     newsletter: {
       title: "Stay Updated",
-      placeholder: "your@email.com"
+      placeholder: "your@email.com",
     },
     bottomBar: {
       copyright: "© 2025 Ritual. All rights reserved.",
       links: [
-        {
-          label: "Privacy",
-          href: "#"
-        },
-        {
-          label: "Terms",
-          href: "#"
-        },
-        {
-          label: "Accessibility",
-          href: "#"
-        }
-      ]
-    }
+        { label: "Privacy", href: "#" },
+        { label: "Terms", href: "#" },
+        { label: "Accessibility", href: "#" },
+      ],
+    },
   },
+
   login: {
     title: "Welcome Back",
     subtitle: "Sign in to your KumiBox account",
@@ -440,8 +389,9 @@ export const APP_REGISTRY = {
     signUpLink: "Get Started",
     signUpHref: "/register",
     errorTitle: "Sign in failed",
-    errorGeneric: "Invalid email or password. Please try again."
+    errorGeneric: "Invalid email or password. Please try again.",
   },
+
   register: {
     title: "Create Account",
     subtitle: "Sign up to start your KumiBox journey",
@@ -459,8 +409,9 @@ export const APP_REGISTRY = {
     signInLink: "Sign In",
     signInHref: "/login",
     errorTitle: "Registration failed",
-    errorGeneric: "Registration failed. Please try again."
+    errorGeneric: "Registration failed. Please try again.",
   },
+
   forgotPassword: {
     title: "Reset Password",
     subtitle: "Enter your email address and we'll send you a link to reset your password.",
@@ -475,8 +426,9 @@ export const APP_REGISTRY = {
     successMessage: "We've sent a password reset link to your email address. Please check your inbox and follow the instructions.",
     backToLogin: "Back to Login",
     errorTitle: "Unable to send reset link",
-    errorGeneric: "Failed to send reset email. Please try again."
+    errorGeneric: "Failed to send reset email. Please try again.",
   },
+
   resetPassword: {
     title: "Set New Password",
     subtitle: "Enter your new password below.",
@@ -493,8 +445,9 @@ export const APP_REGISTRY = {
     goToLogin: "Go to Login",
     errorTitle: "Password reset failed",
     errorInvalidLink: "Invalid or expired reset link. Please request a new password reset link.",
-    errorGeneric: "Failed to reset password. Please try again."
+    errorGeneric: "Failed to reset password. Please try again.",
   },
+
   dashboard: {
     welcomeTitle: "Welcome back",
     emailLabel: "Email",
@@ -526,8 +479,9 @@ export const APP_REGISTRY = {
     notificationsTitle: "Notifications",
     notificationsDesc: "Manage alerts",
     logOut: "Log Out",
-    backToHome: "Back to Home"
+    backToHome: "Back to Home",
   },
+
   checkout: {
     title: "Completa tu pedido",
     subtitle: "Estás a un paso de comenzar tu ritual ✨",
@@ -558,12 +512,13 @@ export const APP_REGISTRY = {
     cancelMessage: "Has cancelado el pago. Puedes volver a intentar cuando quieras.",
     cancelBackToCheckout: "Volver al checkout",
     cancelBackToPricing: "Ver planes",
-    loginRequiredMessage: "Inicia sesión para continuar con este plan."
+    loginRequiredMessage: "Inicia sesión para continuar con este plan.",
   },
+
   account: {
     title: "Account",
-    placeholder: "Account — protected. Add your flow here."
-  }
+    placeholder: "Account — protected. Add your flow here.",
+  },
 } as const;
 
 export type AppRegistry = typeof APP_REGISTRY;

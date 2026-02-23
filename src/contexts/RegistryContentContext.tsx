@@ -1,8 +1,8 @@
 /**
  * Provides registry content and content modifiers.
- * When initialContent/initialContentModifiers are provided (from registry.json), uses them as the full source.
+ * When initialContent/initialContentModifiers are provided, uses them as the full source.
  * Otherwise uses localStorage overrides merged with APP_REGISTRY.
- * Listens to storage events so the other tab updates when the editor saves (localStorage mode).
+ * Listens to storage events so the other tab updates when the editor saves.
  */
 
 import React, {
@@ -16,8 +16,8 @@ import React, {
 } from "react";
 import { APP_REGISTRY, type AppRegistry } from "@/config/app-registry";
 
-const CONTENT_STORAGE_KEY = "app_registry_content_overrides";
-const CONTENT_MODIFIERS_STORAGE_KEY = "app_registry_content_modifiers";
+export const CONTENT_STORAGE_KEY = "app_registry_content_overrides";
+export const CONTENT_MODIFIERS_STORAGE_KEY = "app_registry_content_modifiers";
 
 export type ContentModifiers = Record<
   string,
@@ -26,7 +26,7 @@ export type ContentModifiers = Record<
 
 type RegistryContentProviderProps = {
   children: ReactNode;
-  /** When provided (e.g. from registry.json), used as full content; no localStorage merge. */
+  /** When provided, used as full content; no localStorage merge. */
   initialContent?: AppRegistry | Record<string, unknown>;
   initialContentModifiers?: ContentModifiers;
 };

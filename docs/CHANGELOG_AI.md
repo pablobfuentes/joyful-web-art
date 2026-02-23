@@ -4,6 +4,12 @@
 
 ### Added
 
+- **RegistryEditor: Preview button, Save to source files (app-registry.ts + style-registry.ts), date-stamped backups**
+  - **Goal:** Preview applies changes in browser only (localStorage + reload). Save writes content and style to `src/config/app-registry.ts` and `src/config/style-registry.ts` with a safety backup before overwriting.
+  - **Changes:** (1) **Preview button:** New "Preview" button in RegistryEditor applies current content, style, and contentModifiers to localStorage and reloads (same as previous Save behavior). (2) **Save button:** POSTs `{ content, style }` to dev-only `POST /__registry-save-source`. Vite plugin (dev only) creates `src/config/backups/` if missing; if no backup file with today’s date exists, copies current `app-registry.ts` and `style-registry.ts` to `backups/app-registry.YYYY-MM-DD.ts` and `backups/style-registry.YYYY-MM-DD.ts`, then overwrites the two source files with serialized content and style. (3) **Backups folder:** `src/config/backups/` added with `.gitkeep`; date-stamped backups are created once per day before the first Save of that day. (4) **RegistryEditor:** Save on success also writes to localStorage and reloads; on failure shows toast and does not reload.
+  - **Files touched:** `src/pages/RegistryEditor.tsx`, `vite.config.ts`, `src/config/backups/.gitkeep`, `docs/CHANGELOG_AI.md`, `docs/ADMIN_REGISTRY_EDITOR.md`.
+  - **Verification:** `npm run build` succeeds. No FAILURE_LOG.
+
 - **Main page not reflecting Registry Editor saves (registry.json) — fix**
   - **Issue:** After editing in Registry Editor and Save, the main page did not show the new values; it still showed defaults or old content/style.
   - **Root cause:** When registry is loaded from `registry.json` (file), `Index` on mount was calling `refresh()`, `refreshStyleRegistry()`, and `applyStyleRegistry(getMergedStyleRegistry())`. Those overwrote file-sourced state and DOM with **localStorage** (and defaults), so the file’s content/style were replaced before render.
