@@ -33,7 +33,7 @@ const Index = () => {
     applyStyleRegistry(getMergedStyleRegistry());
     refresh();
     refreshStyleRegistry();
-  }, [fromFile, refresh, refreshStyleRegistry]);
+  }, [fromFile, refresh, refreshStyleRegistry, registry]);
 
   const heroDiv = registry.hero.divider!;
   const whyDiv = registry.why.divider!;

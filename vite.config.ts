@@ -8,20 +8,114 @@ import type { Connect } from "vite";
 
 /** SPA fallback: serve index.html for routes like /admin/registry-editor so client-side routing works. */
 function spaFallbackPlugin() {
+  const historyHandler = history({
+    index: "/",
+    // Don't rewrite Vite internals (@vite/client, @react-refresh, @id/..., etc.)
+    rewrites: [{ from: /^\/@/, to: (ctx: { parsedUrl: { pathname: string } }) => ctx.parsedUrl.pathname }],
+  });
   return {
     name: "spa-fallback",
-    configureServer(server: { middlewares: { stack: Array<{ route: string; handle: (req: unknown, res: unknown, next: () => void) => void }> } }) {
+    configureServer(server: { middlewares: Connect.Server }) {
+      // Prepend so non-file requests are rewritten to / before Vite tries to serve files
+      const stack = (server.middlewares as Connect.Server & { stack?: unknown[] }).stack;
+      if (Array.isArray(stack)) {
+        stack.unshift({
+          route: "",
+          handle: historyHandler,
+        });
+      } else {
+        // Fallback: add at end (subroutes may still 404; open http://localhost:8080/ for home)
+        server.middlewares.use(historyHandler);
+      }
+    },
+  };
+}
+
+const FONT_EXTENSIONS = [".ttf", ".otf", ".woff", ".woff2"];
+
+/** Dev-only: GET /api/sync-fonts lists public/fonts/, appends @font-face for any file not in custom-fonts.css, writes file, returns { added: string[] }. */
+function syncFontsPlugin() {
+  return {
+    name: "sync-fonts",
+    configureServer(server: { middlewares: Connect.Server & { stack?: Array<{ route: string; handle: (req: unknown, res: unknown, next: () => void) => void }> } }) {
+      const handle = (req: Connect.IncomingMessage, res: Connect.ServerResponse, next: () => void) => {
+        if (req.method !== "GET" || req.url !== "/api/sync-fonts") {
+          next();
+          return;
+        }
+        console.log("[sync-fonts] GET /api/sync-fonts requested");
+        try {
+          const projectRoot = path.resolve(__dirname);
+          const fontsDir = path.join(projectRoot, "public", "fonts");
+          const cssPath = path.join(fontsDir, "custom-fonts.css");
+          console.log("[sync-fonts] fontsDir:", fontsDir);
+          const fontsDirExists = fs.existsSync(fontsDir);
+          console.log("[sync-fonts] fonts folder exists:", fontsDirExists);
+          if (!fontsDirExists) {
+            console.log("[sync-fonts] No fonts folder – returning added: []");
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ ok: true, added: [] }));
+            return;
+          }
+          const allInDir = fs.readdirSync(fontsDir, { withFileTypes: true });
+          console.log("[sync-fonts] All entries in fonts folder:", allInDir.map((e) => (e.isFile() ? `file: ${e.name}` : `dir: ${e.name}`)));
+          const existingCss = fs.existsSync(cssPath) ? fs.readFileSync(cssPath, "utf8") : "";
+          console.log("[sync-fonts] custom-fonts.css exists:", fs.existsSync(cssPath), "length:", existingCss.length);
+          const declaredSrc = new Set(
+            Array.from(existingCss.matchAll(/src:\s*url\s*\(\s*['"]?\/?fonts\/([^'")\s]+)['"]?\s*\)/gi), (m) => m[1].toLowerCase())
+          );
+          console.log("[sync-fonts] Already declared in CSS (filename):", Array.from(declaredSrc));
+          const dirEntries = fs.readdirSync(fontsDir, { withFileTypes: true });
+          const fontFiles = dirEntries
+            .filter((e) => e.isFile() && FONT_EXTENSIONS.some((ext) => e.name.toLowerCase().endsWith(ext)))
+            .map((e) => e.name);
+          console.log("[sync-fonts] Font files found in folder:", fontFiles);
+          const added: string[] = [];
+          let newCss = existingCss.trimEnd();
+          for (const file of fontFiles) {
+            const key = file.toLowerCase();
+            if (declaredSrc.has(key)) {
+              console.log("[sync-fonts] Skip (already declared):", file);
+              continue;
+            }
+            const fontFamily = path.basename(file, path.extname(file)).replace(/[-_\s]+/g, " ");
+            const format = key.endsWith(".woff2") ? "woff2" : key.endsWith(".woff") ? "woff" : key.endsWith(".otf") ? "opentype" : "truetype";
+            const block = `\n\n@font-face {\n  font-family: '${fontFamily}';\n  src: url('/fonts/${file}') format('${format}');\n  font-weight: 400;\n  font-style: normal;\n  font-display: swap;\n}`;
+            newCss += block;
+            added.push(fontFamily);
+            declaredSrc.add(key);
+            console.log("[sync-fonts] Adding to custom-fonts.css:", file, "→ font-family:", fontFamily);
+          }
+          if (newCss !== existingCss) {
+            if (!existingCss.trim()) {
+              newCss =
+                `/** Custom Font Declarations – updated by Refresh Fonts */\n` + (newCss.startsWith("@font-face") ? newCss : "\n" + newCss);
+            }
+            fs.writeFileSync(cssPath, newCss + "\n", "utf8");
+            console.log("[sync-fonts] Wrote custom-fonts.css, added count:", added.length);
+          } else {
+            console.log("[sync-fonts] No changes to custom-fonts.css");
+          }
+          console.log("[sync-fonts] Response: ok: true, added:", added);
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ ok: true, added }));
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.error("[sync-fonts] Error:", message);
+          res.statusCode = 500;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ ok: false, error: message }));
+        }
+      };
+      // Register in a post-callback so we run after SPA fallback plugin; then unshift puts us first so /api/sync-fonts is not rewritten to index.html
       return () => {
         const stack = server.middlewares.stack;
         if (Array.isArray(stack)) {
-          stack.unshift({
-            route: "",
-            handle: history({
-              index: "/",
-              // Don't rewrite Vite internals (@vite/client, @react-refresh, @id/..., etc.)
-              rewrites: [{ from: /^\/@/, to: (ctx: { parsedUrl: { pathname: string } }) => ctx.parsedUrl.pathname }],
-            }),
-          });
+          stack.unshift({ route: "", handle: handle as (req: unknown, res: unknown, next: () => void) => void });
+        } else {
+          server.middlewares.use(handle);
         }
       };
     },
@@ -141,6 +235,7 @@ function registrySaveSourcePlugin() {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  appType: "spa",
   server: {
     host: "::",
     port: 8080,
@@ -152,6 +247,7 @@ export default defineConfig(({ mode }) => ({
     spaFallbackPlugin(),
     react(),
     mode === "development" && componentTagger(),
+    mode === "development" && syncFontsPlugin(),
     mode === "development" && registrySaveSourcePlugin(),
   ].filter(Boolean),
   resolve: {

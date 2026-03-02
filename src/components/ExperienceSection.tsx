@@ -3,12 +3,11 @@ import { useRef } from "react";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleLeaf, DoodleDroplet } from "./Doodles";
 
-const bgClasses = ["bg-peach", "bg-lavender", "bg-mint", "bg-sunshine"];
 const emojis = ["📬", "🎯", "📖", "🔄"];
 const rotations = [-3, 2, -2, 3];
 
 const ExperienceSection = () => {
-  const { getSectionContent } = useRegistryContent();
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("experience");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
@@ -38,18 +37,22 @@ const ExperienceSection = () => {
           className="text-center mb-16"
         >
           <motion.span
-            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
+            style={getStyleForPath("experience.subtitle", "--foreground")}
             animate={{ rotate: [2, -2, 2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
             🌟 {data.subtitle}
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-6">{data.title}</h2>
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-6" style={getStyleForPath("experience.title", "--foreground")}>
+            {data.title}
+          </h2>
           <motion.a
             href={data.ctaButton.href}
             whileHover={{ scale: 1.08, rotate: -2 }}
             whileTap={{ scale: 0.95 }}
             className="inline-block gradient-warm px-10 py-5 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
+            style={getStyleForPath("experience.ctaButton.label", "--primary-foreground")}
           >
             {data.ctaButton.label} ✨
           </motion.a>
@@ -66,7 +69,10 @@ const ExperienceSection = () => {
               whileHover={{ y: -10, rotate: 0, scale: 1.04 }}
               className="group relative"
             >
-              <div className={`${bgClasses[index]} rounded-3xl p-7 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover`}>
+              <div
+                className="rounded-3xl p-7 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover"
+                style={{ backgroundColor: "hsl(var(--experience-card-" + index + "-bg))" }}
+              >
                 {/* Number badge */}
                 <motion.div
                   className="absolute -top-4 -left-4 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10"
@@ -85,8 +91,12 @@ const ExperienceSection = () => {
                 </motion.span>
 
                 <div className="pt-4">
-                  <h3 className="font-display text-xl font-bold mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                  <h3 className="font-display text-xl font-bold mb-2" style={getStyleForPath(`experience.steps.${index}.title`, "--foreground")}>
+                    {step.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={getStyleForPath(`experience.steps.${index}.description`, "--muted-foreground")}>
+                    {step.description}
+                  </p>
                 </div>
               </div>
             </motion.div>

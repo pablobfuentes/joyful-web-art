@@ -4,7 +4,7 @@ import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleFlower, DoodleStar } from "./Doodles";
 
 const CompatibilityTestSection = () => {
-  const { getSectionContent } = useRegistryContent();
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("compatibilityTest");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<(boolean | null)[]>(data.questions.map(() => null));
@@ -58,15 +58,20 @@ const CompatibilityTestSection = () => {
           className="text-center mb-12"
         >
           <motion.span
-            className="inline-block bg-bubblegum px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            className="inline-block bg-bubblegum px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
+            style={getStyleForPath("compatibilityTest.subtitle", "--foreground")}
             animate={{ rotate: [-2, 2, -2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
             ✨ {data.subtitle}
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">{data.title}</h2>
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("compatibilityTest.title", "--foreground")}>
+            {data.title}
+          </h2>
           {result === null && (
-            <p className="text-muted-foreground text-lg">{data.triggerLabel}</p>
+            <p className="text-lg" style={getStyleForPath("compatibilityTest.triggerLabel", "--muted-foreground")}>
+              {data.triggerLabel}
+            </p>
           )}
         </motion.div>
 
@@ -89,7 +94,8 @@ const CompatibilityTestSection = () => {
               animate={{ opacity: 1, x: 0, rotate: 0 }}
               exit={{ opacity: 0, x: -40, rotate: -2 }}
               transition={{ duration: 0.4 }}
-              className="bg-background rounded-3xl p-8 md:p-10 shadow-playful border-4 border-peach-strong relative overflow-visible"
+              className="rounded-3xl p-8 md:p-10 shadow-playful border-4 border-peach-strong relative overflow-visible"
+              style={{ backgroundColor: "hsl(var(--compatibilityTest-question-card-bg))" }}
             >
               {/* Floating emoji */}
               <motion.span
@@ -103,7 +109,7 @@ const CompatibilityTestSection = () => {
               <p className="text-sm text-primary font-bold mb-2">
                 Pregunta {currentQuestion + 1} de {data.questions.length}
               </p>
-              <p className="font-display text-xl md:text-2xl font-bold mb-8">
+              <p className="font-display text-xl md:text-2xl font-bold mb-8" style={getStyleForPath(`compatibilityTest.questions.${currentQuestion}`, "--foreground")}>
                 {data.questions[currentQuestion]}
               </p>
               <div className="flex gap-4">
@@ -131,7 +137,8 @@ const CompatibilityTestSection = () => {
               initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="bg-mint rounded-3xl p-8 md:p-10 shadow-playful border-4 border-background text-center relative overflow-visible"
+              className="rounded-3xl p-8 md:p-10 shadow-playful border-4 border-background text-center relative overflow-visible"
+              style={{ backgroundColor: "hsl(var(--compatibilityTest-result-card-bg))" }}
             >
               <motion.span
                 className="absolute -top-6 left-1/2 -translate-x-1/2 text-5xl"
@@ -141,7 +148,7 @@ const CompatibilityTestSection = () => {
                 {result === "goodfit" ? "🎉" : "🩺"}
               </motion.span>
 
-              <p className="font-display text-xl md:text-2xl font-bold mb-6 mt-4">
+              <p className="font-display text-xl md:text-2xl font-bold mb-6 mt-4" style={getStyleForPath(result === "dermatologist" ? "compatibilityTest.resultDermatologist" : "compatibilityTest.resultGoodFit", "--foreground")}>
                 {result === "dermatologist" ? data.resultDermatologist : data.resultGoodFit}
               </p>
               <motion.a
@@ -149,6 +156,7 @@ const CompatibilityTestSection = () => {
                 whileHover={{ scale: 1.08, rotate: -2 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-block gradient-warm px-10 py-5 rounded-full font-bold text-primary-foreground shadow-playful text-lg mb-4"
+                style={getStyleForPath("compatibilityTest.ctaButton", "--primary-foreground")}
               >
                 {data.ctaButton} ✨
               </motion.a>

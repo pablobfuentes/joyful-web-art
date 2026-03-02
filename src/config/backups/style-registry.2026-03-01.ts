@@ -418,13 +418,13 @@ export const STYLE_REGISTRY = {
     },
     images: [
       {
-        path: "AlgoQueFuncioneParaTuPiel_01.JPG"
+        path: "problem-1.jpg"
       },
       {
         path: "comprasilusion3.jpg"
       },
       {
-        path: "problem-1.jpg"
+        path: "problem-3.jpg"
       }
     ],
     divider: {
@@ -542,7 +542,7 @@ export const STYLE_REGISTRY = {
     divider: {
       style: "wavy",
       topColorIndex: 12,
-      bottomColorIndex: 8
+      bottomColorIndex: 9
     }
   },
   pricing: {
@@ -557,7 +557,7 @@ export const STYLE_REGISTRY = {
     cardBorderByAccent: {
       lavender: 10,
       peach: 2,
-      mint: 7
+      mint: 11
     },
     badge: {
       backgroundIndex: 12
@@ -569,7 +569,7 @@ export const STYLE_REGISTRY = {
     },
     divider: {
       style: "blob",
-      topColorIndex: 8,
+      topColorIndex: 9,
       bottomColorIndex: 10
     }
   },

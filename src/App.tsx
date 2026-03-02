@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RegistryContentProvider } from "@/contexts/RegistryContentContext";
 import { StyleRegistryProvider } from "@/contexts/StyleRegistryContext";
@@ -19,7 +19,6 @@ import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import CheckoutCancel from "./pages/CheckoutCancel";
 import Account from "./pages/Account";
-import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -65,8 +64,8 @@ const App = () => (
                 </AdminRoute>
               }
             />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
+            {/* Unknown paths redirect to home so the app never shows a 404 page. */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </StyleRegistryProvider>
           </RegistryContentProvider>

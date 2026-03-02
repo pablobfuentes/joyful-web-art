@@ -6,14 +6,13 @@ import { FloatingDoodle, DoodleDroplet, DoodleLeaf, DoodleFlower, DoodleSparkle 
 const rotations = [-3, 2, -2, 3, -1];
 
 const WhatYouReceiveSection = () => {
-  const { getSectionContent } = useRegistryContent();
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("whatYouReceive");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
     <section className="relative py-24 px-6 bg-[hsl(var(--whatYouReceive-section-bg))] overflow-hidden">
-      <div className="absolute inset-0 bg-pattern-skincare opacity-60" />
 
       <FloatingDoodle className="top-16 left-[6%] w-10 h-10 text-primary/25" delay={0}>
         <DoodleDroplet className="w-full h-full" />
@@ -36,14 +35,19 @@ const WhatYouReceiveSection = () => {
           className="text-center mb-16"
         >
           <motion.span
-            className="inline-block bg-sunshine px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            className="inline-block bg-sunshine px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
+            style={getStyleForPath("whatYouReceive.subtitle", "--foreground")}
             animate={{ rotate: [2, -2, 2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
             {data.subtitleBadgeEmoji ?? "📦"} {data.subtitle}
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">{data.title}</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">{data.description}</p>
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("whatYouReceive.title", "--foreground")}>
+            {data.title}
+          </h2>
+          <p className="max-w-2xl mx-auto text-lg" style={getStyleForPath("whatYouReceive.description", "--muted-foreground")}>
+            {data.description}
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -79,8 +83,12 @@ const WhatYouReceiveSection = () => {
                 </motion.span>
 
                 <div className="pt-4">
-                  <h3 className="font-display text-xl font-bold mb-2">{product.category}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{product.description}</p>
+                  <h3 className="font-display text-xl font-bold mb-2" style={getStyleForPath(`whatYouReceive.products.${index}.category`, "--foreground")}>
+                    {product.category}
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={getStyleForPath(`whatYouReceive.products.${index}.description`, "--muted-foreground")}>
+                    {product.description}
+                  </p>
                 </div>
               </div>
             </motion.div>

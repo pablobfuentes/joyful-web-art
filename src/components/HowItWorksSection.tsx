@@ -1,5 +1,5 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 import step1 from "@/assets/step-1.jpg";
 import step2 from "@/assets/step-2.jpg";
 import step3 from "@/assets/step-3.jpg";
@@ -17,20 +17,25 @@ const STEP_META = [
   { emoji: "✨" },
 ];
 
+const noopStyle = (): CSSProperties => ({});
+
 const StepCard = ({
   step,
   imageSrc,
   style,
   index,
+  getStyleForPath,
 }: {
   step: { label: string; title: string; description: string };
   imageSrc: string;
   style: (typeof STEP_META)[0];
   index: number;
+  getStyleForPath?: (pathKey: string, defaultColorVar?: string) => CSSProperties;
 }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const isEven = index % 2 === 0;
+  const getStyle = typeof getStyleForPath === "function" ? getStyleForPath : noopStyle;
 
   return (
     <motion.div
@@ -79,11 +84,15 @@ const StepCard = ({
       </motion.div>
 
       <div className="flex-1 w-full text-center md:text-left">
-        <span className="inline-block text-sm font-semibold text-primary mb-2">{step.label}</span>
-        <h3 className="font-display text-2xl md:text-3xl font-bold mb-3 text-foreground">
+        <span className="inline-block text-sm font-semibold mb-2" style={getStyle(`howItWorks.steps.${index}.label`, "--primary")}>
+          {step.label}
+        </span>
+        <h3 className="font-display text-2xl md:text-3xl font-bold mb-3" style={getStyle(`howItWorks.steps.${index}.title`, "--foreground")}>
           {step.title}
         </h3>
-        <p className="text-muted-foreground leading-relaxed text-lg">{step.description}</p>
+        <p className="leading-relaxed text-lg" style={getStyle(`howItWorks.steps.${index}.description`, "--muted-foreground")}>
+          {step.description}
+        </p>
       </div>
     </motion.div>
   );
@@ -146,7 +155,7 @@ const HowItWorksSection = () => {
 
         <div className="space-y-20 max-w-4xl mx-auto">
           {data.steps.map((step, index) => (
-            <StepCard key={step.label} step={step} imageSrc={stepStyles[index].imageSrc} style={STEP_META[index]} index={index} />
+            <StepCard key={step.label} step={step} imageSrc={stepStyles[index].imageSrc} style={STEP_META[index]} index={index} getStyleForPath={getStyleForPath} />
           ))}
         </div>
 

@@ -4,7 +4,7 @@ import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleSparkle, DoodleFlower, DoodleHeart } from "./Doodles";
 
 const FAQSection = () => {
-  const { getSectionContent } = useRegistryContent();
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("faq");
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const headerRef = useRef(null);
@@ -32,13 +32,16 @@ const FAQSection = () => {
           className="text-center mb-16"
         >
           <motion.span
-            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
+            style={getStyleForPath("faq.subtitle", "--foreground")}
             animate={{ rotate: [-2, 2, -2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
             🤓 {data.subtitle}
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold">{data.title}</h2>
+          <h2 className="font-display text-4xl md:text-6xl font-bold" style={getStyleForPath("faq.title", "--foreground")}>
+            {data.title}
+          </h2>
         </motion.div>
 
         <div className="space-y-4">
@@ -52,14 +55,16 @@ const FAQSection = () => {
               className="group"
             >
               <motion.div
-                className={`bg-background rounded-3xl shadow-playful border-4 overflow-hidden transition-all ${
+                className={`rounded-3xl shadow-playful border-4 overflow-hidden transition-all ${
                   openIndex === index ? "border-primary" : "border-background"
                 }`}
+                style={{ backgroundColor: "hsl(var(--faq-item-bg))" }}
                 whileHover={{ scale: 1.01 }}
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full text-left px-6 py-5 font-display font-bold text-foreground flex justify-between items-center gap-4"
+                  className="w-full text-left px-6 py-5 font-display font-bold flex justify-between items-center gap-4"
+                  style={getStyleForPath(`faq.items.${index}.question`, "--foreground")}
                 >
                   <span className="flex items-center gap-3">
                     <span className="w-8 h-8 gradient-warm rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold shrink-0 shadow-playful">
@@ -85,7 +90,9 @@ const FAQSection = () => {
                       className="overflow-hidden"
                     >
                       <div className="px-6 pb-5 pl-[4.25rem]">
-                        <p className="text-muted-foreground text-sm leading-relaxed">{item.answer}</p>
+                        <p className="text-sm leading-relaxed" style={getStyleForPath(`faq.items.${index}.answer`, "--muted-foreground")}>
+                          {item.answer}
+                        </p>
                       </div>
                     </motion.div>
                   )}

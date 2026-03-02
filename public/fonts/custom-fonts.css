@@ -31,3 +31,243 @@
     font-style: normal;
     font-display: swap;
   }
+
+@font-face {
+  font-family: 'Butterpop';
+  src: url('/fonts/Butterpop.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Butterpop';
+  src: url('/fonts/Butterpop.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CHICKEN Pie Height';
+  src: url('/fonts/CHICKEN Pie Height.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CHICKEN Pie Height';
+  src: url('/fonts/CHICKEN Pie Height.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CHICKEN Pie';
+  src: url('/fonts/CHICKEN Pie.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CHICKEN Pie';
+  src: url('/fonts/CHICKEN Pie.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Bold Italic trial';
+  src: url('/fonts/Cocogoose-Pro-Bold-Italic-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Bold trial';
+  src: url('/fonts/Cocogoose-Pro-Bold-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Darkmode Italic trial';
+  src: url('/fonts/Cocogoose-Pro-Darkmode-Italic-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Darkmode trial';
+  src: url('/fonts/Cocogoose-Pro-Darkmode-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Italic trial';
+  src: url('/fonts/Cocogoose-Pro-Italic-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Letterpress Regular trial';
+  src: url('/fonts/Cocogoose-Pro-Letterpress-Regular-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Light Italic trial';
+  src: url('/fonts/Cocogoose-Pro-Light-Italic-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Light trial';
+  src: url('/fonts/Cocogoose-Pro-Light-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Regular trial';
+  src: url('/fonts/Cocogoose-Pro-Regular-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Semilight Italic trial';
+  src: url('/fonts/Cocogoose-Pro-Semilight-Italic-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Semilight trial';
+  src: url('/fonts/Cocogoose-Pro-Semilight-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Thin Italic trial';
+  src: url('/fonts/Cocogoose-Pro-Thin-Italic-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Thin trial';
+  src: url('/fonts/Cocogoose-Pro-Thin-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Ultralight Italic trial';
+  src: url('/fonts/Cocogoose-Pro-Ultralight-Italic-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocogoose Pro Ultralight trial';
+  src: url('/fonts/Cocogoose-Pro-Ultralight-trial.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heyam';
+  src: url('/fonts/Heyam.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK Bold';
+  src: url('/fonts/LEMONMILK-Bold.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK BoldItalic';
+  src: url('/fonts/LEMONMILK-BoldItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK Light';
+  src: url('/fonts/LEMONMILK-Light.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK LightItalic';
+  src: url('/fonts/LEMONMILK-LightItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK Medium';
+  src: url('/fonts/LEMONMILK-Medium.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK MediumItalic';
+  src: url('/fonts/LEMONMILK-MediumItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK Regular';
+  src: url('/fonts/LEMONMILK-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEMONMILK RegularItalic';
+  src: url('/fonts/LEMONMILK-RegularItalic.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

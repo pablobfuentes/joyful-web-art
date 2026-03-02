@@ -4,15 +4,13 @@ import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleStar, DoodleFlower, DoodleDroplet } from "./Doodles";
 
 const FinalCTASection = () => {
-  const { getSectionContent } = useRegistryContent();
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("finalCta");
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
     <section className="relative py-32 px-6 bg-[hsl(var(--finalCta-section-bg))] overflow-hidden">
-      <div className="absolute inset-0 bg-pattern-skincare opacity-60" />
-      <div className="absolute inset-0 bg-pattern-dots opacity-30" />
 
       <FloatingDoodle className="top-16 left-[8%] w-12 h-12 text-primary/25" delay={0}>
         <DoodleHeart className="w-full h-full" />
@@ -44,18 +42,27 @@ const FinalCTASection = () => {
           >
             🌸
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4">{data.title}</h2>
-          <p className="text-xl text-foreground/90 mb-2 font-medium">{data.descriptionPrimary}</p>
-          <p className="text-lg text-foreground/80 mb-10">{data.descriptionSecondary}</p>
+          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("finalCta.title", "--foreground")}>
+            {data.title}
+          </h2>
+          <p className="text-xl mb-2 font-medium" style={getStyleForPath("finalCta.descriptionPrimary", "--foreground")}>
+            {data.descriptionPrimary}
+          </p>
+          <p className="text-lg mb-10" style={getStyleForPath("finalCta.descriptionSecondary", "--foreground")}>
+            {data.descriptionSecondary}
+          </p>
           <motion.a
             href={data.ctaButton.href}
             whileHover={{ scale: 1.1, rotate: -3 }}
             whileTap={{ scale: 0.95 }}
             className="inline-block gradient-warm px-12 py-6 rounded-full text-xl font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
+            style={getStyleForPath("finalCta.ctaButton.label", "--primary-foreground")}
           >
             {data.ctaButton.label} ✨
           </motion.a>
-          <p className="text-sm text-foreground/60 mt-8 font-medium">{data.footer}</p>
+          <p className="text-sm mt-8 font-medium" style={getStyleForPath("finalCta.footer", "--foreground")}>
+            {data.footer}
+          </p>
         </motion.div>
       </div>
     </section>

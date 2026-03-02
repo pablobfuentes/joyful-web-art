@@ -176,10 +176,16 @@ const PricingSection = () => {
           viewport={{ once: true }}
           className="flex flex-wrap gap-6 justify-center text-sm mt-12"
         >
-          <span className="bg-mint px-4 py-2 rounded-full font-bold shadow-playful" style={getStyleForPath("pricing.shippingLabel", "--foreground")}>
+          <span
+            className="px-4 py-2 rounded-full font-bold shadow-playful"
+            style={{ ...getStyleForPath("pricing.shippingLabel", "--foreground"), backgroundColor: "hsl(var(--pricing-bottom-badge-0-bg))" }}
+          >
             {data.shippingLabel}: <span style={getStyleForPath("pricing.shippingValue", "--foreground")}>{data.shippingValue}</span> 🚚
           </span>
-          <span className="bg-lavender px-4 py-2 rounded-full font-bold shadow-playful" style={getStyleForPath("pricing.commitmentLabel", "--foreground")}>
+          <span
+            className="px-4 py-2 rounded-full font-bold shadow-playful"
+            style={{ ...getStyleForPath("pricing.commitmentLabel", "--foreground"), backgroundColor: "hsl(var(--pricing-bottom-badge-1-bg))" }}
+          >
             {data.commitmentLabel}: <span style={getStyleForPath("pricing.commitmentValue", "--foreground")}>{data.commitmentValue}</span> 🎉
           </span>
         </motion.div>

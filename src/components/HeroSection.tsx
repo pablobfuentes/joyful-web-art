@@ -26,10 +26,6 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-28">
       <div className="absolute inset-0 bg-[hsl(var(--hero-section-bg))]" />
-      <div
-        className="absolute inset-0 bg-pattern-skincare"
-        style={{ opacity: "var(--hero-pattern-opacity, 0.6)" }}
-      />
 
       <FloatingDoodle className="top-32 left-[8%] w-10 h-10 text-primary/40" delay={0}>
         <DoodleDroplet className="w-full h-full" />

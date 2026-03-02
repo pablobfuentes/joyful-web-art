@@ -3,19 +3,17 @@ import { useRef } from "react";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleStar, DoodleHeart, DoodleSparkle } from "./Doodles";
 
-const bgClasses = ["bg-peach", "bg-lavender", "bg-mint"];
 const emojis = ["💖", "🌟", "✨"];
 const rotations = [-2, 3, -3];
 
 const TestimonialsSection = () => {
-  const { getSectionContent } = useRegistryContent();
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("testimonials");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
     <section className="relative py-24 px-6 bg-[hsl(var(--testimonials-section-bg))] overflow-hidden">
-      <div className="absolute inset-0 bg-pattern-skincare opacity-50" />
 
       <FloatingDoodle className="top-20 right-[10%] w-10 h-10 text-primary/25" delay={0}>
         <DoodleStar className="w-full h-full" />
@@ -35,7 +33,8 @@ const TestimonialsSection = () => {
           className="text-center mb-16"
         >
           <motion.span
-            className="inline-block bg-bubblegum px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            className="inline-block bg-bubblegum px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
+            style={getStyleForPath("testimonials.subtitle", "--foreground")}
             animate={{ rotate: [-2, 2, -2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
@@ -54,7 +53,10 @@ const TestimonialsSection = () => {
               whileHover={{ y: -10, rotate: 0, scale: 1.05 }}
               className="group relative"
             >
-              <div className={`${bgClasses[index]} rounded-3xl p-7 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover`}>
+              <div
+                className="rounded-3xl p-7 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover"
+                style={{ backgroundColor: "hsl(var(--testimonials-card-" + index + "-bg))" }}
+              >
                 <motion.span
                   className="absolute -top-4 -right-3 text-3xl drop-shadow-lg"
                   animate={{ scale: [1, 1.2, 1], rotate: [0, -10, 10, 0] }}
@@ -64,8 +66,12 @@ const TestimonialsSection = () => {
                 </motion.span>
 
                 <div className="text-4xl mb-4 opacity-20 font-display">"</div>
-                <p className="text-foreground italic mb-4 text-sm leading-relaxed">{item.quote}</p>
-                <p className="font-display font-bold text-primary">— {item.author}</p>
+                <p className="italic mb-4 text-sm leading-relaxed" style={getStyleForPath(`testimonials.items.${index}.quote`, "--foreground")}>
+                  {item.quote}
+                </p>
+                <p className="font-display font-bold" style={getStyleForPath(`testimonials.items.${index}.author`, "--primary")}>
+                  — {item.author}
+                </p>
               </div>
             </motion.div>
           ))}

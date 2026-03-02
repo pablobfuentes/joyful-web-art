@@ -87,6 +87,7 @@ const ProblemSection = () => {
   const ctaRef = useRef(null);
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
 
+  const cards = Array.isArray(data.cards) ? data.cards : Object.values(data.cards ?? {});
   const cardStyles = CARD_META.map((meta, i) => ({
     ...meta,
     imageSrc: resolveRegistryImageSrc(registry.why?.images?.[i]?.path, FALLBACK_IMAGES[i]),
@@ -125,7 +126,7 @@ const ProblemSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 mt-16">
-          {data.cards.map((card, index) => (
+          {cards.map((card, index) => (
             <ProblemCard key={index} card={card} imageSrc={cardStyles[index].imageSrc} style={CARD_META[index]} index={index} />
           ))}
         </div>

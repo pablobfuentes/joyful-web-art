@@ -3,12 +3,11 @@ import { useRef } from "react";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleFlower, DoodleStar, DoodleHeart } from "./Doodles";
 
-const accentClasses = ["bg-peach", "bg-lavender", "bg-mint", "bg-sunshine"];
 const emojis = ["💦", "✨", "🧬", "🫧", "☀️", "💧", "🌿", "🍂"];
 const rotations = [-3, 2, -2, 3, -1, 2, -3, 1];
 
 const PastEditionsSection = () => {
-  const { getSectionContent } = useRegistryContent();
+  const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("pastEditions");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
@@ -35,13 +34,16 @@ const PastEditionsSection = () => {
           className="text-center mb-12"
         >
           <motion.span
-            className="inline-block bg-mint px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
+            className="inline-block bg-mint px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
+            style={getStyleForPath("pastEditions.subtitle", "--foreground")}
             animate={{ rotate: [-2, 2, -2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
             📚 {data.subtitle}
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold">{data.title}</h2>
+          <h2 className="font-display text-4xl md:text-6xl font-bold" style={getStyleForPath("pastEditions.title", "--foreground")}>
+            {data.title}
+          </h2>
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
@@ -55,7 +57,10 @@ const PastEditionsSection = () => {
               whileHover={{ y: -10, rotate: 0, scale: 1.08 }}
               className="group relative"
             >
-              <div className={`${accentClasses[index % accentClasses.length]} rounded-3xl p-5 shadow-playful border-4 border-background text-center relative overflow-visible transition-shadow hover:shadow-card-hover`}>
+              <div
+                className="rounded-3xl p-5 shadow-playful border-4 border-background text-center relative overflow-visible transition-shadow hover:shadow-card-hover"
+                style={{ backgroundColor: "hsl(var(--pastEditions-card-" + (index % 4) + "-bg))" }}
+              >
                 <motion.span
                   className="absolute -top-3 -right-2 text-2xl drop-shadow-md"
                   animate={{ rotate: [0, -15, 15, 0] }}
@@ -63,9 +68,15 @@ const PastEditionsSection = () => {
                 >
                   {emojis[index]}
                 </motion.span>
-                <h3 className="font-display font-bold text-foreground text-lg">{edition.name}</h3>
-                <p className="text-sm text-muted-foreground font-medium">{edition.category}</p>
-                <p className="text-xs text-foreground/60 mt-1 font-bold">{edition.month}</p>
+                <h3 className="font-display font-bold text-lg" style={getStyleForPath(`pastEditions.editions.${index}.name`, "--foreground")}>
+                  {edition.name}
+                </h3>
+                <p className="text-sm font-medium" style={getStyleForPath(`pastEditions.editions.${index}.category`, "--muted-foreground")}>
+                  {edition.category}
+                </p>
+                <p className="text-xs mt-1 font-bold" style={getStyleForPath(`pastEditions.editions.${index}.month`, "--muted-foreground")}>
+                  {edition.month}
+                </p>
               </div>
             </motion.div>
           ))}

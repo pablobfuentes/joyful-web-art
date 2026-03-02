@@ -9,7 +9,7 @@ export const APP_REGISTRY = {
     logoText: "KumiBox",
     logoEmoji: "🦊",
     announcementBar: "¡Envío GRATIS a todo México!",
-    announcementBarEmoji: "",
+    announcementBarEmoji: "🎉",
     links: [
       {
         label: "Tienda",
@@ -34,14 +34,16 @@ export const APP_REGISTRY = {
     }
   },
   hero: {
-    badgeText: "0",
-    imageBadgeLeft: "Directo de Seúl",
+    badgeText: "✨ Skincare Coreano ✨",
+    imageBadgeLeft: "🇰🇷 Directo de Seúl",
     imageBadgeRight: "⭐ 4.9/5",
-    rotatingQuotes: {
-      "2": "Hay muchas opciones. ¿Por dónde empiezo?"
-    },
+    rotatingQuotes: [
+      "¿Estoy eligiendo lo correcto para mi piel?",
+      "He probado tanto… y nada se siente claro.",
+      "Hay demasiadas opciones. ¿Por dónde empiezo?"
+    ],
     heading: "Descubre el ritual coreano que simplifica el cuidado de tu piel.",
-    description: "Tu rutina completa de skincare directo a la puerta de tu casa, cuidadosamente seleccionada y expliacada paso a paso. ",
+    description: "Una rutina de skincare coreano cuidadosamente seleccionada para adaptarse a tu vida — sin confusión, sin exceso, sin productos que no usarás.",
     primaryCta: {
       label: "Quiero unirme",
       href: "#pricing"
@@ -55,23 +57,23 @@ export const APP_REGISTRY = {
   why: {
     title: "Por eso existimos",
     ctaButton: "Descubre si esta experiencia es para ti",
-    impactLine1: "El skincare no debería ser confuso.",
-    impactLine2: "Descúbrelo sin estrés.",
+    impactLine1: "Tal vez no necesitas más productos.",
+    impactLine2: "Tal vez necesitas claridad.",
     cards: [
       {
         beforeText: "Buscas algo que realmente funcione para tu piel.",
-        frictionText: "Pero cada recomendación es distinta. Cada dia hay una nueva tendencia.",
+        frictionText: "Pero cada recomendación suena distinta. Cada tendencia promete lo mismo.",
         costText: "Y elegir se vuelve más complicado de lo que debería ser."
       },
       {
-        beforeText: "Quieres resultados sin gastar de más.",
-        frictionText: "Probaste de todo y la inversión no se siente segura.",
-        costText: "Dinero y tiempo en productos que no se complementan."
+        beforeText: "Compras con ilusión.",
+        frictionText: "Algunos productos funcionan. Otros se quedan a medias.",
+        costText: "Tu repisa se llena, pero tu rutina no se siente clara."
       },
       {
-        beforeText: "Necesitas una rutina que puedas mantener.",
-        frictionText: "Demasiados pasos, demasiada información.",
-        costText: "El agobio hace que lo dejes y vuelvas a empezar."
+        beforeText: "Con el tiempo, lo simple se vuelve confuso.",
+        frictionText: "Entre consejos, pasos y opiniones, la constancia se pierde.",
+        costText: "Y el cuidado personal deja de sentirse como un ritual y se vuelve una tarea abrumadora."
       }
     ]
   },

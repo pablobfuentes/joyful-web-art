@@ -187,8 +187,8 @@ function deepSetByPath(root: unknown, path: string[], value: string): unknown {
 }
 
 export default function RegistryEditor() {
-  const { fullContentForEditor, contentModifiers: ctxContentModifiers } = useRegistryContent();
-  const { registry: ctxRegistry } = useStyleRegistry();
+  const { fullContentForEditor, contentModifiers: ctxContentModifiers, refresh: refreshContent } = useRegistryContent();
+  const { registry: ctxRegistry, refreshStyleRegistry } = useStyleRegistry();
   const syncedFromContext = useRef(false);
 
   const [registry, setRegistry] = useState<StyleRegistry>(() => ({ ...STYLE_REGISTRY }));
@@ -219,6 +219,7 @@ export default function RegistryEditor() {
   const [tempComment, setTempComment] = useState("");
   const [availableFonts, setAvailableFonts] = useState<string[]>([]);
   const [scanningFonts, setScanningFonts] = useState(false);
+  const [fontToAdd, setFontToAdd] = useState<string>("");
 
   // Helper: Get contrast color (white or black) for text over a background
   const getContrastColor = useCallback((hex: string): string => {
@@ -233,17 +234,22 @@ export default function RegistryEditor() {
   const scanAvailableFonts = useCallback(async () => {
     setScanningFonts(true);
     try {
+      console.log("[Scan Fonts] Fetching /fonts/custom-fonts.css ...");
       const response = await fetch("/fonts/custom-fonts.css");
+      console.log("[Scan Fonts] Response status:", response.status);
       if (!response.ok) {
+        console.warn("[Scan Fonts] Failed to load CSS, status:", response.status);
         setAvailableFonts([]);
         return;
       }
       const css = await response.text();
+      console.log("[Scan Fonts] CSS length:", css.length);
       const fontMatches = css.matchAll(/@font-face\s*\{[^}]*font-family:\s*['"]([^'"]+)['"]/gi);
       const fonts = Array.from(fontMatches, (m) => m[1]).filter((f, i, arr) => arr.indexOf(f) === i);
+      console.log("[Scan Fonts] Fonts found in CSS:", fonts);
       setAvailableFonts(fonts);
     } catch (error) {
-      console.error("Failed to scan fonts:", error);
+      console.error("[Scan Fonts] Failed to scan fonts:", error);
       setAvailableFonts([]);
     } finally {
       setScanningFonts(false);
@@ -364,9 +370,38 @@ export default function RegistryEditor() {
     }
   }, [selectedColorIndex, updatePaletteCell]);
 
-  // Handle refresh fonts
-  const handleRefreshFonts = useCallback(() => {
-    scanAvailableFonts();
+  // Handle refresh fonts: sync undeclared font files into custom-fonts.css, then re-scan so dropdown has all fonts
+  const handleRefreshFonts = useCallback(async () => {
+    console.log("[Refresh Fonts] Clicked – syncing then scanning");
+    setScanningFonts(true);
+    try {
+      console.log("[Refresh Fonts] Fetching /api/sync-fonts ...");
+      const syncRes = await fetch("/api/sync-fonts");
+      console.log("[Refresh Fonts] Sync response status:", syncRes.status, syncRes.statusText);
+      if (syncRes.ok) {
+        const contentType = syncRes.headers.get("content-type") ?? "";
+        if (!contentType.includes("application/json")) {
+          const text = await syncRes.text();
+          console.warn("[Refresh Fonts] Sync returned non-JSON (e.g. SPA fallback). Content-Type:", contentType, "body preview:", text.slice(0, 80));
+        } else {
+          const _data = (await syncRes.json()) as { ok?: boolean; added?: string[]; error?: string };
+          console.log("[Refresh Fonts] Sync response body:", _data);
+          if (_data.added?.length) {
+            toast.success(`Added ${_data.added.length} font(s) to custom-fonts.css`);
+          }
+        }
+      } else {
+        const text = await syncRes.text();
+        console.warn("[Refresh Fonts] Sync failed:", syncRes.status, text);
+      }
+    } catch (e) {
+      console.warn("[Refresh Fonts] Sync request failed (e.g. no dev server):", e);
+    } finally {
+      console.log("[Refresh Fonts] Scanning custom-fonts.css for font list ...");
+      await scanAvailableFonts();
+      setScanningFonts(false);
+      console.log("[Refresh Fonts] Done");
+    }
   }, [scanAvailableFonts]);
 
   // Update section helper (for nested updates)
@@ -407,19 +442,20 @@ export default function RegistryEditor() {
     []
   );
 
-  // Apply in browser only (localStorage + reload). Does not write to app-registry.ts or style-registry.ts.
+  // Apply in browser only (localStorage). Does not reload the editor so tab and scroll are preserved.
   const handlePreview = useCallback(() => {
     try {
       localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
       localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
       localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
-      toast.success("Preview applied. Reloading so the site uses the new registry.");
-      window.location.reload();
+      refreshStyleRegistry();
+      refreshContent();
+      toast.success("Preview applied. Open or refresh the main site to see changes.");
     } catch (e) {
       console.error("Failed to preview registry", e);
       toast.error("Failed to apply preview.");
     }
-  }, [registry, content, contentModifiers]);
+  }, [registry, content, contentModifiers, refreshStyleRegistry, refreshContent]);
 
   // Write to app-registry.ts and style-registry.ts (dev only, with date-stamped backups). Also persists to localStorage and reloads.
   const handleSave = useCallback(async () => {
@@ -1002,9 +1038,32 @@ export default function RegistryEditor() {
           </Card>
         );
       }
+      if (sectionKey === "compatibilityTest") {
+        const questionCard = (sectionData.questionCard ?? (STYLE_REGISTRY.compatibilityTest as { questionCard?: { backgroundIndex: number } }).questionCard) as { backgroundIndex: number } | undefined;
+        const resultCard = (sectionData.resultCard ?? (STYLE_REGISTRY.compatibilityTest as { resultCard?: { backgroundIndex: number } }).resultCard) as { backgroundIndex: number } | undefined;
+        if (questionCard || resultCard) {
+          controls.push(
+            <Card key="compatibilityTest-cards">
+              <CardHeader>
+                <CardTitle className="text-lg">Panel colors</CardTitle>
+                <p className="text-sm text-muted-foreground">Question panel and result panel backgrounds.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {questionCard && renderPaletteSelect("Question panel", [sectionKey, "questionCard", "backgroundIndex"], questionCard.backgroundIndex ?? 0, (val) => {
+                  setRegistry((prev) => ({ ...prev, compatibilityTest: { ...prev.compatibilityTest, questionCard: { backgroundIndex: val } } }));
+                })}
+                {resultCard && renderPaletteSelect("Result panel", [sectionKey, "resultCard", "backgroundIndex"], resultCard.backgroundIndex ?? 11, (val) => {
+                  setRegistry((prev) => ({ ...prev, compatibilityTest: { ...prev.compatibilityTest, resultCard: { backgroundIndex: val } } }));
+                })}
+              </CardContent>
+            </Card>
+          );
+        }
+      }
       if (sectionKey === "pricing") {
         const pricingCard = (sectionData.card ?? STYLE_REGISTRY.pricing.card) as { backgroundIndex: number; borderRadius?: string; shadow?: string };
         const cardBorderByAccent = (sectionData.cardBorderByAccent ?? STYLE_REGISTRY.pricing.cardBorderByAccent) as Record<string, number>;
+        const bottomBadges = (sectionData.bottomBadges ?? STYLE_REGISTRY.pricing.bottomBadges) as Array<{ backgroundIndex: number }> | undefined;
         if (pricingCard) {
           controls.push(
             <Card key="pricing-card">
@@ -1040,6 +1099,27 @@ export default function RegistryEditor() {
                     </div>
                   ))}
                 </div>
+                {bottomBadges?.length ? (
+                  <div className="space-y-2 pt-4 border-t">
+                    <span className="text-sm font-medium">Bottom badges (shipping, commitment)</span>
+                    {bottomBadges.map((badge, i) => (
+                      <div key={i}>
+                        {renderPaletteSelect(`Badge ${i + 1}`, [sectionKey, "bottomBadges", String(i), "backgroundIndex"], badge.backgroundIndex ?? 11, (val) => {
+                          setRegistry((prev) => {
+                            const badges = prev.pricing.bottomBadges ?? STYLE_REGISTRY.pricing.bottomBadges;
+                            return {
+                              ...prev,
+                              pricing: {
+                                ...prev.pricing,
+                                bottomBadges: badges.map((b, j) => (j === i ? { ...b, backgroundIndex: val } : b)),
+                              },
+                            };
+                          });
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           );
@@ -1075,6 +1155,108 @@ export default function RegistryEditor() {
                     )}
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+          );
+        }
+      }
+      if (sectionKey === "pastEditions") {
+        const cards = (sectionData.cards ?? (STYLE_REGISTRY.pastEditions as { cards?: Array<{ backgroundIndex: number }> }).cards) as Array<{ backgroundIndex: number }>;
+        if (cards?.length) {
+          controls.push(
+            <Card key="pastEditions-cards">
+              <CardHeader>
+                <CardTitle className="text-lg">Edition card colors</CardTitle>
+                <p className="text-sm text-muted-foreground">Palette index per edition card (cycle of 4).</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {cards.map((card, i) => (
+                  <div key={`pe-card-${i}`}>
+                    {renderPaletteSelect(`Card ${i + 1}`, [sectionKey, "cards", String(i), "backgroundIndex"], card.backgroundIndex ?? 8, (val) => {
+                      setRegistry((prev) => ({
+                        ...prev,
+                        pastEditions: {
+                          ...prev.pastEditions,
+                          cards: prev.pastEditions.cards.map((c, j) => (j === i ? { ...c, backgroundIndex: val } : c)),
+                        },
+                      }));
+                    })}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        }
+      }
+      if (sectionKey === "experience") {
+        const cards = (sectionData.cards ?? (STYLE_REGISTRY.experience as { cards?: Array<{ backgroundIndex: number }> }).cards) as Array<{ backgroundIndex: number }>;
+        if (cards?.length) {
+          controls.push(
+            <Card key="experience-cards">
+              <CardHeader>
+                <CardTitle className="text-lg">Step card colors</CardTitle>
+                <p className="text-sm text-muted-foreground">Palette index per experience step card.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {cards.map((card, i) => (
+                  <div key={`exp-card-${i}`}>
+                    {renderPaletteSelect(`Card ${i + 1}`, [sectionKey, "cards", String(i), "backgroundIndex"], card.backgroundIndex ?? 8, (val) => {
+                      setRegistry((prev) => ({
+                        ...prev,
+                        experience: {
+                          ...prev.experience,
+                          cards: prev.experience.cards.map((c, j) => (j === i ? { ...c, backgroundIndex: val } : c)),
+                        },
+                      }));
+                    })}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        }
+      }
+      if (sectionKey === "testimonials") {
+        const cards = (sectionData.cards ?? (STYLE_REGISTRY.testimonials as { cards?: Array<{ backgroundIndex: number }> }).cards) as Array<{ backgroundIndex: number }>;
+        if (cards?.length) {
+          controls.push(
+            <Card key="testimonials-cards">
+              <CardHeader>
+                <CardTitle className="text-lg">Testimonial card colors</CardTitle>
+                <p className="text-sm text-muted-foreground">Palette index per testimonial card.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {cards.map((card, i) => (
+                  <div key={`test-card-${i}`}>
+                    {renderPaletteSelect(`Card ${i + 1}`, [sectionKey, "cards", String(i), "backgroundIndex"], card.backgroundIndex ?? 8, (val) => {
+                      setRegistry((prev) => ({
+                        ...prev,
+                        testimonials: {
+                          ...prev.testimonials,
+                          cards: prev.testimonials.cards.map((c, j) => (j === i ? { ...c, backgroundIndex: val } : c)),
+                        },
+                      }));
+                    })}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        }
+      }
+      if (sectionKey === "faq") {
+        const item = (sectionData.item ?? (STYLE_REGISTRY.faq as { item?: { backgroundIndex: number } }).item) as { backgroundIndex: number } | undefined;
+        if (item) {
+          controls.push(
+            <Card key="faq-item">
+              <CardHeader>
+                <CardTitle className="text-lg">Accordion item</CardTitle>
+                <p className="text-sm text-muted-foreground">Background for FAQ accordion panels.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {renderPaletteSelect("Panel background", [sectionKey, "item", "backgroundIndex"], item.backgroundIndex ?? 0, (val) => {
+                  setRegistry((prev) => ({ ...prev, faq: { ...prev.faq, item: { backgroundIndex: val } } }));
+                })}
               </CardContent>
             </Card>
           );
@@ -1387,22 +1569,52 @@ export default function RegistryEditor() {
                         </div>
                       </div>
                     ))}
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          const newFonts = [...registry.general.fonts, { name: availableFonts[0] || "Arial" }];
-                          setRegistry((prev) => ({
-                            ...prev,
-                            general: {
-                              ...prev.general,
-                              fonts: newFonts,
-                            },
-                          }));
-                        }}
-                      >
-                        Add Font
-                      </Button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {(() => {
+                        const currentNames = new Set(registry.general.fonts.map((f) => f.name));
+                        const availableToAdd = availableFonts.filter((f) => !currentNames.has(f));
+                        const effectiveFontToAdd =
+                          fontToAdd && availableToAdd.includes(fontToAdd)
+                            ? fontToAdd
+                            : availableToAdd[0] || availableFonts[0] || "Arial";
+                        return (
+                          <>
+                            <Select
+                              value={availableToAdd.length ? effectiveFontToAdd : ""}
+                              onValueChange={(v) => setFontToAdd(v)}
+                              disabled={!availableToAdd.length}
+                            >
+                              <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="Font to add" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableToAdd.map((name) => (
+                                  <SelectItem key={name} value={name}>
+                                    {name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                const pick = availableToAdd.length ? effectiveFontToAdd : availableFonts[0] || "Arial";
+                                const newFonts = [...registry.general.fonts, { name: pick }];
+                                setRegistry((prev) => ({
+                                  ...prev,
+                                  general: {
+                                    ...prev.general,
+                                    fonts: newFonts,
+                                  },
+                                }));
+                              }}
+                              disabled={!availableFonts.length}
+                            >
+                              Add Font
+                            </Button>
+                          </>
+                        );
+                      })()}
                       <Button
                         variant="outline"
                         onClick={handleRefreshFonts}
