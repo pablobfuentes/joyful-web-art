@@ -38,7 +38,7 @@ export function useProfile(): {
       } = await supabase.auth.getSession();
       if (cancelled) return;
       const uid = session?.user?.id ?? user.id;
-      const { data, err } = await supabase
+      const { data, error: err } = await supabase
         .from("profiles")
         .select("user_id, role")
         .eq("user_id", uid)

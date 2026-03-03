@@ -61,7 +61,7 @@ function hexToHslString(hex: string): string {
 }
 
 /** Get HSL string for a palette index (for section-specific vars). */
-function getPaletteHsl(cells: { hex: string }[], index: number): string {
+function getPaletteHsl(cells: readonly { hex: string }[] | { hex: string }[], index: number): string {
   const cell = cells[index];
   return cell ? hexToHslString(cell.hex) : "0 0% 100%";
 }
@@ -106,7 +106,7 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
 
   root.style.setProperty("--radius", registry.general.radius.default);
   // Set default font (first in list) as both display and body
-  const defaultFont = registry.general.fonts.find((f) => f.isDefault) || registry.general.fonts[0];
+  const defaultFont = registry.general.fonts.find((f) => (f as any).isDefault) || registry.general.fonts[0];
   if (defaultFont) {
     root.style.setProperty("--font-display", defaultFont.name);
     root.style.setProperty("--font-body", defaultFont.name);
@@ -151,8 +151,8 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
     root.style.setProperty(`--howItWorks-step-card-${i}-bg`, getPaletteHsl(cells, card.circleBackgroundIndex));
   });
   root.style.setProperty("--compatibilityTest-section-bg", getPaletteHsl(cells, registry.compatibilityTest.section.backgroundIndex));
-  const compatQuestionCard = registry.compatibilityTest.questionCard ?? (STYLE_REGISTRY.compatibilityTest as { questionCard?: { backgroundIndex: number } }).questionCard;
-  const compatResultCard = registry.compatibilityTest.resultCard ?? (STYLE_REGISTRY.compatibilityTest as { resultCard?: { backgroundIndex: number } }).resultCard;
+  const compatQuestionCard = (registry.compatibilityTest as any).questionCard ?? (STYLE_REGISTRY.compatibilityTest as any).questionCard;
+  const compatResultCard = (registry.compatibilityTest as any).resultCard ?? (STYLE_REGISTRY.compatibilityTest as any).resultCard;
   if (compatQuestionCard) root.style.setProperty("--compatibilityTest-question-card-bg", getPaletteHsl(cells, compatQuestionCard.backgroundIndex));
   if (compatResultCard) root.style.setProperty("--compatibilityTest-result-card-bg", getPaletteHsl(cells, compatResultCard.backgroundIndex));
   root.style.setProperty("--whatYouReceive-section-bg", getPaletteHsl(cells, registry.whatYouReceive.section.backgroundIndex));
