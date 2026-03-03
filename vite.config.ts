@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import fs from "node:fs";
+// @ts-ignore -- no type declarations available
 import history from "connect-history-api-fallback";
 import { componentTagger } from "lovable-tagger";
 import type { Connect } from "vite";
@@ -38,7 +39,7 @@ function syncFontsPlugin() {
   return {
     name: "sync-fonts",
     configureServer(server: { middlewares: Connect.Server & { stack?: Array<{ route: string; handle: (req: unknown, res: unknown, next: () => void) => void }> } }) {
-      const handle = (req: Connect.IncomingMessage, res: Connect.ServerResponse, next: () => void) => {
+      const handle = (req: Connect.IncomingMessage, res: any, next: () => void) => {
         if (req.method !== "GET" || req.url !== "/api/sync-fonts") {
           next();
           return;
@@ -193,7 +194,7 @@ function registrySaveSourcePlugin() {
   return {
     name: "registry-save-source",
     configureServer(server: { middlewares: Connect.Server }) {
-      server.middlewares.use((req: Connect.IncomingMessage, res: Connect.ServerResponse, next: () => void) => {
+      server.middlewares.use((req: Connect.IncomingMessage, res: any, next: () => void) => {
         if (req.method !== "POST" || req.url !== "/__registry-save-source") {
           next();
           return;
