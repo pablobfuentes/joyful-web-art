@@ -5,6 +5,7 @@ import step2 from "@/assets/step-2.jpg";
 import step3 from "@/assets/step-3.jpg";
 import step4 from "@/assets/step-4.jpg";
 import { resolveRegistryImageSrc } from "@/lib/registry-images";
+import { registryListToArray } from "@/lib/utils";
 import { FloatingDoodle, DoodleFlower, DoodleLeaf, DoodleStar, DoodleDroplet } from "./Doodles";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
@@ -26,7 +27,7 @@ const StepCard = ({
   index,
   getStyleForPath,
 }: {
-  step: { label: string; title: string; description: string };
+  step: { label?: string; title: string; description: string };
   imageSrc: string;
   style: (typeof STEP_META)[0];
   index: number;
@@ -107,6 +108,7 @@ const HowItWorksSection = () => {
   const ctaRef = useRef(null);
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
 
+  const steps = registryListToArray(data.steps);
   const stepStyles = STEP_META.map((meta, i) => ({
     ...meta,
     imageSrc: resolveRegistryImageSrc(registry.howItWorks?.images?.[i]?.path, FALLBACK_STEP_IMAGES[i]),
@@ -154,8 +156,8 @@ const HowItWorksSection = () => {
         </motion.div>
 
         <div className="space-y-20 max-w-4xl mx-auto">
-          {data.steps.map((step, index) => (
-            <StepCard key={step.label} step={step} imageSrc={stepStyles[index].imageSrc} style={STEP_META[index]} index={index} getStyleForPath={getStyleForPath} />
+          {steps.map((step, index) => (
+            <StepCard key={step?.label ?? `step-${index}`} step={step} imageSrc={stepStyles[index].imageSrc} style={STEP_META[index]} index={index} getStyleForPath={getStyleForPath} />
           ))}
         </div>
 

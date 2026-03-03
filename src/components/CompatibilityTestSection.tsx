@@ -1,13 +1,15 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
+import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleFlower, DoodleStar } from "./Doodles";
 
 const CompatibilityTestSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("compatibilityTest");
+  const questions = registryListToArray(data.questions);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<(boolean | null)[]>(data.questions.map(() => null));
+  const [answers, setAnswers] = useState<(boolean | null)[]>(questions.map(() => null));
   const [result, setResult] = useState<"dermatologist" | "goodfit" | null>(null);
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
@@ -16,7 +18,7 @@ const CompatibilityTestSection = () => {
     const next = [...answers];
     next[currentQuestion] = yes;
     setAnswers(next);
-    if (currentQuestion < data.questions.length - 1) {
+    if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       const hasNo = next.some((a) => a === false);
@@ -27,11 +29,11 @@ const CompatibilityTestSection = () => {
 
   const reset = () => {
     setCurrentQuestion(0);
-    setAnswers(data.questions.map(() => null));
+    setAnswers(questions.map(() => null));
     setResult(null);
   };
 
-  const progressPercent = ((currentQuestion + (result ? 1 : 0)) / data.questions.length) * 100;
+  const progressPercent = ((currentQuestion + (result ? 1 : 0)) / questions.length) * 100;
 
   return (
     <section id="compatibility" className="relative py-24 px-6 bg-[hsl(var(--compatibilityTest-section-bg))] overflow-hidden">
@@ -107,10 +109,10 @@ const CompatibilityTestSection = () => {
               </motion.span>
 
               <p className="text-sm text-primary font-bold mb-2">
-                Pregunta {currentQuestion + 1} de {data.questions.length}
+                Pregunta {currentQuestion + 1} de {questions.length}
               </p>
               <p className="font-display text-xl md:text-2xl font-bold mb-8" style={getStyleForPath(`compatibilityTest.questions.${currentQuestion}`, "--foreground")}>
-                {data.questions[currentQuestion]}
+                {questions[currentQuestion]}
               </p>
               <div className="flex gap-4">
                 <motion.button

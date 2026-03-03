@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleFlower, DoodleStar, DoodleSparkle } from "./Doodles";
 
@@ -51,11 +52,11 @@ const PricingSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-          {(Array.isArray(data.plans) ? data.plans : []).map((plan, index) => {
+          {registryListToArray(data.plans).map((plan, index) => {
             const isPopular = !!plan.badge && plan.accentColor === "peach";
             return (
               <motion.div
-                key={plan.id}
+                key={plan?.id ?? index}
                 initial={{ opacity: 0, y: 40, rotate: index === 0 ? -2 : index === 2 ? 2 : 0 }}
                 whileInView={{ opacity: 1, y: 0, rotate: index === 0 ? -1 : index === 2 ? 1 : 0 }}
                 viewport={{ once: true }}
@@ -117,7 +118,7 @@ const PricingSection = () => {
 
                 {/* Features */}
                 <ul className="space-y-3 mb-8 flex-grow">
-                  {plan.features.map((feature, i) => (
+                  {registryListToArray(plan.features).map((feature, i) => (
                     <motion.li
                       key={i}
                       initial={{ opacity: 0, x: -15 }}

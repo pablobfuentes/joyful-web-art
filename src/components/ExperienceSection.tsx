@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleLeaf, DoodleDroplet } from "./Doodles";
 
@@ -59,9 +60,9 @@ const ExperienceSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {data.steps.map((step, index) => (
+          {registryListToArray(data.steps).map((step, index) => (
             <motion.div
-              key={step.number}
+              key={step?.number ?? index}
               initial={{ opacity: 0, y: 60, rotate: rotations[index] * 2 }}
               whileInView={{ opacity: 1, y: 0, rotate: rotations[index] }}
               viewport={{ once: true, margin: "-40px" }}

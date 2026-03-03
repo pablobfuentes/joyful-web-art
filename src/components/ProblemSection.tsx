@@ -4,6 +4,7 @@ import problem1 from "@/assets/problem-1.jpg";
 import problem2 from "@/assets/problem-2.jpg";
 import problem3 from "@/assets/problem-3.jpg";
 import { resolveRegistryImageSrc } from "@/lib/registry-images";
+import { registryListToArray } from "@/lib/utils";
 import { FloatingDoodle, DoodleDroplet, DoodleSparkle, DoodleHeart } from "./Doodles";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
@@ -87,7 +88,7 @@ const ProblemSection = () => {
   const ctaRef = useRef(null);
   const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
 
-  const cards = Array.isArray(data.cards) ? data.cards : Object.values(data.cards ?? {});
+  const cards = registryListToArray(data.cards);
   const cardStyles = CARD_META.map((meta, i) => ({
     ...meta,
     imageSrc: resolveRegistryImageSrc(registry.why?.images?.[i]?.path, FALLBACK_IMAGES[i]),

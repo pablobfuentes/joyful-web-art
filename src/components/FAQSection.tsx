@@ -1,5 +1,6 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
+import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleSparkle, DoodleFlower, DoodleHeart } from "./Doodles";
 
@@ -45,7 +46,7 @@ const FAQSection = () => {
         </motion.div>
 
         <div className="space-y-4">
-          {data.items.map((item, index) => (
+          {registryListToArray(data.items).map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}

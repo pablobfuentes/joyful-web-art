@@ -127,3 +127,9 @@
   - AuthContext: `updateProfile(fullName)` calling `supabase.auth.updateUser({ data: { full_name } })`.
   - Dashboard: single Account Information card with view mode (email, name, member since, Edit profile button, Change password link) and edit mode (name input, Save, Cancel); success toast on save, inline error on failure; same style (rounded-lg border bg-card, font-display, primary/outline buttons).
   - Tests: `src/pages/Dashboard.test.tsx` (renders welcome and account info, shows Edit profile and Change password; Supabase mocked with session user).
+
+- **Hero rotatingQuotes regression: normalize list and add guardrail tests**
+  - **Issue:** `hero.rotatingQuotes` in `app-registry.ts` was accidentally reduced to only the third phrase, and later migrated from an array to an object with numeric keys. `HeroSection` still treated it as a plain array (`data.rotatingQuotes.length` and index access), so changes in the registry could silently drop quotes or break rotation.
+  - **Changes:** (1) `HeroSection` now imports and uses `registryListToArray()` so `rotatingQuotes` can safely be either an array or an object with numeric keys; rotation uses the normalized list length and no-ops when there are zero quotes. (2) Added `HeroSection.test.tsx` with a test that asserts `registryListToArray` is called when rendering, and a guardrail test that ensures `APP_REGISTRY.hero.rotatingQuotes` always yields at least three quotes when normalized. (3) Installed `@testing-library/dom` as a devDependency (with `--legacy-peer-deps`) so Vitest + React Testing Library can run.
+  - **Files touched:** `src/components/HeroSection.tsx`, `src/components/HeroSection.test.tsx`, `package-lock.json`, `docs/FAILURE_LOG.md`, `docs/CHANGELOG_AI.md`.
+  - **Verification:** `npm test -- HeroSection.test.tsx` passes; no new linter errors; manual check of the hero on `/` shows all three rotating questions cycling correctly.

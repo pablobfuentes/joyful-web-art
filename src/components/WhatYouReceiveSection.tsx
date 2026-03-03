@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleDroplet, DoodleLeaf, DoodleFlower, DoodleSparkle } from "./Doodles";
 
@@ -51,9 +52,9 @@ const WhatYouReceiveSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {data.products.map((product, index) => (
+          {registryListToArray(data.products).map((product, index) => (
             <motion.div
-              key={product.number}
+              key={product?.number ?? index}
               initial={{ opacity: 0, y: 60, rotate: rotations[index] * 2 }}
               whileInView={{ opacity: 1, y: 0, rotate: rotations[index] }}
               viewport={{ once: true, margin: "-50px" }}

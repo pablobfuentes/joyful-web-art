@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleFlower, DoodleStar, DoodleHeart } from "./Doodles";
 
@@ -47,9 +48,9 @@ const PastEditionsSection = () => {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          {data.editions.map((edition, index) => (
+          {registryListToArray(data.editions).map((edition, index) => (
             <motion.div
-              key={edition.name}
+              key={edition?.name ?? index}
               initial={{ opacity: 0, scale: 0.8, rotate: rotations[index] * 2 }}
               whileInView={{ opacity: 1, scale: 1, rotate: rotations[index] }}
               viewport={{ once: true }}

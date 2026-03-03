@@ -378,7 +378,7 @@ export const STYLE_REGISTRY = {
       textColorIndex: 1
     },
     image: {
-      path: "hero-image1.png",
+      path: "hero-skincare.jpg",
       width: "100%",
       height: "450px",
       borderWidth: 4,

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-skincare.jpg";
 import { resolveRegistryImageSrc } from "@/lib/registry-images";
+import { registryListToArray } from "@/lib/utils";
 import { FloatingDoodle, DoodleDroplet, DoodleSparkle, DoodleHeart, DoodleFlower, DoodleLeaf, DoodleStar } from "./Doodles";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
@@ -12,16 +13,18 @@ const HeroSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const { registry } = useStyleRegistry();
   const data = getSectionContent("hero");
+  const quotes = registryListToArray(data.rotatingQuotes as unknown as string[]);
   const [quoteIndex, setQuoteIndex] = useState(0);
   const heroImagePath = registry.hero?.image?.path;
   const heroSrc = resolveRegistryImageSrc(heroImagePath, heroImage);
 
   useEffect(() => {
+    if (quotes.length === 0) return;
     const id = setInterval(() => {
-      setQuoteIndex((i) => (i + 1) % data.rotatingQuotes.length);
+      setQuoteIndex((i) => (i + 1) % quotes.length);
     }, ROTATE_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [data.rotatingQuotes.length]);
+  }, [quotes.length]);
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-28">
@@ -66,7 +69,7 @@ const HeroSection = () => {
               className="font-display italic text-lg mb-3"
               style={getStyleForPath(`hero.rotatingQuotes.${quoteIndex}`, "--hero-quote-color")}
             >
-              "{data.rotatingQuotes[quoteIndex]}"
+              "{quotes[quoteIndex] ?? ""}"
             </motion.p>
 
             <motion.h1

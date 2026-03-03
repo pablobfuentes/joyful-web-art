@@ -32,3 +32,12 @@
   2. **Column names differ:** Table Editor may show `id` instead of `user_id`, or different names. The app selects only `user_id, role`. If your table has no `user_id` column, add it or rename to match (or recreate table from the Phase 1 script).
   3. **RLS policy references missing object:** A policy on `profiles` may call a function or reference a table that doesn’t exist (e.g. `get_user_email`, or another table). Create the missing object from the Phase 1 script, or temporarily disable RLS to confirm the 500 goes away, then fix the policy.
 - **Verification:** After running the script, reload `/admin/registry-editor`; the profiles request should return 200 and the page should load for an admin user.
+
+## Vitest missing @testing-library/dom
+
+- **Date:** 2026-03-03
+- **Context:** Running `npm test -- HeroSection.test.tsx` as part of TDD for the hero rotatingQuotes bug.
+- **Error:** Vitest fails with `Cannot find module '@testing-library/dom'` required by `@testing-library/react`.
+- **Root cause:** `@testing-library/dom` was not installed even though it is a peer dependency of `@testing-library/react`. A first attempt to install it with `npm install -D @testing-library/dom` failed with an `ERESOLVE` peer-dependency conflict on `eslint` / `eslint-plugin-react-hooks`.
+- **Fix:** Install `@testing-library/dom` as a devDependency using `npm install -D @testing-library/dom --legacy-peer-deps` to bypass the peer-dependency conflict for this dev-only library.
+- **Verification:** Re-run the relevant Vitest command and confirm the missing-module error is gone and tests execute.

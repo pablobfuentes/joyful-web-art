@@ -38,8 +38,6 @@ export const APP_REGISTRY = {
     imageBadgeLeft: "Directo de Seúl",
     imageBadgeRight: "⭐ 4.9/5",
     rotatingQuotes: {
-      "0": "¿Estoy eligiendo lo correcto para mi piel?",
-      "1": "He probado tanto… y nada se siente claro.",
       "2": "Hay muchas opciones. ¿Por dónde empiezo?"
     },
     heading: "Descubre el ritual coreano que simplifica el cuidado de tu piel.",
@@ -99,14 +97,14 @@ export const APP_REGISTRY = {
     },
     steps: [
       {
-        label: "Subscríbete",
+        label: "Subscribete",
         title: "Únete y comienza tu ritual coreano",
         description: "Te acompañamos paso a paso, desde el primer día"
       },
       {
         label: "Elegimos",
-        title: "Seleccionamos los mejores productos originales",
-        description: "Fórmulas pensadas para funcionar en todos los tipos de piel"
+        title: "Seleccionamos productos originales, suaves y compatibles",
+        description: "Fórmulas pensadas para funcionar en la mayoria de los tipos de piel"
       },
       {
         label: "Recibe",
