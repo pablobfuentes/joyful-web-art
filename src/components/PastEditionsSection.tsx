@@ -1,17 +1,45 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleFlower, DoodleStar, DoodleHeart } from "./Doodles";
 
-const emojis = ["💦", "✨", "🧬", "🫧", "☀️", "💧", "🌿", "🍂"];
-const rotations = [-3, 2, -2, 3, -1, 2, -3, 1];
-
 const PastEditionsSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("pastEditions");
+  const editions = registryListToArray(data.editions);
+
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
+  const listRef = useRef<HTMLUListElement | null>(null);
+  const [activeIndex, setActiveIndex] = useState(
+    editions.length > 0 ? Math.floor(editions.length / 2) : 0
+  );
+  const transitionTimeout = useRef<number | null>(null);
+
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+
+    if (transitionTimeout.current !== null) {
+      window.clearTimeout(transitionTimeout.current);
+    }
+
+    el.style.setProperty(
+      "--transition",
+      "600ms cubic-bezier(0.22, 0.61, 0.36, 1)"
+    );
+
+    transitionTimeout.current = window.setTimeout(() => {
+      el.style.removeProperty("--transition");
+    }, 900);
+
+    return () => {
+      if (transitionTimeout.current !== null) {
+        window.clearTimeout(transitionTimeout.current);
+      }
+    };
+  }, [activeIndex]);
 
   return (
     <section className="relative py-24 px-6 bg-[hsl(var(--pastEditions-section-bg))] overflow-hidden">
@@ -47,40 +75,69 @@ const PastEditionsSection = () => {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          {registryListToArray(data.editions).map((edition, index) => (
-            <motion.div
-              key={edition?.name ?? index}
-              initial={{ opacity: 0, scale: 0.8, rotate: rotations[index] * 2 }}
-              whileInView={{ opacity: 1, scale: 1, rotate: rotations[index] }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.06, type: "spring", stiffness: 200 }}
-              whileHover={{ y: -10, rotate: 0, scale: 1.08 }}
-              className="group relative"
-            >
-              <div
-                className="rounded-3xl p-5 shadow-playful border-4 border-background text-center relative overflow-visible transition-shadow hover:shadow-card-hover"
-                style={{ backgroundColor: "hsl(var(--pastEditions-card-" + (index % 4) + "-bg))" }}
-              >
-                <motion.span
-                  className="absolute -top-3 -right-2 text-2xl drop-shadow-md"
-                  animate={{ rotate: [0, -15, 15, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }}
+        <div className="max-w-6xl mx-auto">
+          <ul
+            ref={listRef}
+            className="flex w-full flex-col gap-4 md:h-[420px] md:flex-row md:gap-[1.5%]"
+          >
+            {editions.map((edition, index) => {
+              const isActive = index === activeIndex;
+
+              return (
+                <li
+                  key={edition?.name ?? index}
+                  onClick={() => setActiveIndex(index)}
+                  aria-current={isActive}
+                  className="relative group cursor-pointer transition-all duration-500 ease-in-out md:w-[8%] md:[&[aria-current='true']]:w-[52%] md:[transition:width_var(--transition,300ms_ease_in)]"
                 >
-                  {emojis[index]}
-                </motion.span>
-                <h3 className="font-display font-bold text-lg" style={getStyleForPath(`pastEditions.editions.${index}.name`, "--foreground")}>
-                  {edition.name}
-                </h3>
-                <p className="text-sm font-medium" style={getStyleForPath(`pastEditions.editions.${index}.category`, "--muted-foreground")}>
-                  {edition.category}
-                </p>
-                <p className="text-xs mt-1 font-bold" style={getStyleForPath(`pastEditions.editions.${index}.month`, "--muted-foreground")}>
-                  {edition.month}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+                  <motion.div
+                    className="relative h-40 md:h-full w-full overflow-hidden rounded-3xl shadow-playful border-4 border-background bg-[hsl(var(--card))]"
+                    whileHover={{ scale: 1.03, y: -8 }}
+                  >
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent transition-opacity duration-500 ease-in-out"
+                      style={{ opacity: isActive ? 1 : 0 }}
+                    />
+                    <div
+                      className="absolute bottom-0 left-0 w-full p-4 md:p-6 text-left text-white transition-all duration-500 ease-in-out"
+                      style={{
+                        transform: isActive ? "translateY(0)" : "translateY(14px)",
+                        opacity: isActive ? 1 : 0,
+                      }}
+                    >
+                      <p
+                        className="text-xs font-semibold uppercase tracking-widest text-gray-200 md:text-sm"
+                        style={getStyleForPath(
+                          `pastEditions.editions.${index}.category`,
+                          "--muted-foreground"
+                        )}
+                      >
+                        {edition.category}
+                      </p>
+                      <p
+                        className="text-lg md:text-2xl font-bold tracking-tight"
+                        style={getStyleForPath(
+                          `pastEditions.editions.${index}.name`,
+                          "--foreground"
+                        )}
+                      >
+                        {edition.name}
+                      </p>
+                      <p
+                        className="text-xs md:text-sm mt-1 font-semibold text-gray-200/90"
+                        style={getStyleForPath(
+                          `pastEditions.editions.${index}.month`,
+                          "--muted-foreground"
+                        )}
+                      >
+                        {edition.month}
+                      </p>
+                    </div>
+                  </motion.div>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </div>
     </section>
