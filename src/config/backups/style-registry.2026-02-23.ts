@@ -364,15 +364,15 @@ export const STYLE_REGISTRY = {
 
   dashboard: {
     page: { backgroundIndex: 0 },
-  } satisfies PageStyles,
+  },
 
   checkout: {
     page: { backgroundIndex: 0 },
-  } satisfies PageStyles,
+  },
 
   account: {
     page: { backgroundIndex: 0 },
-  } satisfies PageStyles,
+  },
 } as const;
 
 export type StyleRegistry = typeof STYLE_REGISTRY;

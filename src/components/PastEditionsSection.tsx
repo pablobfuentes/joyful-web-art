@@ -42,7 +42,7 @@ const PastEditionsSection = () => {
   }, [activeIndex]);
 
   return (
-    <section className="relative py-24 px-6 bg-[hsl(var(--pastEditions-section-bg))] overflow-hidden">
+    <section className="relative py-24 bg-[hsl(var(--pastEditions-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-30" />
 
       <FloatingDoodle className="top-20 right-[6%] w-10 h-10 text-primary/25" delay={0}>
@@ -55,7 +55,7 @@ const PastEditionsSection = () => {
         <DoodleHeart className="w-full h-full" />
       </FloatingDoodle>
 
-      <div className="container mx-auto relative z-10">
+      <div className="container mx-auto relative z-10 px-6">
         <motion.div
           ref={headerRef}
           initial={{ opacity: 0, y: 30 }}
@@ -70,75 +70,78 @@ const PastEditionsSection = () => {
           >
             📚 {data.subtitle}
           </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold" style={getStyleForPath("pastEditions.title", "--foreground")}>
+          <h2
+            className="font-display text-4xl md:text-6xl font-bold"
+            style={getStyleForPath("pastEditions.title", "--foreground")}
+          >
             {data.title}
           </h2>
         </motion.div>
+      </div>
 
-        <div className="max-w-6xl mx-auto">
-          <ul
-            ref={listRef}
-            className="flex w-full flex-col gap-4 md:h-[420px] md:flex-row md:gap-[1.5%]"
-          >
-            {editions.map((edition, index) => {
-              const isActive = index === activeIndex;
+      <div className="max-w-6xl mx-auto">
+        <ul
+          ref={listRef}
+          className="flex w-full flex-col gap-4 md:h-[420px] md:flex-row md:gap-[1.5%]"
+        >
+          {editions.map((edition, index) => {
+            const isActive = index === activeIndex;
 
-              return (
-                <li
-                  key={edition?.name ?? index}
-                  onClick={() => setActiveIndex(index)}
-                  aria-current={isActive}
-                  className="relative group cursor-pointer transition-all duration-500 ease-in-out md:w-[8%] md:[&[aria-current='true']]:w-[52%] md:[transition:width_var(--transition,300ms_ease_in)]"
+            return (
+              <li
+                key={edition?.name ?? index}
+                onClick={() => setActiveIndex(index)}
+                aria-current={isActive}
+                className="relative group cursor-pointer transition-all duration-500 ease-in-out md:w-[8%] md:[&[aria-current='true']]:w-[52%] md:[transition:width_var(--transition,300ms_ease_in)]"
+              >
+                <motion.div
+                  className="relative h-40 md:h-full w-full overflow-hidden rounded-3xl shadow-playful border-4 border-background bg-[hsl(var(--card))]"
+                  whileHover={{ scale: 1.03, y: -8 }}
                 >
-                  <motion.div
-                    className="relative h-40 md:h-full w-full overflow-hidden rounded-3xl shadow-playful border-4 border-background bg-[hsl(var(--card))]"
-                    whileHover={{ scale: 1.03, y: -8 }}
+                  <div
+                    className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent transition-opacity duration-500 ease-in-out"
+                    style={{ opacity: isActive ? 1 : 0 }}
+                  />
+                  <div
+                    className="absolute bottom-0 left-0 w-full p-4 md:p-6 text-left text-white transition-all duration-500 ease-in-out"
+                    style={{
+                      transform: isActive ? "translateY(0)" : "translateY(14px)",
+                      opacity: isActive ? 1 : 0,
+                    }}
                   >
-                    <div
-                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent transition-opacity duration-500 ease-in-out"
-                      style={{ opacity: isActive ? 1 : 0 }}
-                    />
-                    <div
-                      className="absolute bottom-0 left-0 w-full p-4 md:p-6 text-left text-white transition-all duration-500 ease-in-out"
-                      style={{
-                        transform: isActive ? "translateY(0)" : "translateY(14px)",
-                        opacity: isActive ? 1 : 0,
-                      }}
+                    <p
+                      className="text-xs font-semibold uppercase tracking-widest text-gray-200 md:text-sm"
+                      style={getStyleForPath(
+                        `pastEditions.editions.${index}.category`,
+                        "--muted-foreground"
+                      )}
                     >
-                      <p
-                        className="text-xs font-semibold uppercase tracking-widest text-gray-200 md:text-sm"
-                        style={getStyleForPath(
-                          `pastEditions.editions.${index}.category`,
-                          "--muted-foreground"
-                        )}
-                      >
-                        {edition.category}
-                      </p>
-                      <p
-                        className="text-lg md:text-2xl font-bold tracking-tight"
-                        style={getStyleForPath(
-                          `pastEditions.editions.${index}.name`,
-                          "--foreground"
-                        )}
-                      >
-                        {edition.name}
-                      </p>
-                      <p
-                        className="text-xs md:text-sm mt-1 font-semibold text-gray-200/90"
-                        style={getStyleForPath(
-                          `pastEditions.editions.${index}.month`,
-                          "--muted-foreground"
-                        )}
-                      >
-                        {edition.month}
-                      </p>
-                    </div>
-                  </motion.div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+                      {edition.category}
+                    </p>
+                    <p
+                      className="text-lg md:text-2xl font-bold tracking-tight"
+                      style={getStyleForPath(
+                        `pastEditions.editions.${index}.name`,
+                        "--foreground"
+                      )}
+                    >
+                      {edition.name}
+                    </p>
+                    <p
+                      className="text-xs md:text-sm mt-1 font-semibold text-gray-200/90"
+                      style={getStyleForPath(
+                        `pastEditions.editions.${index}.month`,
+                        "--muted-foreground"
+                      )}
+                    >
+                      {edition.month}
+                    </p>
+                  </div>
+                </motion.div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );

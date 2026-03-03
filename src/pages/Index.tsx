@@ -33,7 +33,8 @@ const Index = () => {
     applyStyleRegistry(getMergedStyleRegistry());
     refresh();
     refreshStyleRegistry();
-  }, [fromFile, refresh, refreshStyleRegistry, registry]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromFile]);
 
   const heroDiv = registry.hero.divider!;
   const whyDiv = registry.why.divider!;
