@@ -236,18 +236,78 @@ export const APP_REGISTRY = {
   },
   testimonials: {
     subtitle: "Trusted by Skincare Enthusiasts",
-    items: [
+    // Orbiting carousel people data (adapted from example)
+    people: [
       {
-        quote: "Finally, a skincare routine that doesn't overwhelm me. Everything just works together.",
-        author: "Sarah M."
+        id: 1,
+        name: "Albert Einstein",
+        role: "Theoretical Physicist",
+        email: "einstein@example.com",
+        quote: "“The most beautiful experience we can have is the mysterious.”",
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/d/d3/Albert_Einstein_Head.jpg"
       },
       {
-        quote: "I've tried so many products, but this is the first time I've actually stuck with a routine.",
-        author: "Jessica L."
+        id: 2,
+        name: "Isaac Newton",
+        role: "Physicist & Mathematician",
+        email: "newton@example.com",
+        quote: "“Truth is ever to be found in simplicity, and not in the multiplicity and confusion of things.”",
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg/1200px-Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg"
       },
       {
-        quote: "No more decision fatigue. My skin has never looked better.",
-        author: "Emily K."
+        id: 3,
+        name: "Marie Curie",
+        role: "Physicist & Chemist",
+        email: "curie@example.com",
+        quote: "“Nothing in life is to be feared, it is only to be understood.”",
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/7/7e/Marie_Curie_c1920.jpg"
+      },
+      {
+        id: 4,
+        name: "Nikola Tesla",
+        role: "Inventor & Engineer",
+        email: "tesla@example.com",
+        quote: "“If you want to find the secrets of the universe, think in terms of energy, frequency and vibration.”",
+        profile: "https://upload.wikimedia.org/wikipedia/commons/d/d4/N.Tesla.JPG"
+      },
+      {
+        id: 5,
+        name: "Charles Darwin",
+        role: "Naturalist & Biologist",
+        email: "darwin@example.com",
+        quote: "“In the long history of humankind those who learned to collaborate and improvise most effectively have prevailed.”",
+        profile:
+          "https://hips.hearstapps.com/hmg-prod/images/gettyimages-79035252.jpg?crop=1xw:1.0xh;center,top&resize=640:*"
+      },
+      {
+        id: 6,
+        name: "Galileo Galilei",
+        role: "Astronomer & Physicist",
+        email: "galileo@example.com",
+        quote: "“Wine is sunlight, held together by water.”",
+        profile:
+          "https://res.cloudinary.com/aenetworks/image/upload/c_fill,ar_2,w_3840,h_1920,g_auto/dpr_auto/f_auto/q_auto:eco/v1/galileo-galilei-gettyimages-51246872?_a=BAVAZGDX0"
+      },
+      {
+        id: 7,
+        name: "Stephen Hawking",
+        role: "Theoretical Physicist",
+        email: "hawking@example.com",
+        quote: "“Intelligence is the ability to adapt to change.”",
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/e/eb/Stephen_Hawking.StarChild.jpg"
+      },
+      {
+        id: 8,
+        name: "Richard Feynman",
+        role: "Theoretical Physicist",
+        email: "feynman@example.com",
+        quote: "“The pleasure of finding things out is the greatest joy of science.”",
+        profile:
+          "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiz7DeuUmHN7TiT3xf7cV7UPBJNDtEvjNZcgMmNElTmOJYaec6zQI0UiLU04jZP6hqkeLcrnaC5NP4WC_zRQzP3_QhLumNxyzPOsC-WEmWQyYsadq1Eg_V_jEjDfCdddeQgJjY_OOB1KLMj6o2ShA6ycHwM91I430Yr9tkYTn6759jDmcGAsONOACbi/w1200-h630-p-k-no-nu/richard%20feynman%20quotes%20atheism%20religion%20science.png"
       }
     ]
   },

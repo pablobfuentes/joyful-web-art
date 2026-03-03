@@ -1,10 +1,35 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleStar, DoodleHeart, DoodleSparkle } from "./Doodles";
 
-const emojis = ["💖", "🌟", "✨"];
+const FALLBACK_AVATAR =
+  "https://placehold.co/100x100/E0E7FF/4338CA?text=Error";
+
+const useIsMobile = (breakpoint: number = 768): boolean => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < breakpoint);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, [breakpoint]);
+
+  return isMobile;
+};
+
+const safeImage = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const target = e.target as HTMLImageElement;
+  target.src = FALLBACK_AVATAR;
+};
 
 const TestimonialsSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
@@ -12,9 +37,42 @@ const TestimonialsSection = () => {
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
-  const items = registryListToArray(data.items);
-  // Double for seamless infinite loop
-  const doubled = [...items, ...items];
+  const people = registryListToArray(data.people);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const isMobile = useIsMobile();
+
+  const containerRadius = isMobile ? 150 : 240;
+  const profileSize = isMobile ? 70 : 90;
+  const containerSize = containerRadius * 2 + 140;
+
+  const getRotation = useCallback(
+    (index: number): number =>
+      (index - activeIndex) * (360 / Math.max(people.length, 1)),
+    [activeIndex, people.length]
+  );
+
+  const next = () =>
+    setActiveIndex((i) => (i + 1) % Math.max(people.length, 1));
+  const prev = () =>
+    setActiveIndex((i) => (i - 1 + Math.max(people.length, 1)) % Math.max(people.length, 1));
+
+  const handleProfileClick = useCallback(
+    (index: number) => {
+      if (index === activeIndex) return;
+      setActiveIndex(index);
+    },
+    [activeIndex]
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") prev();
+      else if (event.key === "ArrowRight") next();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <section className="relative py-24 bg-[hsl(var(--testimonials-section-bg))] overflow-hidden">
@@ -33,81 +91,145 @@ const TestimonialsSection = () => {
           ref={headerRef}
           initial={{ opacity: 0, y: 30 }}
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
-          <motion.span
-            className="inline-block bg-bubblegum px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
+          <motion.p
+            className="text-base md:text-lg font-semibold"
             style={getStyleForPath("testimonials.subtitle", "--foreground")}
-            animate={{ rotate: [-2, 2, -2] }}
-            transition={{ duration: 3, repeat: Infinity }}
           >
             ⭐ {data.subtitle}
-          </motion.span>
+          </motion.p>
         </motion.div>
       </div>
 
-      {/* Infinite horizontal marquee */}
-      <div className="relative w-full overflow-hidden">
-        {/* Fade masks on edges */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 z-20 bg-gradient-to-r from-[hsl(var(--testimonials-section-bg))] to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 z-20 bg-gradient-to-l from-[hsl(var(--testimonials-section-bg))] to-transparent" />
-
-        <motion.div
-          className="flex gap-8 w-max"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+      {/* Orbiting carousel */}
+      <div className="flex flex-col items-center p-4 relative min-h-[420px]">
+        <div
+          className="relative flex items-center justify-center"
+          style={{ width: containerSize, height: containerSize }}
         >
-          {doubled.map((item, index) => {
-            const realIndex = index % items.length;
+          {/* Single orbit circle */}
+          <div
+            className="absolute rounded-full border border-foreground/20"
+            style={{
+              width: containerRadius * 2,
+              height: containerRadius * 2,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          />
+
+          {/* Active person card */}
+          <AnimatePresence mode="wait">
+            {people.length > 0 && (
+              <motion.div
+                key={(people[activeIndex] as any).id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  duration: 0.3,
+                  ease: "easeInOut",
+                }}
+                className="z-10 bg-background/95 backdrop-blur-sm shadow-xl rounded-xl p-5 md:p-6 w-64 md:w-80 text-center border border-foreground/5"
+              >
+                <motion.img
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  src={(people[activeIndex] as any).profile}
+                  alt={(people[activeIndex] as any).name}
+                  onError={safeImage}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto -mt-10 md:-mt-12 border-4 border-background object-cover shadow-md"
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.15 }}
+                >
+                  <p className="mt-4 text-sm md:text-base italic leading-relaxed mb-3 text-muted-foreground">
+                    {(people[activeIndex] as any).quote}
+                  </p>
+                  <h2 className="mt-1 text-base md:text-lg font-bold">
+                    {(people[activeIndex] as any).name}
+                  </h2>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                  className="flex justify-center items-center mt-3 space-x-2"
+                >
+                  <button
+                    type="button"
+                    onClick={prev}
+                    className="p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    aria-label="Previous testimonial"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={next}
+                    className="p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    aria-label="Next testimonial"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Orbiting profiles with counter-rotation */}
+          {people.map((p: any, i: number) => {
+            const rotation = getRotation(i);
             return (
-              <div
-                key={index}
-                className="shrink-0 w-80 md:w-96"
+              <motion.div
+                key={p.id}
+                animate={{
+                  transform: `rotate(${rotation}deg) translateY(-${containerRadius}px)`,
+                }}
+                transition={{
+                  duration: 0.8,
+                  ease: [0.34, 1.56, 0.64, 1],
+                }}
+                style={{
+                  width: profileSize,
+                  height: profileSize,
+                  position: "absolute",
+                  top: `calc(50% - ${profileSize / 2}px)`,
+                  left: `calc(50% - ${profileSize / 2}px)`,
+                }}
               >
                 <motion.div
-                  whileHover={{ scale: 1.05, rotate: -1 }}
-                  className="relative p-8 shadow-playful border-4 border-background overflow-visible"
-                  style={{
-                    backgroundColor: `hsl(var(--testimonials-card-${realIndex}-bg))`,
-                    borderRadius: "2.5rem 1rem 2.5rem 1rem",
+                  animate={{ rotate: -rotation }}
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.34, 1.56, 0.64, 1],
                   }}
+                  className="w-full h-full"
                 >
-                  {/* Large quote mark */}
-                  <span className="absolute -top-6 -left-2 text-7xl font-display opacity-15 leading-none select-none">"</span>
-
-                  <motion.span
-                    className="absolute -top-4 -right-3 text-3xl drop-shadow-lg z-10"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2.5, repeat: Infinity, delay: realIndex * 0.3 }}
-                  >
-                    {emojis[realIndex]}
-                  </motion.span>
-
-                  <p
-                    className="italic text-base leading-relaxed mb-6"
-                    style={getStyleForPath(`testimonials.items.${realIndex}.quote`, "--foreground")}
-                  >
-                    {(item as any).quote}
-                  </p>
-
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full gradient-warm flex items-center justify-center text-primary-foreground font-bold text-sm shadow-playful"
-                    >
-                      {((item as any).author as string)?.charAt(0)}
-                    </div>
-                    <p
-                      className="font-display font-bold"
-                      style={getStyleForPath(`testimonials.items.${realIndex}.author`, "--primary")}
-                    >
-                      {(item as any).author}
-                    </p>
-                  </div>
+                  <motion.img
+                    src={p.profile}
+                    alt={p.name}
+                    onError={safeImage}
+                    onClick={() => handleProfileClick(i)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`w-full h-full object-cover rounded-full cursor-pointer transition-all duration-300 ${
+                      i === activeIndex
+                        ? "border-4 border-primary shadow-lg"
+                        : "border-2 border-muted-foreground/40 hover:border-primary"
+                    }`}
+                  />
                 </motion.div>
-              </div>
+              </motion.div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
