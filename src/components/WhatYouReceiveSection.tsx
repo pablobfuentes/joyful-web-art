@@ -1,29 +1,22 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
 import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleDroplet, DoodleLeaf, DoodleFlower, DoodleSparkle } from "./Doodles";
 
-const rotations = [-3, 2, -2, 3, -1];
-
-/* Each card gets a unique organic clip-path for a "torn ticket" / blob feel */
-const clipPaths = [
-  "polygon(0% 8%, 6% 0%, 100% 0%, 100% 92%, 94% 100%, 0% 100%)",
-  "polygon(0% 0%, 94% 0%, 100% 6%, 100% 100%, 6% 100%, 0% 92%)",
-  "polygon(4% 0%, 100% 0%, 100% 100%, 96% 100%, 0% 96%, 0% 4%)",
-  "polygon(0% 0%, 100% 4%, 96% 100%, 0% 100%)",
-  "polygon(0% 0%, 100% 0%, 100% 96%, 94% 100%, 0% 100%, 4% 96%)",
-];
+const emojis = ["🧴", "💧", "🛡️", "☀️", "🌸"];
 
 const WhatYouReceiveSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("whatYouReceive");
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+
+  const products = registryListToArray(data.products);
 
   return (
     <section className="relative py-24 px-6 bg-[hsl(var(--whatYouReceive-section-bg))] overflow-hidden">
-
       <FloatingDoodle className="top-16 left-[6%] w-10 h-10 text-primary/25" delay={0}>
         <DoodleDroplet className="w-full h-full" />
       </FloatingDoodle>
@@ -60,53 +53,87 @@ const WhatYouReceiveSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {registryListToArray(data.products).map((product, index) => (
-            <motion.div
-              key={product?.number ?? index}
-              initial={{ opacity: 0, y: 60, rotate: rotations[index] * 2 }}
-              whileInView={{ opacity: 1, y: 0, rotate: rotations[index] }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -12, rotate: 0, scale: 1.05 }}
-              className="group relative"
-            >
-              <div
-                className="p-6 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover"
-                style={{
-                  backgroundColor: "hsl(var(--whatYouReceive-card-" + index + "-bg))",
-                  clipPath: clipPaths[index % clipPaths.length],
-                  borderRadius: "1.5rem",
-                }}
+        {/* Accordion strips — each row expands on click to reveal details */}
+        <div className="max-w-3xl mx-auto flex flex-col gap-3">
+          {products.map((product, index) => {
+            const isOpen = expandedIndex === index;
+            return (
+              <motion.div
+                key={product?.number ?? index}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -80 : 80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                onClick={() => setExpandedIndex(isOpen ? null : index)}
+                className="cursor-pointer group"
               >
-                {/* Number badge overlapping top-left */}
                 <motion.div
-                  className="absolute -top-4 -left-4 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10"
-                  whileHover={{ scale: 1.2, rotate: 10 }}
+                  className="relative border-4 border-background shadow-playful overflow-hidden transition-shadow hover:shadow-card-hover"
+                  style={{
+                    backgroundColor: `hsl(var(--whatYouReceive-card-${index}-bg))`,
+                    borderRadius: "2rem",
+                  }}
+                  layout
                 >
-                  {product.number}
+                  {/* Header strip */}
+                  <div className="flex items-center gap-4 px-6 py-5">
+                    <motion.div
+                      className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-lg font-bold shadow-playful shrink-0"
+                      animate={{ rotate: isOpen ? 360 : 0 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      {product.number}
+                    </motion.div>
+
+                    <h3
+                      className="font-display text-xl font-bold flex-1"
+                      style={getStyleForPath(`whatYouReceive.products.${index}.category`, "--foreground")}
+                    >
+                      {product.category}
+                    </h3>
+
+                    <motion.span
+                      className="text-3xl"
+                      animate={{ y: [0, -4, 0], rotate: isOpen ? [0, -10, 10, 0] : 0 }}
+                      transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
+                    >
+                      {emojis[index % emojis.length]}
+                    </motion.span>
+
+                    <motion.div
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      className="text-2xl select-none"
+                    >
+                      ▾
+                    </motion.div>
+                  </div>
+
+                  {/* Expandable content */}
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-6 pt-0">
+                          <div className="h-px bg-foreground/10 mb-4" />
+                          <p
+                            className="text-base leading-relaxed"
+                            style={getStyleForPath(`whatYouReceive.products.${index}.description`, "--muted-foreground")}
+                          >
+                            {product.description}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
-
-                {/* Floating emoji */}
-                <motion.span
-                  className="absolute -top-3 -right-3 text-3xl drop-shadow-lg z-10"
-                  animate={{ y: [0, -6, 0], rotate: [0, -10, 10, 0] }}
-                  transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
-                >
-                  {product.emoji ?? ["🧴", "💧", "🛡️", "☀️", "🌸"][index]}
-                </motion.span>
-
-                <div className="pt-4">
-                  <h3 className="font-display text-xl font-bold mb-2" style={getStyleForPath(`whatYouReceive.products.${index}.category`, "--foreground")}>
-                    {product.category}
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={getStyleForPath(`whatYouReceive.products.${index}.description`, "--muted-foreground")}>
-                    {product.description}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

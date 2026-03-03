@@ -12,9 +12,12 @@ const TestimonialsSection = () => {
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
-  return (
-    <section className="relative py-24 px-6 bg-[hsl(var(--testimonials-section-bg))] overflow-hidden">
+  const items = registryListToArray(data.items);
+  // Double for seamless infinite loop
+  const doubled = [...items, ...items];
 
+  return (
+    <section className="relative py-24 bg-[hsl(var(--testimonials-section-bg))] overflow-hidden">
       <FloatingDoodle className="top-20 right-[10%] w-10 h-10 text-primary/25" delay={0}>
         <DoodleStar className="w-full h-full" />
       </FloatingDoodle>
@@ -25,7 +28,7 @@ const TestimonialsSection = () => {
         <DoodleSparkle className="w-full h-full" />
       </FloatingDoodle>
 
-      <div className="container mx-auto relative z-10">
+      <div className="container mx-auto relative z-10 px-6">
         <motion.div
           ref={headerRef}
           initial={{ opacity: 0, y: 30 }}
@@ -41,63 +44,70 @@ const TestimonialsSection = () => {
             ⭐ {data.subtitle}
           </motion.span>
         </motion.div>
+      </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {registryListToArray(data.items).map((item, index) => (
-            <motion.div
-              key={(item as any)?.author ?? index}
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.12, duration: 0.6 }}
-              whileHover={{ y: -10, scale: 1.05 }}
-              className="group relative"
-            >
-              {/* Speech bubble card */}
+      {/* Infinite horizontal marquee */}
+      <div className="relative w-full overflow-hidden">
+        {/* Fade masks on edges */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 z-20 bg-gradient-to-r from-[hsl(var(--testimonials-section-bg))] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 z-20 bg-gradient-to-l from-[hsl(var(--testimonials-section-bg))] to-transparent" />
+
+        <motion.div
+          className="flex gap-8 w-max"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        >
+          {doubled.map((item, index) => {
+            const realIndex = index % items.length;
+            return (
               <div
-                className="relative p-7 shadow-playful border-4 border-background overflow-visible transition-shadow hover:shadow-card-hover"
-                style={{
-                  backgroundColor: "hsl(var(--testimonials-card-" + index + "-bg))",
-                  borderRadius: "2rem 2rem 2rem 0.25rem",
-                }}
+                key={index}
+                className="shrink-0 w-80 md:w-96"
               >
-                <motion.span
-                  className="absolute -top-4 -right-3 text-3xl drop-shadow-lg z-10"
-                  animate={{ scale: [1, 1.2, 1], rotate: [0, -10, 10, 0] }}
-                  transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
-                >
-                  {emojis[index]}
-                </motion.span>
-
-                <div className="text-4xl mb-4 opacity-20 font-display">"</div>
-                <p className="italic mb-4 text-sm leading-relaxed" style={getStyleForPath(`testimonials.items.${index}.quote`, "--foreground")}>
-                  {(item as any).quote}
-                </p>
-
-                {/* Speech bubble tail */}
-                <div
-                  className="absolute -bottom-3 left-6 w-6 h-6 border-b-4 border-l-4 border-background"
+                <motion.div
+                  whileHover={{ scale: 1.05, rotate: -1 }}
+                  className="relative p-8 shadow-playful border-4 border-background overflow-visible"
                   style={{
-                    backgroundColor: "hsl(var(--testimonials-card-" + index + "-bg))",
-                    clipPath: "polygon(0% 0%, 100% 0%, 0% 100%)",
+                    backgroundColor: `hsl(var(--testimonials-card-${realIndex}-bg))`,
+                    borderRadius: "2.5rem 1rem 2.5rem 1rem",
                   }}
-                />
-              </div>
+                >
+                  {/* Large quote mark */}
+                  <span className="absolute -top-6 -left-2 text-7xl font-display opacity-15 leading-none select-none">"</span>
 
-              {/* Author below bubble */}
-              <motion.p
-                className="font-display font-bold mt-5 ml-2"
-                style={getStyleForPath(`testimonials.items.${index}.author`, "--primary")}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.12 + 0.3 }}
-              >
-                — {(item as any).author}
-              </motion.p>
-            </motion.div>
-          ))}
-        </div>
+                  <motion.span
+                    className="absolute -top-4 -right-3 text-3xl drop-shadow-lg z-10"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2.5, repeat: Infinity, delay: realIndex * 0.3 }}
+                  >
+                    {emojis[realIndex]}
+                  </motion.span>
+
+                  <p
+                    className="italic text-base leading-relaxed mb-6"
+                    style={getStyleForPath(`testimonials.items.${realIndex}.quote`, "--foreground")}
+                  >
+                    {(item as any).quote}
+                  </p>
+
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-full gradient-warm flex items-center justify-center text-primary-foreground font-bold text-sm shadow-playful"
+                    >
+                      {((item as any).author as string)?.charAt(0)}
+                    </div>
+                    <p
+                      className="font-display font-bold"
+                      style={getStyleForPath(`testimonials.items.${realIndex}.author`, "--primary")}
+                    >
+                      {(item as any).author}
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );
