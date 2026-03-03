@@ -6,6 +6,15 @@ import { FloatingDoodle, DoodleDroplet, DoodleLeaf, DoodleFlower, DoodleSparkle 
 
 const rotations = [-3, 2, -2, 3, -1];
 
+/* Each card gets a unique organic clip-path for a "torn ticket" / blob feel */
+const clipPaths = [
+  "polygon(0% 8%, 6% 0%, 100% 0%, 100% 92%, 94% 100%, 0% 100%)",
+  "polygon(0% 0%, 94% 0%, 100% 6%, 100% 100%, 6% 100%, 0% 92%)",
+  "polygon(4% 0%, 100% 0%, 100% 100%, 96% 100%, 0% 96%, 0% 4%)",
+  "polygon(0% 0%, 100% 4%, 96% 100%, 0% 100%)",
+  "polygon(0% 0%, 100% 0%, 100% 96%, 94% 100%, 0% 100%, 4% 96%)",
+];
+
 const WhatYouReceiveSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("whatYouReceive");
@@ -63,8 +72,12 @@ const WhatYouReceiveSection = () => {
               className="group relative"
             >
               <div
-                className="rounded-3xl p-6 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover"
-                style={{ backgroundColor: "hsl(var(--whatYouReceive-card-" + index + "-bg))" }}
+                className="p-6 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover"
+                style={{
+                  backgroundColor: "hsl(var(--whatYouReceive-card-" + index + "-bg))",
+                  clipPath: clipPaths[index % clipPaths.length],
+                  borderRadius: "1.5rem",
+                }}
               >
                 {/* Number badge overlapping top-left */}
                 <motion.div
@@ -76,7 +89,7 @@ const WhatYouReceiveSection = () => {
 
                 {/* Floating emoji */}
                 <motion.span
-                  className="absolute -top-3 -right-3 text-3xl drop-shadow-lg"
+                  className="absolute -top-3 -right-3 text-3xl drop-shadow-lg z-10"
                   animate={{ y: [0, -6, 0], rotate: [0, -10, 10, 0] }}
                   transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
                 >

@@ -5,7 +5,6 @@ import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleFlower, DoodleStar, DoodleHeart } from "./Doodles";
 
 const emojis = ["💦", "✨", "🧬", "🫧", "☀️", "💧", "🌿", "🍂"];
-const rotations = [-3, 2, -2, 3, -1, 2, -3, 1];
 
 const PastEditionsSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
@@ -47,36 +46,42 @@ const PastEditionsSection = () => {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        {/* Horizontal scrollable pill-shaped cards */}
+        <div className="flex flex-wrap justify-center gap-5 max-w-5xl mx-auto">
           {registryListToArray(data.editions).map((edition, index) => (
             <motion.div
-              key={edition?.name ?? index}
-              initial={{ opacity: 0, scale: 0.8, rotate: rotations[index] * 2 }}
-              whileInView={{ opacity: 1, scale: 1, rotate: rotations[index] }}
+              key={(edition as any)?.name ?? index}
+              initial={{ opacity: 0, scale: 0.7, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.06, type: "spring", stiffness: 200 }}
-              whileHover={{ y: -10, rotate: 0, scale: 1.08 }}
+              whileHover={{ y: -10, scale: 1.1 }}
               className="group relative"
             >
+              {/* Pill / capsule shape */}
               <div
-                className="rounded-3xl p-5 shadow-playful border-4 border-background text-center relative overflow-visible transition-shadow hover:shadow-card-hover"
-                style={{ backgroundColor: "hsl(var(--pastEditions-card-" + (index % 4) + "-bg))" }}
+                className="relative px-6 py-5 shadow-playful border-4 border-background text-center overflow-visible transition-shadow hover:shadow-card-hover"
+                style={{
+                  backgroundColor: "hsl(var(--pastEditions-card-" + (index % 4) + "-bg))",
+                  borderRadius: index % 2 === 0 ? "9999px" : "1rem 3rem 1rem 3rem",
+                  minWidth: "10rem",
+                }}
               >
                 <motion.span
-                  className="absolute -top-3 -right-2 text-2xl drop-shadow-md"
+                  className="absolute -top-3 -right-2 text-2xl drop-shadow-md z-10"
                   animate={{ rotate: [0, -15, 15, 0] }}
                   transition={{ duration: 2, repeat: Infinity, delay: index * 0.2 }}
                 >
                   {emojis[index]}
                 </motion.span>
                 <h3 className="font-display font-bold text-lg" style={getStyleForPath(`pastEditions.editions.${index}.name`, "--foreground")}>
-                  {edition.name}
+                  {(edition as any).name}
                 </h3>
                 <p className="text-sm font-medium" style={getStyleForPath(`pastEditions.editions.${index}.category`, "--muted-foreground")}>
-                  {edition.category}
+                  {(edition as any).category}
                 </p>
                 <p className="text-xs mt-1 font-bold" style={getStyleForPath(`pastEditions.editions.${index}.month`, "--muted-foreground")}>
-                  {edition.month}
+                  {(edition as any).month}
                 </p>
               </div>
             </motion.div>
