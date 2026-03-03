@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  * (e.g. after localStorage overrides or merge). Ensures correct order and avoids
  * .map() errors; does not add, remove, or change any content.
  */
-export function registryListToArray<T>(value: T[] | Record<string, T> | null | undefined): T[] {
+export function registryListToArray<T>(value: readonly T[] | T[] | Record<string, T> | null | undefined): T[] {
   if (value == null) return [];
   if (Array.isArray(value)) return value;
   if (typeof value !== "object") return [];

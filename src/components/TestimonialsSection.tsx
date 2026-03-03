@@ -5,7 +5,6 @@ import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleStar, DoodleHeart, DoodleSparkle } from "./Doodles";
 
 const emojis = ["💖", "🌟", "✨"];
-const rotations = [-2, 3, -3];
 
 const TestimonialsSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
@@ -46,20 +45,24 @@ const TestimonialsSection = () => {
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {registryListToArray(data.items).map((item, index) => (
             <motion.div
-              key={item?.author ?? index}
-              initial={{ opacity: 0, y: 60, rotate: rotations[index] * 2 }}
-              whileInView={{ opacity: 1, y: 0, rotate: rotations[index] }}
+              key={(item as any)?.author ?? index}
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.12, duration: 0.6 }}
-              whileHover={{ y: -10, rotate: 0, scale: 1.05 }}
+              whileHover={{ y: -10, scale: 1.05 }}
               className="group relative"
             >
+              {/* Speech bubble card */}
               <div
-                className="rounded-3xl p-7 shadow-playful border-4 border-background relative overflow-visible transition-shadow hover:shadow-card-hover"
-                style={{ backgroundColor: "hsl(var(--testimonials-card-" + index + "-bg))" }}
+                className="relative p-7 shadow-playful border-4 border-background overflow-visible transition-shadow hover:shadow-card-hover"
+                style={{
+                  backgroundColor: "hsl(var(--testimonials-card-" + index + "-bg))",
+                  borderRadius: "2rem 2rem 2rem 0.25rem",
+                }}
               >
                 <motion.span
-                  className="absolute -top-4 -right-3 text-3xl drop-shadow-lg"
+                  className="absolute -top-4 -right-3 text-3xl drop-shadow-lg z-10"
                   animate={{ scale: [1, 1.2, 1], rotate: [0, -10, 10, 0] }}
                   transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
                 >
@@ -68,12 +71,30 @@ const TestimonialsSection = () => {
 
                 <div className="text-4xl mb-4 opacity-20 font-display">"</div>
                 <p className="italic mb-4 text-sm leading-relaxed" style={getStyleForPath(`testimonials.items.${index}.quote`, "--foreground")}>
-                  {item.quote}
+                  {(item as any).quote}
                 </p>
-                <p className="font-display font-bold" style={getStyleForPath(`testimonials.items.${index}.author`, "--primary")}>
-                  — {item.author}
-                </p>
+
+                {/* Speech bubble tail */}
+                <div
+                  className="absolute -bottom-3 left-6 w-6 h-6 border-b-4 border-l-4 border-background"
+                  style={{
+                    backgroundColor: "hsl(var(--testimonials-card-" + index + "-bg))",
+                    clipPath: "polygon(0% 0%, 100% 0%, 0% 100%)",
+                  }}
+                />
               </div>
+
+              {/* Author below bubble */}
+              <motion.p
+                className="font-display font-bold mt-5 ml-2"
+                style={getStyleForPath(`testimonials.items.${index}.author`, "--primary")}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.12 + 0.3 }}
+              >
+                — {(item as any).author}
+              </motion.p>
             </motion.div>
           ))}
         </div>
