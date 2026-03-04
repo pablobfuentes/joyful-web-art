@@ -1,19 +1,54 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleLeaf, DoodleDroplet } from "./Doodles";
 
-const emojis = ["📬", "🎯", "📖", "🔄"];
+const STEP_EMOJIS = ["📬", "🎯", "📖", "🔄"];
+
+/** Fill fraction (0–1) so the colored line reaches from section top to viewport center. */
+function useTimelineFillProgress(sectionRef: React.RefObject<HTMLElement | null>) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const update = () => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const sectionHeight = rect.height;
+      if (sectionHeight <= 0) {
+        setProgress(0);
+        return;
+      }
+      const viewportCenterY = window.innerHeight / 2;
+      const fillFromTop = viewportCenterY - rect.top;
+      const fraction = fillFromTop / sectionHeight;
+      setProgress(Math.min(1, Math.max(0, fraction)));
+    };
+
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [sectionRef]);
+
+  return progress;
+}
 
 const ExperienceSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("experience");
   const headerRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
+  const lineProgress = useTimelineFillProgress(sectionRef);
+  const steps = registryListToArray(data.steps) as Array<{ number?: string; title?: string; description?: string }>;
 
   return (
-    <section id="experience" className="relative py-24 px-6 bg-[hsl(var(--experience-section-bg))] overflow-hidden">
+    <section ref={sectionRef} id="experience" className="relative py-24 px-6 bg-[hsl(var(--experience-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-40" />
 
       <FloatingDoodle className="top-16 left-[8%] w-11 h-11 text-primary/25" delay={0}>
@@ -36,58 +71,59 @@ const ExperienceSection = () => {
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-16"
         >
-          <motion.span
-            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
-            style={getStyleForPath("experience.subtitle", "--foreground")}
-            animate={{ rotate: [2, -2, 2] }}
-            transition={{ duration: 3, repeat: Infinity }}
+          <p
+            className="text-xs font-medium tracking-[0.4em] uppercase text-muted-foreground mb-6"
+            style={getStyleForPath("experience.subtitle", "--muted-foreground")}
           >
-            🌟 {data.subtitle}
-          </motion.span>
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-6" style={getStyleForPath("experience.title", "--foreground")}>
+            {data.subtitle}
+          </p>
+          <h2
+            className="font-display text-4xl md:text-6xl font-bold mb-4"
+            style={getStyleForPath("experience.title", "--foreground")}
+          >
             {data.title}
           </h2>
-          <motion.a
-            href={data.ctaButton.href}
-            whileHover={{ scale: 1.08, rotate: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-block gradient-warm px-10 py-5 rounded-full text-lg font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow"
-            style={getStyleForPath("experience.ctaButton.label", "--primary-foreground")}
+          <p
+            className="max-w-xl mx-auto text-muted-foreground text-base md:text-lg leading-relaxed"
+            style={getStyleForPath("experience.topBody", "--muted-foreground")}
           >
-            {data.ctaButton.label} ✨
-          </motion.a>
+            {data.topBody}
+          </p>
         </motion.div>
 
         {/* Timeline layout instead of grid */}
         <div className="relative max-w-3xl mx-auto">
-          {/* Vertical line */}
-          <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-primary/20 rounded-full md:-translate-x-1/2" />
-
-          {registryListToArray(data.steps).map((step, index) => {
+          <div
+            data-testid="experience-vertical-line"
+            className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-primary/20 rounded-full md:-translate-x-1/2 overflow-hidden"
+            aria-hidden="true"
+          >
+            <div
+              className="absolute left-0 right-0 top-0 w-full rounded-full bg-primary"
+              style={{ height: `${lineProgress * 100}%` }}
+            />
+          </div>
+          {steps.map((step, index) => {
             const isEven = index % 2 === 0;
+            const stepKey = step?.number ?? index;
             return (
               <motion.div
-                key={(step as any)?.number ?? index}
+                key={stepKey}
+                data-step={index}
                 initial={{ opacity: 0, x: isEven ? -60 : 60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.6, delay: index * 0.12 }}
-                className={`relative flex items-start gap-6 mb-12 md:mb-16 ${
-                  isEven ? "md:flex-row" : "md:flex-row-reverse"
-                } flex-row`}
+                className={`relative flex items-start gap-6 mb-6 md:mb-8 ${isEven ? "md:flex-row" : "md:flex-row-reverse"} flex-row`}
+                style={{ minHeight: "28vh" }}
               >
-                {/* Connector dot */}
                 <motion.div
                   className="absolute left-6 md:left-1/2 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10 -translate-x-1/2"
                   whileHover={{ scale: 1.2, rotate: 10 }}
                 >
-                  {(step as any).number}
+                  {step?.number ?? index + 1}
                 </motion.div>
-
-                {/* Spacer for the dot */}
                 <div className="w-14 shrink-0 md:hidden" />
-
-                {/* Card */}
                 <motion.div
                   whileHover={{ y: -6, scale: 1.02 }}
                   className={`flex-1 ${isEven ? "md:pr-12 md:text-right" : "md:pl-12"} pl-6 md:pl-0`}
@@ -96,35 +132,91 @@ const ExperienceSection = () => {
                   <div
                     className="relative p-6 shadow-playful border-4 border-background overflow-visible transition-shadow hover:shadow-card-hover"
                     style={{
-                      backgroundColor: "hsl(var(--experience-card-" + index + "-bg))",
+                      backgroundColor: `hsl(var(--experience-card-${index}-bg))`,
                       borderRadius: isEven ? "2rem 0.5rem 2rem 0.5rem" : "0.5rem 2rem 0.5rem 2rem",
                     }}
                   >
-                    {/* Emoji */}
                     <motion.span
                       className="absolute -top-3 text-3xl drop-shadow-lg z-10"
                       style={{ [isEven ? "left" : "right"]: "-0.5rem" }}
                       animate={{ y: [0, -6, 0], rotate: [0, -10, 10, 0] }}
                       transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
                     >
-                      {emojis[index]}
+                      {STEP_EMOJIS[index]}
                     </motion.span>
-
                     <h3 className="font-display text-xl font-bold mb-2" style={getStyleForPath(`experience.steps.${index}.title`, "--foreground")}>
-                      {(step as any).title}
+                      {step?.title}
                     </h3>
                     <p className="text-sm leading-relaxed" style={getStyleForPath(`experience.steps.${index}.description`, "--muted-foreground")}>
-                      {(step as any).description}
+                      {step?.description}
                     </p>
                   </div>
                 </motion.div>
-
-                {/* Invisible spacer for the other side */}
                 <div className="hidden md:block flex-1" />
               </motion.div>
             );
           })}
         </div>
+
+        {/* Closing section with line, top & bottom paragraphs, and bottom CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mt-20 flex flex-col items-center text-center px-4"
+        >
+          <motion.div
+            className="w-16 h-px bg-primary/30 mx-auto mb-6"
+            aria-hidden="true"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.7 }}
+          />
+          <p
+            className="text-xs font-medium tracking-[0.4em] uppercase text-muted-foreground mb-4"
+            style={getStyleForPath("experience.closing.overline", "--muted-foreground")}
+          >
+            {data.closing.overline}
+          </p>
+          <h3
+            className="font-display text-3xl md:text-4xl text-foreground mb-4 leading-tight"
+            style={getStyleForPath("experience.closing.title", "--foreground")}
+          >
+            {data.closing.title}
+            <br />
+            <span className="text-primary">{data.closing.highlight}</span>
+          </h3>
+          <p
+            className="max-w-md mx-auto text-muted-foreground text-base md:text-lg leading-relaxed mb-8"
+            style={getStyleForPath("experience.closing.body", "--muted-foreground")}
+          >
+            {data.closing.body}
+          </p>
+          <motion.a
+            href={data.closing.ctaHref}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground font-semibold text-sm tracking-wide uppercase rounded-full shadow-playful hover:shadow-card-hover transition-shadow"
+            style={getStyleForPath("experience.closing.ctaLabel", "--primary-foreground")}
+          >
+            {data.closing.ctaLabel}
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="transition-transform duration-300 group-hover:translate-x-1"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </motion.a>
+        </motion.div>
       </div>
     </section>
   );

@@ -218,9 +218,18 @@ export const APP_REGISTRY = {
   experience: {
     subtitle: "The Experience",
     title: "Más que una caja. Un reinicio mensual",
+    topBody: "No es solo un envío. Es una experiencia pensada para que tu rutina fluya sin esfuerzo.",
     ctaButton: {
       label: "Quiero vivir esta experiencia",
       href: "#pricing"
+    },
+    closing: {
+      overline: "Tu rutina empieza aquí",
+      title: "Simple. Claro.",
+      highlight: "Tuyo.",
+      body: "Sin complicaciones. Sin excesos. Solo lo que necesitas, cuando lo necesitas.",
+      ctaLabel: "Comenzar",
+      ctaHref: "#pricing"
     },
     steps: [
       {

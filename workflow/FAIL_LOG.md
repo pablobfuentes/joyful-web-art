@@ -19,3 +19,9 @@
 ## Entry 3: (This session) Full analysis and fix without content changes
 - **Goal**: Page works as intended; any change in variables only changes values, not behavior. No content/variable changes without permission.
 - **Implementation**: Add `registryListToArray` in `src/lib/utils.ts`; use it in all sections that read list-like registry data (why.cards, howItWorks.steps, testimonials.items, etc.). Ensure key for StepCard is stable when `step.label` is missing (use `index` or `step.label ?? index`). No edits to app-registry.ts or to any copy/variable values.
+
+## Entry 4: ExperienceSection data-step roadmap markers
+- **Date**: This session
+- **Failure**: New TDD test `renders one step marker per experience step using data-step attributes` in `src/components/ExperienceSection.test.tsx` expected one `[data-step]` marker per `APP_REGISTRY.experience.steps` entry, but `ExperienceSection` did not render any `data-step` attributes (markers length 0 vs expected 4).
+- **Root cause**: The Experience section’s timeline layout did not expose per-step markers for scroll-aware roadmap behavior as in the Loveable Roadmap example. Steps were rendered, but there was no structural hook (`data-step`) for navigation or progress indicators.
+- **Fix**: Updated `src/components/ExperienceSection.tsx` so each mapped step `motion.div` includes `data-step={index}` and a `minHeight: "40vh"` style, aligning structure with the roadmap pattern while preserving the existing color palette and registry-driven content.
