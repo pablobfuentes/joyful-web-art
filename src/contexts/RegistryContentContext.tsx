@@ -118,6 +118,12 @@ export function RegistryContentProvider({
         deepMergeSection(item, o[i] ?? o[String(i)])
       );
     }
+    if (Array.isArray(base) && Array.isArray(over)) {
+      const len = Math.max((base as unknown[]).length, over.length);
+      return Array.from({ length: len }, (_, i) =>
+        deepMergeSection((base as unknown[])[i], over[i])
+      );
+    }
     if (
       typeof base === "object" &&
       base !== null &&
@@ -147,24 +153,20 @@ export function RegistryContentProvider({
 
   const getSectionContent = useCallback(
     <K extends keyof AppRegistry>(sectionKey: K): AppRegistry[K] => {
-      if (fromFile && content != null && sectionKey in content) {
-        return content[sectionKey] as AppRegistry[K];
-      }
       const base = APP_REGISTRY[sectionKey];
       const over = content?.[sectionKey];
       return deepMergeSection(base, over) as AppRegistry[K];
     },
-    [fromFile, content, deepMergeSection]
+    [content, deepMergeSection]
   );
 
   const fullContentForEditor = useMemo<Record<string, unknown>>(() => {
-    if (fromFile && content != null) return content;
     const out: Record<string, unknown> = {};
     for (const k of Object.keys(APP_REGISTRY) as (keyof AppRegistry)[]) {
       out[k] = getSectionContent(k);
     }
     return out;
-  }, [fromFile, content, getSectionContent]);
+  }, [getSectionContent]);
 
   const getStyleForPath = useCallback(
     (pathKey: string, defaultColorVar?: string) =>

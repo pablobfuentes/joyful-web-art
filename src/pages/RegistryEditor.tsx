@@ -85,6 +85,12 @@ function deepMergeSection(base: unknown, over: unknown): unknown {
       deepMergeSection(item, o[i] ?? o[String(i)])
     );
   }
+  if (Array.isArray(base) && Array.isArray(over)) {
+    const len = Math.max((base as unknown[]).length, over.length);
+    return Array.from({ length: len }, (_, i) =>
+      deepMergeSection((base as unknown[])[i], over[i])
+    );
+  }
   if (
     typeof base === "object" &&
     base !== null &&

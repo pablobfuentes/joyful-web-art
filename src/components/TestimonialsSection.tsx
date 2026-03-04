@@ -1,12 +1,11 @@
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 import { FloatingDoodle, DoodleStar, DoodleHeart, DoodleSparkle } from "./Doodles";
-
-const FALLBACK_AVATAR =
-  "https://placehold.co/100x100/E0E7FF/4338CA?text=Error";
 
 const useIsMobile = (breakpoint: number = 768): boolean => {
   const [isMobile, setIsMobile] = useState(false);
@@ -26,20 +25,24 @@ const useIsMobile = (breakpoint: number = 768): boolean => {
   return isMobile;
 };
 
-const safeImage = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-  const target = e.target as HTMLImageElement;
-  target.src = FALLBACK_AVATAR;
-};
+const makeSafeImage =
+  (fallback: string) => (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = fallback;
+  };
 
 const TestimonialsSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("testimonials");
+  const { registry } = useStyleRegistry();
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   const people = registryListToArray(data.people);
   const [activeIndex, setActiveIndex] = useState(0);
   const isMobile = useIsMobile();
+  const fallbackAvatar = (data.fallbackAvatar as string) || "https://placehold.co/100x100/E0E7FF/4338CA?text=Error";
+  const safeImage = makeSafeImage(fallbackAvatar);
 
   const containerRadius = isMobile ? 150 : 240;
   const profileSize = isMobile ? 70 : 90;
@@ -97,7 +100,7 @@ const TestimonialsSection = () => {
             className="text-base md:text-lg font-semibold"
             style={getStyleForPath("testimonials.subtitle", "--foreground")}
           >
-            ⭐ {data.subtitle}
+            {data.subtitleEmoji} {data.subtitle}
           </motion.p>
         </motion.div>
       </div>
@@ -132,7 +135,14 @@ const TestimonialsSection = () => {
                   duration: 0.3,
                   ease: "easeInOut",
                 }}
-                className="z-10 bg-background/95 backdrop-blur-sm shadow-xl rounded-xl p-5 md:p-6 w-64 md:w-80 text-center border border-foreground/5"
+                className="z-10 backdrop-blur-sm shadow-xl rounded-xl p-5 md:p-6 w-64 md:w-80 text-center border border-foreground/5"
+                style={{
+                  backgroundColor: `hsl(var(--testimonials-card-${
+                    (registry.testimonials.cards?.length ?? 0) > 0
+                      ? activeIndex % (registry.testimonials.cards!.length)
+                      : 0
+                  }-bg))`,
+                }}
               >
                 <motion.img
                   initial={{ opacity: 0, scale: 0.8 }}

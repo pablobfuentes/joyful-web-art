@@ -159,48 +159,59 @@ export const APP_REGISTRY = {
     ]
   },
   pastEditions: {
+    subtitleEmoji: "📚",
     subtitle: "Past Editions",
     title: "See what we've curated",
+    /** Fallback image URL when an edition has no image or load fails. */
+    fallbackImage: "https://placehold.co/590x640/e8e4de/2d2620?text=Past+Edition",
     editions: [
       {
         name: "Hydration Boost",
         category: "Moisturizing",
-        month: "January 2024"
+        month: "January 2024",
+        image: "https://picsum.photos/seed/hydration/590/640"
       },
       {
         name: "Glow Essentials",
         category: "Brightening",
-        month: "February 2024"
+        month: "February 2024",
+        image: "https://picsum.photos/seed/glow/590/640"
       },
       {
         name: "Barrier Repair",
         category: "Repair",
-        month: "March 2024"
+        month: "March 2024",
+        image: "https://picsum.photos/seed/barrier/590/640"
       },
       {
         name: "Gentle Cleanse",
         category: "Cleansing",
-        month: "April 2024"
+        month: "April 2024",
+        image: "https://picsum.photos/seed/cleanse/590/640"
       },
       {
         name: "Summer Glow",
         category: "Protection",
-        month: "May 2024"
+        month: "May 2024",
+        image: "https://picsum.photos/seed/summer/590/640"
       },
       {
         name: "Deep Hydration",
         category: "Moisturizing",
-        month: "June 2024"
+        month: "June 2024",
+        image: "https://picsum.photos/seed/deep/590/640"
       },
       {
         name: "Calming Routine",
         category: "Sensitive",
-        month: "July 2024"
+        month: "July 2024",
+        image: "https://picsum.photos/seed/calming/590/640"
       },
       {
         name: "Autumn Prep",
         category: "Repair",
-        month: "August 2024"
+        month: "August 2024",
+        image: "https://picsum.photos/seed/autumn/590/640"
       }
     ]
   },
@@ -235,7 +246,9 @@ export const APP_REGISTRY = {
     ]
   },
   testimonials: {
+    subtitleEmoji: "⭐",
     subtitle: "Trusted by Skincare Enthusiasts",
+    fallbackAvatar: "https://placehold.co/100x100/E0E7FF/4338CA?text=Error",
     // Orbiting carousel people data (adapted from example)
     people: [
       {

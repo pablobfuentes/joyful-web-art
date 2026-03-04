@@ -3,11 +3,23 @@ import { useEffect, useRef, useState } from "react";
 import { registryListToArray } from "@/lib/utils";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { FloatingDoodle, DoodleFlower, DoodleStar, DoodleHeart } from "./Doodles";
+import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
+
+const FALLBACK_EDITION_IMAGE =
+  "https://placehold.co/590x640/e8e4de/2d2620?text=Past+Edition";
 
 const PastEditionsSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("pastEditions");
   const editions = registryListToArray(data.editions);
+  const { registry } = useStyleRegistry();
+  const fallbackImage =
+    (data.fallbackImage as string) || FALLBACK_EDITION_IMAGE;
+
+  const onImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    if (target.src !== fallbackImage) target.src = fallbackImage;
+  };
 
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-80px" });
@@ -68,7 +80,7 @@ const PastEditionsSection = () => {
             animate={{ rotate: [-2, 2, -2] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            📚 {data.subtitle}
+            {data.subtitleEmoji} {data.subtitle}
           </motion.span>
           <h2
             className="font-display text-4xl md:text-6xl font-bold"
@@ -86,6 +98,8 @@ const PastEditionsSection = () => {
         >
           {editions.map((edition, index) => {
             const isActive = index === activeIndex;
+            const cards = registry.pastEditions.cards ?? [];
+            const colorIndex = cards.length > 0 ? index % cards.length : 0;
 
             return (
               <li
@@ -95,9 +109,18 @@ const PastEditionsSection = () => {
                 className="relative group cursor-pointer transition-all duration-500 ease-in-out md:w-[8%] md:[&[aria-current='true']]:w-[52%] md:[transition:width_var(--transition,300ms_ease_in)]"
               >
                 <motion.div
-                  className="relative h-40 md:h-full w-full overflow-hidden rounded-3xl shadow-playful border-4 border-background bg-[hsl(var(--card))]"
+                  className="relative h-40 md:h-full w-full overflow-hidden rounded-3xl shadow-playful border-4 border-background"
+                  style={{
+                    backgroundColor: `hsl(var(--pastEditions-card-${colorIndex}-bg))`,
+                  }}
                   whileHover={{ scale: 1.03, y: -8 }}
                 >
+                  <img
+                    src={(edition as { image?: string }).image || fallbackImage}
+                    alt={(edition as { name?: string }).name ?? ""}
+                    onError={onImageError}
+                    className={`absolute left-1/2 top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 object-cover transition-all duration-500 ease-in-out ${isActive ? "scale-105 grayscale-0" : "scale-100 grayscale"}`}
+                  />
                   <div
                     className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent transition-opacity duration-500 ease-in-out"
                     style={{ opacity: isActive ? 1 : 0 }}

@@ -17,6 +17,15 @@ describe("PastEditionsSection carousel", () => {
     expect(items[expectedActiveIndex]).toHaveAttribute("aria-current", "true");
   });
 
+  it("renders one image per edition card", () => {
+    render(<PastEditionsSection />);
+
+    const editions = APP_REGISTRY.pastEditions.editions;
+    const images = screen.getAllByRole("img");
+
+    expect(images.length).toBe(editions.length);
+  });
+
   it("changes the active item when a different edition is clicked", () => {
     render(<PastEditionsSection />);
 
