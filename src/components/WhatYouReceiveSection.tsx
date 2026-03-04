@@ -56,56 +56,66 @@ const WhatYouReceiveSection = () => {
           </p>
         </motion.div>
 
-        {/* 5 cards in 2 rows (3 + 2), all text visible */}
-        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-visible">
-          {products.map((product, index) => (
-            <motion.div
-              key={product?.number ?? index}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-24px" }}
-              transition={{ duration: 0.4, delay: index * 0.06 }}
-              className="relative border-4 border-background shadow-playful rounded-2xl overflow-visible transition-shadow hover:shadow-card-hover"
-              style={{
-                backgroundColor: `hsl(var(--whatYouReceive-card-${index}-bg))`,
-              }}
-            >
-              {/* Number circle: center at card top-left corner, half extending out (wrapper keeps position when motion animates rotate) */}
-              <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 z-10">
-                <motion.div
-                  className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-lg font-bold shadow-playful"
-                  animate={{ rotate: [0, -4, 4, -4, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 0.8, delay: index * 0.15 }}
-                >
-                  {product?.number ?? index + 1}
-                </motion.div>
-              </div>
-              <div className="p-6 pl-10 pt-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <h3
-                    className="font-display text-xl font-bold flex-1"
-                    style={getStyleForPath(`whatYouReceive.products.${index}.category`, "--foreground")}
+        {/* 5 cards: top row 3, bottom row 2 centered (brick-style) */}
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 overflow-visible">
+          {products.map((product, index) => {
+            const isBottomRow = index >= 3;
+            const isLastCard = index === 4;
+            const gridClass =
+              !isBottomRow
+                ? "sm:col-span-1 lg:col-span-2"
+                : index === 3
+                  ? "sm:col-span-1 lg:col-start-2 lg:col-span-2"
+                  : "sm:col-span-1 lg:col-span-2";
+            return (
+              <motion.div
+                key={product?.number ?? index}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-24px" }}
+                transition={{ duration: 0.4, delay: index * 0.06 }}
+                className={`relative border-4 border-background shadow-playful rounded-2xl overflow-visible transition-shadow hover:shadow-card-hover ${gridClass}`}
+                style={{
+                  backgroundColor: `hsl(var(--whatYouReceive-card-${index}-bg))`,
+                }}
+              >
+                {/* Number circle: center at card top-left corner, half extending out (wrapper keeps position when motion animates rotate) */}
+                <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 z-10">
+                  <motion.div
+                    className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-lg font-bold shadow-playful"
+                    animate={{ rotate: [0, -4, 4, -4, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 0.8, delay: index * 0.15 }}
                   >
-                    {product?.category}
-                  </h3>
-                  <motion.span
-                    className="text-3xl inline-block"
-                    aria-hidden
-                    animate={{ rotate: [0, -6, 6, -6, 0], y: [0, -2, 2, 0] }}
-                    transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.5, delay: index * 0.2 }}
-                  >
-                    {product?.emoji ?? PRODUCT_EMOJIS[index % PRODUCT_EMOJIS.length]}
-                  </motion.span>
+                    {product?.number ?? index + 1}
+                  </motion.div>
                 </div>
-                <p
-                  className="text-base leading-relaxed"
-                  style={getStyleForPath(`whatYouReceive.products.${index}.description`, "--muted-foreground")}
-                >
-                  {product?.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+                <div className="p-6 pl-10 pt-10">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3
+                      className="font-display text-xl font-bold flex-1"
+                      style={getStyleForPath(`whatYouReceive.products.${index}.category`, "--foreground")}
+                    >
+                      {product?.category}
+                    </h3>
+                    <motion.span
+                      className="text-3xl inline-block"
+                      aria-hidden
+                      animate={{ rotate: [0, -6, 6, -6, 0], y: [0, -2, 2, 0] }}
+                      transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.5, delay: index * 0.2 }}
+                    >
+                      {product?.emoji ?? PRODUCT_EMOJIS[index % PRODUCT_EMOJIS.length]}
+                    </motion.span>
+                  </div>
+                  <p
+                    className="text-base leading-relaxed"
+                    style={getStyleForPath(`whatYouReceive.products.${index}.description`, "--muted-foreground")}
+                  >
+                    {product?.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

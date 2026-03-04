@@ -123,6 +123,90 @@ function syncFontsPlugin() {
   };
 }
 
+/** Deep merge overlay onto base so only changed paths are applied; preserves base structure (e.g. full arrays). */
+function deepMergeSection(base: unknown, over: unknown): unknown {
+  if (over == null || over === undefined) return base;
+  if (Array.isArray(base) && typeof over === "object" && over !== null && !Array.isArray(over)) {
+    const o = over as Record<string, unknown>;
+    return (base as unknown[]).map((item, i) =>
+      deepMergeSection(item, o[i] ?? o[String(i)])
+    );
+  }
+  if (Array.isArray(base) && Array.isArray(over)) {
+    const len = Math.max((base as unknown[]).length, over.length);
+    return Array.from({ length: len }, (_, i) =>
+      deepMergeSection((base as unknown[])[i], over[i])
+    );
+  }
+  if (
+    typeof base === "object" &&
+    base !== null &&
+    !Array.isArray(base) &&
+    typeof over === "object" &&
+    over !== null &&
+    !Array.isArray(over)
+  ) {
+    const b = base as Record<string, unknown>;
+    const o = over as Record<string, unknown>;
+    const merged = { ...b };
+    for (const [k, v] of Object.entries(o)) {
+      if (v === undefined) continue;
+      const baseVal = b[k];
+      if (Array.isArray(baseVal) && !Array.isArray(v)) {
+        merged[k] = (baseVal as unknown[]).map((item, i) =>
+          deepMergeSection(item, (v as Record<string, unknown>)[i] ?? (v as Record<string, unknown>)[String(i)])
+        );
+        continue;
+      }
+      merged[k] = deepMergeSection(baseVal, v) as unknown;
+    }
+    return merged;
+  }
+  return over !== undefined ? over : base;
+}
+
+/** Extract APP_REGISTRY object literal from app-registry.ts and parse it (so we can merge editor content into existing file). */
+function parseAppRegistryFile(fileContent: string): Record<string, unknown> {
+  const marker = "export const APP_REGISTRY = ";
+  const idx = fileContent.indexOf(marker);
+  if (idx === -1) throw new Error("Could not find APP_REGISTRY in app-registry.ts");
+  let start = idx + marker.length;
+  while (start < fileContent.length && /\s/.test(fileContent[start])) start++;
+  if (fileContent[start] !== "{") throw new Error("APP_REGISTRY value does not start with {");
+  let depth = 0;
+  let end = start;
+  for (let i = start; i < fileContent.length; i++) {
+    const c = fileContent[i];
+    if (c === '"' || c === "'") {
+      const q = c;
+      i++;
+      while (i < fileContent.length) {
+        if (fileContent[i] === "\\") {
+          i += 2;
+          continue;
+        }
+        if (fileContent[i] === q) break;
+        i++;
+      }
+      continue;
+    }
+    if (c === "{") depth++;
+    else if (c === "}") {
+      depth--;
+      if (depth === 0) {
+        end = i + 1;
+        break;
+      }
+    }
+  }
+  const objStr = fileContent.slice(start, end);
+  try {
+    return eval("(" + objStr + ")") as Record<string, unknown>;
+  } catch {
+    throw new Error("Failed to parse APP_REGISTRY object from app-registry.ts");
+  }
+}
+
 /** Dev-only: POST /__registry-save-source writes content → app-registry.ts, style → style-registry.ts, with date-stamped backups. */
 function registrySaveSourcePlugin() {
   const APP_HEADER = `/**
@@ -182,12 +266,23 @@ function registrySaveSourcePlugin() {
     if (!fs.existsSync(appBackup) && fs.existsSync(appPath)) fs.copyFileSync(appPath, appBackup);
     if (!fs.existsSync(styleBackup) && fs.existsSync(stylePath)) fs.copyFileSync(stylePath, styleBackup);
   }
-  function writeRegistrySource(projectRoot: string, content: Record<string, unknown>, style: Record<string, unknown>) {
+  function writeRegistrySource(projectRoot: string, contentFromRequest: Record<string, unknown>, style: Record<string, unknown>) {
     const configDir = path.join(projectRoot, "src", "config");
     const appPath = path.join(configDir, "app-registry.ts");
     const stylePath = path.join(configDir, "style-registry.ts");
     ensureBackup(projectRoot, getDateStamp());
-    fs.writeFileSync(appPath, toAppRegistryTS(content), "utf8");
+    // Merge request content into existing file so only the edited variable changes; never replace whole sections (e.g. all steps).
+    let contentToWrite = contentFromRequest;
+    if (fs.existsSync(appPath)) {
+      try {
+        const existingContent = fs.readFileSync(appPath, "utf8");
+        const existingObject = parseAppRegistryFile(existingContent);
+        contentToWrite = deepMergeSection(existingObject, contentFromRequest) as Record<string, unknown>;
+      } catch (e) {
+        console.warn("[registry-save-source] Could not merge into existing app-registry, writing request content as-is:", e);
+      }
+    }
+    fs.writeFileSync(appPath, toAppRegistryTS(contentToWrite), "utf8");
     const styleFileContent = fs.readFileSync(stylePath, "utf8");
     fs.writeFileSync(stylePath, toStyleRegistryTS(style, styleFileContent), "utf8");
   }

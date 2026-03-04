@@ -52,15 +52,6 @@ const HeroSection = () => {
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
-              className="inline-block px-5 py-2 text-sm font-bold mb-6 shadow-playful rotate-[-2deg] bg-[hsl(var(--hero-badge-bg))] text-[hsl(var(--hero-badge-text))] rounded-[var(--hero-badge-radius)]"
-            >
-              {data.badgeText ?? "✨ Skincare Coreano ✨"}
-            </motion.div>
-
             <motion.p
               key={quoteIndex}
               initial={{ opacity: 0, x: -30 }}

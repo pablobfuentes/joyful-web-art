@@ -111,7 +111,7 @@ export const APP_REGISTRY = {
       {
         label: "Recibe",
         title: "Cada caja sigue una rutina clara y fácil de integrar",
-        description: "Limpia · Hidrata · Trata · Protege — productos diseñados para trabajar juntos. Hasta tu puerta, cada 2 meses"
+        description: "Limpia · Hidrata · Trata · Protege — productos diseñados para trabajar juntos"
       },
       {
         label: "Disfruta",
@@ -162,6 +162,7 @@ export const APP_REGISTRY = {
     subtitleEmoji: "📚",
     subtitle: "Past Editions",
     title: "See what we've curated",
+    /** Fallback image URL when an edition has no image or load fails. */
     fallbackImage: "https://placehold.co/590x640/e8e4de/2d2620?text=Past+Edition",
     editions: [
       {
@@ -257,6 +258,7 @@ export const APP_REGISTRY = {
     subtitleEmoji: "⭐",
     subtitle: "Trusted by Skincare Enthusiasts",
     fallbackAvatar: "https://placehold.co/100x100/E0E7FF/4338CA?text=Error",
+    // Orbiting carousel people data (adapted from example)
     people: [
       {
         id: 1,
@@ -264,7 +266,8 @@ export const APP_REGISTRY = {
         role: "Theoretical Physicist",
         email: "einstein@example.com",
         quote: "“The most beautiful experience we can have is the mysterious.”",
-        profile: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Albert_Einstein_Head.jpg"
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/d/d3/Albert_Einstein_Head.jpg"
       },
       {
         id: 2,
@@ -272,7 +275,8 @@ export const APP_REGISTRY = {
         role: "Physicist & Mathematician",
         email: "newton@example.com",
         quote: "“Truth is ever to be found in simplicity, and not in the multiplicity and confusion of things.”",
-        profile: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg/1200px-Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg"
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg/1200px-Portrait_of_Sir_Isaac_Newton%2C_1689_%28brightened%29.jpg"
       },
       {
         id: 3,
@@ -280,7 +284,8 @@ export const APP_REGISTRY = {
         role: "Physicist & Chemist",
         email: "curie@example.com",
         quote: "“Nothing in life is to be feared, it is only to be understood.”",
-        profile: "https://upload.wikimedia.org/wikipedia/commons/7/7e/Marie_Curie_c1920.jpg"
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/7/7e/Marie_Curie_c1920.jpg"
       },
       {
         id: 4,
@@ -296,7 +301,8 @@ export const APP_REGISTRY = {
         role: "Naturalist & Biologist",
         email: "darwin@example.com",
         quote: "“In the long history of humankind those who learned to collaborate and improvise most effectively have prevailed.”",
-        profile: "https://hips.hearstapps.com/hmg-prod/images/gettyimages-79035252.jpg?crop=1xw:1.0xh;center,top&resize=640:*"
+        profile:
+          "https://hips.hearstapps.com/hmg-prod/images/gettyimages-79035252.jpg?crop=1xw:1.0xh;center,top&resize=640:*"
       },
       {
         id: 6,
@@ -304,7 +310,8 @@ export const APP_REGISTRY = {
         role: "Astronomer & Physicist",
         email: "galileo@example.com",
         quote: "“Wine is sunlight, held together by water.”",
-        profile: "https://res.cloudinary.com/aenetworks/image/upload/c_fill,ar_2,w_3840,h_1920,g_auto/dpr_auto/f_auto/q_auto:eco/v1/galileo-galilei-gettyimages-51246872?_a=BAVAZGDX0"
+        profile:
+          "https://res.cloudinary.com/aenetworks/image/upload/c_fill,ar_2,w_3840,h_1920,g_auto/dpr_auto/f_auto/q_auto:eco/v1/galileo-galilei-gettyimages-51246872?_a=BAVAZGDX0"
       },
       {
         id: 7,
@@ -312,7 +319,8 @@ export const APP_REGISTRY = {
         role: "Theoretical Physicist",
         email: "hawking@example.com",
         quote: "“Intelligence is the ability to adapt to change.”",
-        profile: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Stephen_Hawking.StarChild.jpg"
+        profile:
+          "https://upload.wikimedia.org/wikipedia/commons/e/eb/Stephen_Hawking.StarChild.jpg"
       },
       {
         id: 8,
@@ -320,21 +328,8 @@ export const APP_REGISTRY = {
         role: "Theoretical Physicist",
         email: "feynman@example.com",
         quote: "“The pleasure of finding things out is the greatest joy of science.”",
-        profile: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiz7DeuUmHN7TiT3xf7cV7UPBJNDtEvjNZcgMmNElTmOJYaec6zQI0UiLU04jZP6hqkeLcrnaC5NP4WC_zRQzP3_QhLumNxyzPOsC-WEmWQyYsadq1Eg_V_jEjDfCdddeQgJjY_OOB1KLMj6o2ShA6ycHwM91I430Yr9tkYTn6759jDmcGAsONOACbi/w1200-h630-p-k-no-nu/richard%20feynman%20quotes%20atheism%20religion%20science.png"
-      }
-    ],
-    items: [
-      {
-        quote: "Finally, a skincare routine that doesn't overwhelm me. Everything just works together.",
-        author: "Sarah M."
-      },
-      {
-        quote: "I've tried so many products, but this is the first time I've actually stuck with a routine.",
-        author: "Jessica L."
-      },
-      {
-        quote: "No more decision fatigue. My skin has never looked better.",
-        author: "Emily K."
+        profile:
+          "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiz7DeuUmHN7TiT3xf7cV7UPBJNDtEvjNZcgMmNElTmOJYaec6zQI0UiLU04jZP6hqkeLcrnaC5NP4WC_zRQzP3_QhLumNxyzPOsC-WEmWQyYsadq1Eg_V_jEjDfCdddeQgJjY_OOB1KLMj6o2ShA6ycHwM91I430Yr9tkYTn6759jDmcGAsONOACbi/w1200-h630-p-k-no-nu/richard%20feynman%20quotes%20atheism%20religion%20science.png"
       }
     ]
   },

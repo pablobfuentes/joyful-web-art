@@ -483,6 +483,12 @@ export const STYLE_REGISTRY = {
       textColorIndex: 3,
       borderRadius: "9999px"
     },
+    questionCard: {
+      backgroundIndex: 13
+    },
+    resultCard: {
+      backgroundIndex: 11
+    },
     divider: {
       style: "wavy",
       topColorIndex: 10,
@@ -520,8 +526,14 @@ export const STYLE_REGISTRY = {
     section: {
       backgroundIndex: 0
     },
+    cards: [
+      { backgroundIndex: 8 },
+      { backgroundIndex: 10 },
+      { backgroundIndex: 11 },
+      { backgroundIndex: 12 },
+    ],
     divider: {
-      style: "sawtooth",
+      style: "sawtooth" as const,
       topColorIndex: 0,
       bottomColorIndex: 9
     }
@@ -530,8 +542,14 @@ export const STYLE_REGISTRY = {
     section: {
       backgroundIndex: 9
     },
+    cards: [
+      { backgroundIndex: 8 },
+      { backgroundIndex: 10 },
+      { backgroundIndex: 11 },
+      { backgroundIndex: 12 },
+    ],
     divider: {
-      style: "wavy2",
+      style: "wavy2" as const,
       topColorIndex: 9,
       bottomColorIndex: 12
     }
@@ -540,8 +558,13 @@ export const STYLE_REGISTRY = {
     section: {
       backgroundIndex: 12
     },
+    cards: [
+      { backgroundIndex: 8 },
+      { backgroundIndex: 10 },
+      { backgroundIndex: 16 },
+    ],
     divider: {
-      style: "wavy",
+      style: "wavy" as const,
       topColorIndex: 12,
       bottomColorIndex: 8
     }
@@ -563,13 +586,17 @@ export const STYLE_REGISTRY = {
     badge: {
       backgroundIndex: 12
     },
+    bottomBadges: [
+      { backgroundIndex: 11 },
+      { backgroundIndex: 12 },
+    ],
     ctaButton: {
       gradientKey: "warm",
       textColorIndex: 3,
       borderRadius: "9999px"
     },
     divider: {
-      style: "blob",
+      style: "blob" as const,
       topColorIndex: 8,
       bottomColorIndex: 10
     }
@@ -578,8 +605,11 @@ export const STYLE_REGISTRY = {
     section: {
       backgroundIndex: 10
     },
+    item: {
+      backgroundIndex: 13
+    },
     divider: {
-      style: "wavy2",
+      style: "wavy2" as const,
       topColorIndex: 10,
       bottomColorIndex: 9
     }
@@ -679,6 +709,6 @@ export const STYLE_REGISTRY = {
       backgroundIndex: 0
     }
   }
-} as const;
+};
 
 export type StyleRegistry = typeof STYLE_REGISTRY;
