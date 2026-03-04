@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import { STYLE_REGISTRY, type StyleRegistry, type PaletteCell } from "@/config/style-registry";
 import { applyStyleRegistry } from "@/lib/apply-style-registry";
 import { APP_REGISTRY } from "@/config/app-registry";
-import { useRegistryContent, CONTENT_STORAGE_KEY, CONTENT_MODIFIERS_STORAGE_KEY } from "@/contexts/RegistryContentContext";
+import { useRegistryContent, CONTENT_STORAGE_KEY, CONTENT_MODIFIERS_STORAGE_KEY, CONTENT_STORAGE_VERSION, CONTENT_VERSION_KEY } from "@/contexts/RegistryContentContext";
 import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 import { STYLE_STORAGE_KEY } from "@/lib/apply-style-registry";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -454,6 +454,7 @@ export default function RegistryEditor() {
       localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
       localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
       localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
+      localStorage.setItem(CONTENT_VERSION_KEY, String(CONTENT_STORAGE_VERSION));
       refreshStyleRegistry();
       refreshContent();
       toast.success("Preview applied. Open or refresh the main site to see changes.");
@@ -479,6 +480,7 @@ export default function RegistryEditor() {
       localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(content));
       localStorage.setItem(STYLE_STORAGE_KEY, JSON.stringify(registry));
       localStorage.setItem(CONTENT_MODIFIERS_STORAGE_KEY, JSON.stringify(contentModifiers));
+      localStorage.setItem(CONTENT_VERSION_KEY, String(CONTENT_STORAGE_VERSION));
       toast.success("Saved to app-registry.ts and style-registry.ts. Reloading.");
       window.location.reload();
     } catch (e) {

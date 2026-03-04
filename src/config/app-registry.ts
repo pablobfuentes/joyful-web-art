@@ -409,76 +409,76 @@ export const APP_REGISTRY = {
       },
       {
         question: "¿Son tamaño completo o muestras?",
-        answer: "Sizes may vary. What matters is duration — each product is selected to last until your next box arrives with normal use. You'll never receive two single-use products."
+        answer: "Los tamaños pueden variar. Lo importante es la duración: cada producto está pensado para durar hasta que llegue tu siguiente caja con un uso normal. Nunca recibirás dos productos de un solo uso."
       },
       {
-        question: "Will I receive the same type of product twice?",
-        answer: "No. Each box includes five different product categories that work together as one routine. No repeated categories in the same box."
+        question: "¿Recibiré el mismo tipo de producto dos veces?",
+        answer: "No. Cada caja incluye cinco categorías de productos distintas que funcionan como una sola rutina. No repetimos categorías en la misma caja."
       },
       {
-        question: "What if a product doesn't work for me?",
-        answer: "We focus on gentle, daily-use skincare to minimize irritation and incompatibility. If something feels off, reach out — we're here to help."
+        question: "¿Y si un producto no me funciona?",
+        answer: "Priorizamos skincare suave y de uso diario para minimizar irritación e incompatibilidad. Si algo no te convence, escríbenos: estamos para ayudarte."
       },
       {
-        question: "When does my box ship?",
-        answer: "Boxes ship monthly, on a predictable schedule. You'll receive tracking information as soon as your box is on the way."
+        question: "¿Cuándo se envía mi caja?",
+        answer: "Las cajas se envían cada mes en una fecha previsible. Recibirás el seguimiento en cuanto tu caja esté en camino."
       },
       {
-        question: "Can I cancel or skip a month?",
-        answer: "Yes. You can cancel anytime or skip a month if you need to — no penalties, no questions asked."
+        question: "¿Puedo cancelar o saltarme un mes?",
+        answer: "Sí. Puedes cancelar cuando quieras o saltarte un mes si lo necesitas: sin penalizaciones ni preguntas."
       },
       {
-        question: "Is there a long-term commitment?",
-        answer: "No. Your subscription is month-to-month."
+        question: "¿Hay compromiso a largo plazo?",
+        answer: "No. Tu suscripción es mes a mes."
       },
       {
-        question: "Are the products safe to use together?",
-        answer: "Yes. Each box is built as a cohesive routine, not a random assortment of products."
+        question: "¿Los productos son seguros para usarlos juntos?",
+        answer: "Sí. Cada caja está pensada como una rutina coherente, no como una mezcla aleatoria de productos."
       }
     ]
   },
   finalCta: {
-    title: "Ready to simplify your skincare?",
-    descriptionPrimary: "A complete routine. Delivered monthly.",
-    descriptionSecondary: "Designed to be finished — not forgotten.",
+    title: "¿Lista para simplificar tu skincare?",
+    descriptionPrimary: "Una rutina completa. En tu puerta cada mes.",
+    descriptionSecondary: "Diseñada para usarse — no para olvidarse.",
     ctaButton: {
-      label: "Reserve my spot",
+      label: "Reservar mi lugar",
       href: "#pricing"
     },
-    footer: "Cancel anytime · No commitments · Ships monthly"
+    footer: "Cancela cuando quieras · Sin compromisos · Envíos mensuales"
   },
   footer: {
     mission: {
       title: "Ritual",
-      description: "Thoughtful skincare routines, delivered with intention."
+      description: "Rutinas de skincare con sentido, entregadas con intención."
     },
     navigate: {
-      title: "Navigate",
+      title: "Navegar",
       links: [
         {
-          label: "Shop",
+          label: "Tienda",
           href: "#"
         },
         {
-          label: "Our Story",
+          label: "Nuestra historia",
           href: "#why"
         },
         {
-          label: "How It Works",
+          label: "Cómo funciona",
           href: "#how-it-works"
         },
         {
-          label: "FAQ",
+          label: "Preguntas",
           href: "#faq"
         },
         {
-          label: "Shipping",
+          label: "Envíos",
           href: "#"
         }
       ]
     },
     connect: {
-      title: "Connect",
+      title: "Conectar",
       links: [
         {
           label: "Instagram",
@@ -491,22 +491,22 @@ export const APP_REGISTRY = {
       ]
     },
     newsletter: {
-      title: "Stay Updated",
-      placeholder: "your@email.com"
+      title: "Mantente al día",
+      placeholder: "tu@email.com"
     },
     bottomBar: {
-      copyright: "© 2025 Ritual. All rights reserved.",
+      copyright: "© 2025 Ritual. Todos los derechos reservados.",
       links: [
         {
-          label: "Privacy",
+          label: "Privacidad",
           href: "#"
         },
         {
-          label: "Terms",
+          label: "Términos",
           href: "#"
         },
         {
-          label: "Accessibility",
+          label: "Accesibilidad",
           href: "#"
         }
       ]

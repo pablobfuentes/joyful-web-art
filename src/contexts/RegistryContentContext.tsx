@@ -18,6 +18,9 @@ import { APP_REGISTRY, type AppRegistry } from "@/config/app-registry";
 
 export const CONTENT_STORAGE_KEY = "app_registry_content_overrides";
 export const CONTENT_MODIFIERS_STORAGE_KEY = "app_registry_content_modifiers";
+/** Bump when app-registry content structure or default copy changes so stale localStorage is ignored. */
+export const CONTENT_STORAGE_VERSION = 2;
+export const CONTENT_VERSION_KEY = "app_registry_content_version";
 
 export type ContentModifiers = Record<
   string,
@@ -66,7 +69,10 @@ const RegistryContentContext = createContext<RegistryContentState | null>(null);
 
 function readContentOverrides(): Record<string, unknown> | null {
   try {
-    const raw = typeof localStorage !== "undefined" ? localStorage.getItem(CONTENT_STORAGE_KEY) : null;
+    if (typeof localStorage === "undefined") return null;
+    const version = localStorage.getItem(CONTENT_VERSION_KEY);
+    if (version !== String(CONTENT_STORAGE_VERSION)) return null;
+    const raw = localStorage.getItem(CONTENT_STORAGE_KEY);
     if (raw) return JSON.parse(raw) as Record<string, unknown>;
   } catch (_) {}
   return null;
