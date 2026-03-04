@@ -1,8 +1,10 @@
 # Style Variables Inventory
 
-**Last updated:** 2026-02-18  
-**Purpose:** Map every stylized element to a proposed registry path. Used by RegistryEditor and to derive "tags" (which elements use each palette index).  
-**Source:** Audit of `src/components`, `src/pages`, `src/index.css`, `tailwind.config.ts`.
+**Last updated:** 2026-03-03  
+**Source:** `src/config/style-registry.ts`  
+**Editor:** Every variable below is editable in the Registry Editor at `/registry-editor` under the **Style** tab for each section (General tab for palette, fonts, radius, shadows, gradients).
+
+**Purpose:** Map every stylized element to a registry path. The Registry Editor exposes these so that palette indices, section backgrounds, card colors, dividers, and image paths can be changed without editing code.
 
 ---
 
@@ -148,11 +150,15 @@ Gradients and shadows reference the above (e.g. gradient-warm = primary + second
 
 | Registry path | Description | Component |
 |---------------|-------------|-----------|
-| `styles.compatibilityTest.section.background` | lavender |
-| `styles.compatibilityTest.divider.style` | wave1 |
-| `styles.compatibilityTest.divider.topColorIndex` | lavender |
-| `styles.compatibilityTest.divider.bottomColorIndex` | peach |
-| `styles.compatibilityTest.triggerButton.*` | Button style |
+| `styles.compatibilityTest.section.background` | Section bg palette index | CompatibilityTestSection |
+| `styles.compatibilityTest.triggerButton.backgroundIndex` | Trigger button fill | |
+| `styles.compatibilityTest.triggerButton.textColorIndex` | Trigger button text | |
+| `styles.compatibilityTest.triggerButton.borderRadius` | Button radius | |
+| `styles.compatibilityTest.questionCard.backgroundIndex` | Question panel background | |
+| `styles.compatibilityTest.resultCard.backgroundIndex` | Result panel background | |
+| `styles.compatibilityTest.divider.style` | wave1, wavy2, sawtooth, blob | |
+| `styles.compatibilityTest.divider.topColorIndex` | Divider top color | |
+| `styles.compatibilityTest.divider.bottomColorIndex` | Divider bottom color | |
 
 ---
 
@@ -303,4 +309,8 @@ Each image entry: `path`, `width`, `height` (or aspectRatio), `borderWidth`, `bo
 
 ---
 
-This inventory is the source of truth for (1) building the style registry schema and (2) generating "tags" in the RegistryEditor color modal (which elements use a given palette index). Keep it updated when adding or removing sections or style variables.
+## Registry Editor coverage
+
+- **Content (text):** All user-facing strings are in `src/config/app-registry.ts` and appear in the Registry Editor **Content** tab per section. See `docs/WEBSITE_TEXT_CONTENT.md` for the full path list.
+- **Style:** All style variables above live in `src/config/style-registry.ts` and are editable in the Registry Editor **Style** tab (General + per-section). Section keys: `general`, `page`, `nav`, `hero`, `why`, `howItWorks`, `compatibilityTest`, `whatYouReceive`, `pastEditions`, `experience`, `testimonials`, `pricing`, `faq`, `finalCta`, `footer`, `login`, `register`, `forgotPassword`, `resetPassword`, `dashboard`, `checkout`, `account`.
+- **No hardcoding:** Components must read from the registries (or context that merges localStorage overrides with the registry). Add new variables only in the appropriate registry and, if needed, in the Editor’s section controls; then update this inventory and `WEBSITE_TEXT_CONTENT.md` as needed.

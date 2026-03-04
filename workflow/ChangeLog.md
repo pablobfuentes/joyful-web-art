@@ -1,5 +1,24 @@
 # Change Log
 
+## [Unreleased] — Registry/Editor parity and documentation
+
+### Rationale
+- User requested that every variable be present in the Registry Editor and in `app-registry.ts` / `style-registry.ts`, and that everything be documented according to workflow documents.
+
+### Changes
+- **Style registry (`src/config/style-registry.ts`):**
+  - `compatibilityTest.questionCard` and `compatibilityTest.resultCard` added (backgroundIndex each) so the Compatibility Test panel colors are editable in Registry Editor and defined in the registry.
+- **Documentation:**
+  - **`docs/WEBSITE_TEXT_CONTENT.md`:** Regenerated as a full path inventory for all user-facing text. Every top-level section in `app-registry.ts` is listed with every registry path (string leaf). Notes added: single source of truth, Registry Editor usage, list normalization.
+  - **`docs/STYLE_VARIABLES_INVENTORY.md`:** Updated last-updated date; added explicit note that every variable is editable in Registry Editor. Documented `compatibilityTest.questionCard` and `compatibilityTest.resultCard`. Added “Registry Editor coverage” section listing content vs style and section keys.
+- **Registry Editor:** No code change. Content is discovered from `APP_REGISTRY` via `getContentEntries()`; style controls already cover all sections. `SECTION_DISPLAY_NAMES` already includes every app-registry section (nav, hero, why, … checkout, account).
+
+### Verification
+- All app-registry top-level keys (nav, hero, why, compatibilityTest, howItWorks, whatYouReceive, pastEditions, experience, testimonials, pricing, faq, finalCta, footer, login, register, forgotPassword, resetPassword, dashboard, checkout, account) are present in Registry Editor and in `WEBSITE_TEXT_CONTENT.md`.
+- All style-registry section keys are present in Registry Editor; compatibilityTest now has question/result panel controls.
+
+---
+
 ## [Unreleased] — Past Editions carousel: placeholder pictures and registry image URLs
 
 ### Rationale

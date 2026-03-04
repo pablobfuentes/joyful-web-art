@@ -483,6 +483,12 @@ export const STYLE_REGISTRY = {
       textColorIndex: 3,
       borderRadius: "9999px"
     },
+    questionCard: {
+      backgroundIndex: 13
+    },
+    resultCard: {
+      backgroundIndex: 11
+    },
     divider: {
       style: "wavy",
       topColorIndex: 10,
