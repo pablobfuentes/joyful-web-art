@@ -13,7 +13,7 @@ export const APP_REGISTRY = {
     links: [
       {
         label: "Tienda",
-        href: "#pricing"
+        href: "#how-it-works"
       },
       {
         label: "Nosotros",
@@ -344,13 +344,13 @@ export const APP_REGISTRY = {
     plans: [
       {
         id: "gift",
-        name: "Kumi Gift",
+        name: "Caja Regalo",
         emoji: "🎁",
-        priceAmount: "$899",
-        pricePeriod: "1 vez",
-        description: "Perfecta para descubrir la experiencia Kumi",
+        priceAmount: "$599",
+        pricePeriod: "una vez",
+        description: "Perfecta para regalar o probar la experiencia",
         features: [
-          "3 ó 4 productos full size",
+          "5 productos coreanos premium",
           "Guía de rutina paso a paso",
           "Empaque especial de regalo"
         ],
@@ -360,11 +360,11 @@ export const APP_REGISTRY = {
       },
       {
         id: "monthly",
-        name: "Kumi Essential",
+        name: "Suscripción Mensual",
         emoji: "✨",
-        priceAmount: "$1199",
-        pricePeriod: "/ cada 2 meses",
-        description: "La rutina ideal para resultados consistentes",
+        priceAmount: "$499",
+        pricePeriod: "/ mes",
+        description: "La forma más popular de cuidar tu piel",
         features: [
           "5 productos complementarios",
           "Rutina completa sin repeticiones",
@@ -377,14 +377,14 @@ export const APP_REGISTRY = {
       },
       {
         id: "premium",
-        name: "Kumi Ritual",
+        name: "Premium Anual",
         emoji: "👑",
-        priceAmount: "$1799",
-        pricePeriod: "/ cada 2 meses",
-        description: "Para las obsesionadas del K-beauty",
+        priceAmount: "$399",
+        pricePeriod: "/ mes",
+        description: "El mejor valor · Paga anual, ahorra más",
         features: [
-          "Todo lo de Kumi Essential",
-          "2 ó 3 productos adicionales",
+          "Todo lo de la suscripción mensual",
+          "2 productos extra cada caja",
           "Acceso a ediciones limitadas",
           "Descuento exclusivo en tienda",
           "Envío prioritario"

@@ -71,3 +71,10 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Environment variables and security
+
+- **Secrets** (Supabase URL/anon key, Stripe keys for edge functions) must be set via environment variables, never committed.
+- Copy `.env.example` to `.env.local` and fill in values from Supabase Dashboard → Settings → API. For production, set the same variables in your host (e.g. Vercel project env).
+- Do not commit `.env` or `.env.local`; they are listed in `.gitignore`.
+- Security headers (CSP, HSTS, X-Frame-Options, etc.) are applied via host config when deployed (e.g. `vercel.json`). See `docs/Security_Checklist.md` and `docs/Security_Phase1_Results.md`.

@@ -18,6 +18,10 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
+// Dev-only logging (Phase 2 security: no verbose logs in production)
+const devLog = (...args: unknown[]) => { if (import.meta.env.DEV) console.log(...args); };
+const devWarn = (...args: unknown[]) => { if (import.meta.env.DEV) console.warn(...args); };
+
 // Section display names
 const SECTION_DISPLAY_NAMES: Record<string, string> = {
   general: "General",
@@ -240,22 +244,22 @@ export default function RegistryEditor() {
   const scanAvailableFonts = useCallback(async () => {
     setScanningFonts(true);
     try {
-      console.log("[Scan Fonts] Fetching /fonts/custom-fonts.css ...");
+      devLog("[Scan Fonts] Fetching /fonts/custom-fonts.css ...");
       const response = await fetch("/fonts/custom-fonts.css");
-      console.log("[Scan Fonts] Response status:", response.status);
+      devLog("[Scan Fonts] Response status:", response.status);
       if (!response.ok) {
-        console.warn("[Scan Fonts] Failed to load CSS, status:", response.status);
+        devWarn("[Scan Fonts] Failed to load CSS, status:", response.status);
         setAvailableFonts([]);
         return;
       }
       const css = await response.text();
-      console.log("[Scan Fonts] CSS length:", css.length);
+      devLog("[Scan Fonts] CSS length:", css.length);
       const fontMatches = css.matchAll(/@font-face\s*\{[^}]*font-family:\s*['"]([^'"]+)['"]/gi);
       const fonts = Array.from(fontMatches, (m) => m[1]).filter((f, i, arr) => arr.indexOf(f) === i);
-      console.log("[Scan Fonts] Fonts found in CSS:", fonts);
+      devLog("[Scan Fonts] Fonts found in CSS:", fonts);
       setAvailableFonts(fonts);
     } catch (error) {
-      console.error("[Scan Fonts] Failed to scan fonts:", error);
+      devWarn("[Scan Fonts] Failed to scan fonts:", error);
       setAvailableFonts([]);
     } finally {
       setScanningFonts(false);
@@ -378,35 +382,35 @@ export default function RegistryEditor() {
 
   // Handle refresh fonts: sync undeclared font files into custom-fonts.css, then re-scan so dropdown has all fonts
   const handleRefreshFonts = useCallback(async () => {
-    console.log("[Refresh Fonts] Clicked – syncing then scanning");
+    devLog("[Refresh Fonts] Clicked – syncing then scanning");
     setScanningFonts(true);
     try {
-      console.log("[Refresh Fonts] Fetching /api/sync-fonts ...");
+      devLog("[Refresh Fonts] Fetching /api/sync-fonts ...");
       const syncRes = await fetch("/api/sync-fonts");
-      console.log("[Refresh Fonts] Sync response status:", syncRes.status, syncRes.statusText);
+      devLog("[Refresh Fonts] Sync response status:", syncRes.status, syncRes.statusText);
       if (syncRes.ok) {
         const contentType = syncRes.headers.get("content-type") ?? "";
         if (!contentType.includes("application/json")) {
           const text = await syncRes.text();
-          console.warn("[Refresh Fonts] Sync returned non-JSON (e.g. SPA fallback). Content-Type:", contentType, "body preview:", text.slice(0, 80));
+          devWarn("[Refresh Fonts] Sync returned non-JSON (e.g. SPA fallback). Content-Type:", contentType, "body preview:", text.slice(0, 80));
         } else {
           const _data = (await syncRes.json()) as { ok?: boolean; added?: string[]; error?: string };
-          console.log("[Refresh Fonts] Sync response body:", _data);
+          devLog("[Refresh Fonts] Sync response body:", _data);
           if (_data.added?.length) {
             toast.success(`Added ${_data.added.length} font(s) to custom-fonts.css`);
           }
         }
       } else {
         const text = await syncRes.text();
-        console.warn("[Refresh Fonts] Sync failed:", syncRes.status, text);
+        devWarn("[Refresh Fonts] Sync failed:", syncRes.status, text);
       }
     } catch (e) {
-      console.warn("[Refresh Fonts] Sync request failed (e.g. no dev server):", e);
+      devWarn("[Refresh Fonts] Sync request failed (e.g. no dev server):", e);
     } finally {
-      console.log("[Refresh Fonts] Scanning custom-fonts.css for font list ...");
+      devLog("[Refresh Fonts] Scanning custom-fonts.css for font list ...");
       await scanAvailableFonts();
       setScanningFonts(false);
-      console.log("[Refresh Fonts] Done");
+      devLog("[Refresh Fonts] Done");
     }
   }, [scanAvailableFonts]);
 
@@ -1209,13 +1213,16 @@ export default function RegistryEditor() {
                 {cards.map((card, i) => (
                   <div key={`exp-card-${i}`}>
                     {renderPaletteSelect(`Card ${i + 1}`, [sectionKey, "cards", String(i), "backgroundIndex"], card.backgroundIndex ?? 8, (val) => {
-                      setRegistry((prev) => ({
-                        ...prev,
-                        experience: {
-                          ...prev.experience,
-                          cards: prev.experience.cards.map((c, j) => (j === i ? { ...c, backgroundIndex: val } : c)),
-                        },
-                      }));
+                      setRegistry((prev) => {
+                        const currentCards = prev.experience?.cards ?? STYLE_REGISTRY.experience.cards ?? [];
+                        return {
+                          ...prev,
+                          experience: {
+                            ...prev.experience,
+                            cards: currentCards.map((c, j) => (j === i ? { ...c, backgroundIndex: val } : c)),
+                          },
+                        };
+                      });
                     })}
                   </div>
                 ))}
@@ -1237,13 +1244,16 @@ export default function RegistryEditor() {
                 {cards.map((card, i) => (
                   <div key={`test-card-${i}`}>
                     {renderPaletteSelect(`Card ${i + 1}`, [sectionKey, "cards", String(i), "backgroundIndex"], card.backgroundIndex ?? 8, (val) => {
-                      setRegistry((prev) => ({
-                        ...prev,
-                        testimonials: {
-                          ...prev.testimonials,
-                          cards: prev.testimonials.cards.map((c, j) => (j === i ? { ...c, backgroundIndex: val } : c)),
-                        },
-                      }));
+                      setRegistry((prev) => {
+                        const currentCards = prev.testimonials?.cards ?? STYLE_REGISTRY.testimonials.cards ?? [];
+                        return {
+                          ...prev,
+                          testimonials: {
+                            ...prev.testimonials,
+                            cards: currentCards.map((c, j) => (j === i ? { ...c, backgroundIndex: val } : c)),
+                          },
+                        };
+                      });
                     })}
                   </div>
                 ))}

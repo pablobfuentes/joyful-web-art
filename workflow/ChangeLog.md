@@ -1,5 +1,59 @@
 # Change Log
 
+## [Unreleased] — Security Phase 3 verification
+
+### Rationale
+- Execute Phase 3 of the security checklist: re-scan and test after Phase 2 remediation; update logs.
+
+### Changes
+- **Secrets re-scan:** No hardcoded secrets in `src/`; only env-based VITE_SUPABASE_*; `.gitignore` confirms `.env`, `.env.local`, `.env.*.local`.
+- **Dependency audit:** `npm audit` re-run; 5 vulnerabilities unchanged (documented accepted risk); no new vulns.
+- **Headers:** `vercel.json` confirmed; local `vite preview` does not send these (expected); they apply on Vercel deploy.
+- **Cookies:** Code verified (sidebar SameSite=Lax, Secure on HTTPS); manual check on live HTTPS recommended.
+- **Version/debug:** Production build succeeds; RegistryEditor font logs guarded by devLog/devWarn (DEV-only).
+- **`docs/Security_Phase1_Results.md`:** Added "Phase 3 — Verification (Executed)" with task 11–12 results and checklist status.
+- **`docs/Security_Checklist.md`:** Phase 3 section marked executed; tasks 11–12 checkboxes and summary reference added.
+
+### Verification
+- Phase 3 tasks 11–12 completed. No FAIL_LOG entries. Security checklist Phases 1–3 complete.
+
+---
+
+## [Unreleased] — Security Phase 2 remediation
+
+### Rationale
+- Execute Phase 2 of the security checklist: apply remediations for secrets, headers, cookies, version/debug exposure, and dependencies per Phase 1 findings.
+
+### Changes
+- **`.gitignore`:** Added `.env`, `.env.local`, `.env.*.local` so env files with secrets are never committed.
+- **`README.md`:** New section "Environment variables and security" (no committing secrets; use `.env.local` and host env; reference to security docs).
+- **`vercel.json`:** Created. Security headers for all routes: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy: strict-origin-when-cross-origin, Strict-Transport-Security, Content-Security-Policy (self + Supabase connect/font/img). Documented as applying on Vercel; other hosts need equivalent config.
+- **`src/components/ui/sidebar.tsx`:** When setting `sidebar:state` cookie, added `SameSite=Lax` and `Secure` when `window.location.protocol === "https:"`.
+- **`src/pages/RegistryEditor.tsx`:** Added `devLog`/`devWarn` (run only when `import.meta.env.DEV`); replaced font-scanning `console.log`/`console.warn`/`console.error` in `scanAvailableFonts` and `handleRefreshFonts` with these helpers.
+- **Dependencies:** Ran `npm audit fix --legacy-peer-deps` (fixes applied; 5 vulns remain—jsdom, vite/esbuild—documented as accepted risk for dev/test only).
+- **`docs/Security_Phase1_Results.md`:** Added "Phase 2 — Remediation Applied" section describing all changes and remaining vulns.
+- **`docs/Security_Checklist.md`:** Phase 2 heading set to "Remediation (Executed)"; tasks 6–10 updated with checkboxes and summary reference to Phase 1 results doc.
+
+### Verification
+- Build and tests: `npm run build` and test run (as applicable). Remaining 5 vulnerabilities documented in `Security_Phase1_Results.md`; production bundle not affected by dev-server CVE.
+
+---
+
+## [Unreleased] — Security checklist and Phase 1 discovery
+
+### Rationale
+- User requested security testing (secrets, headers, cookies, version/debug exposure, dependencies) and to follow workflow Prompt.md. Plan written as checklist; Phase 1 (discovery) executed.
+
+### Changes
+- **`docs/Security_Checklist.md`:** Created. Full security plan: Phase 1 (discovery), Phase 2 (remediation design), Phase 3 (verification and logs). Skills, risks, assumptions, improvements, things to consider.
+- **`docs/Security_Phase1_Results.md`:** Created. Phase 1 inventory: (1) No hardcoded secrets; .gitignore missing explicit `.env`. (2) No security headers; app served by Vite dev/preview or host. (3) Cookie `sidebar:state` in `src/components/ui/sidebar.tsx` without Secure/SameSite; Supabase auth cookies documented. (4) RegistryEditor and supabase.ts console logging; vite.config dev-only logging. (5) `npm audit`: 10 vulnerabilities (4 high, 3 moderate, 3 low)—ajv, esbuild/vite, minimatch, rollup, tar/supabase, @tootallnate/once/jsdom—with fix options.
+- **`docs/Security_Checklist.md`:** Phase 1 checklist items marked complete; results reference added.
+
+### Verification
+- Phase 1 tasks 1–5 completed; findings documented in `Security_Phase1_Results.md`. No code or config changed (discovery only). Phase 2 remediation executed and documented above.
+
+---
+
 ## [Unreleased] — Registry/Editor parity and documentation
 
 ### Rationale

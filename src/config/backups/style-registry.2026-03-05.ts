@@ -495,10 +495,10 @@ export const STYLE_REGISTRY = {
     },
     cards: [
       {
-        backgroundIndex: 10
+        backgroundIndex: 9
       },
       {
-        backgroundIndex: 9
+        backgroundIndex: 10
       },
       {
         backgroundIndex: 16
@@ -507,7 +507,7 @@ export const STYLE_REGISTRY = {
         backgroundIndex: 12
       },
       {
-        backgroundIndex: 11
+        backgroundIndex: 4
       }
     ],
     divider: {
@@ -530,25 +530,18 @@ export const STYLE_REGISTRY = {
     section: {
       backgroundIndex: 9
     },
+    /** Palette index per experience step card (4 steps). */
+    cards: [
+      { backgroundIndex: 8 },
+      { backgroundIndex: 10 },
+      { backgroundIndex: 11 },
+      { backgroundIndex: 13 }
+    ],
     divider: {
       style: "wavy2",
       topColorIndex: 9,
       bottomColorIndex: 12
-    },
-    cards: [
-      {
-        backgroundIndex: 8
-      },
-      {
-        backgroundIndex: 8
-      },
-      {
-        backgroundIndex: 8
-      },
-      {
-        backgroundIndex: 8
-      }
-    ]
+    }
   },
   testimonials: {
     section: {
