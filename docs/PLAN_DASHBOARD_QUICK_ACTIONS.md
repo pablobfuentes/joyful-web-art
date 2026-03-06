@@ -87,17 +87,17 @@ Consolidate all “account” functionality into the `Dashboard` page and give t
     - [ ] Dashboard → Quick Action → Target page → Back to Dashboard or Home.
     - [ ] No dead ends, confusing loops, or missing links.
 
-- [ ] 10. Logging and VMP compliance evidence
-  - [ ] 10.1 Update `workflow/ChangeLog.md` with:
-    - [ ] Description of Account consolidation and new Quick Action pages.
-    - [ ] Files touched.
-    - [ ] Verification summary (tests + manual checks).
-  - [ ] 10.2 Update `docs/CHANGELOG_AI.md` with:
-    - [ ] Entry describing Dashboard Quick Actions → dedicated pages and `/account` deprecation.
-  - [ ] 10.3 Update `docs/VMP_COMPLIANCE_AUDIT.md`:
-    - [ ] New audit entry for this feature, including:
-      - [ ] Test file paths.
-      - [ ] Security review notes.
-      - [ ] Performance review notes.
-  - [ ] 10.4 Update `workflow/FAIL_LOG.md` **only if** unexpected failures arise (environmental red/green in TDD does not count as a failure for this log).
+- [x] 10. Logging and VMP compliance evidence
+  - [x] 10.1 Update `workflow/ChangeLog.md` with:
+    - [x] Description of Account consolidation and new Quick Action pages.
+    - [x] Files touched.
+    - [x] Verification summary (tests + manual checks).
+  - [x] 10.2 Update `docs/CHANGELOG_AI.md` with:
+    - [x] Entry describing Dashboard Quick Actions → dedicated pages and `/account` deprecation.
+  - [x] 10.3 Update `docs/VMP_COMPLIANCE_AUDIT.md`:
+    - [x] New audit entry for this feature, including:
+      - [x] Test file paths.
+      - [x] Security review notes.
+      - [x] Performance review notes.
+  - [x] 10.4 Update `workflow/FAIL_LOG.md` **only if** unexpected failures arise (environmental red/green in TDD does not count as a failure for this log).
 

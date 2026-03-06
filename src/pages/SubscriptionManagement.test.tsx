@@ -32,6 +32,9 @@ describe("SubscriptionManagement page", () => {
     expect(
       screen.getByText(APP_REGISTRY.subscriptionManagement.body),
     ).toBeInTheDocument();
+
+    const backLink = screen.getByRole("link", { name: "Back to dashboard" });
+    expect(backLink).toHaveAttribute("href", "/dashboard");
   });
 });
 

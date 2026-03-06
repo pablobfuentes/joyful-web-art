@@ -36,6 +36,9 @@ describe("OrderHistory page", () => {
     expect(
       screen.getByText(APP_REGISTRY.orderHistory.emptyStateDescription),
     ).toBeInTheDocument();
+
+    const backLink = screen.getByRole("link", { name: "Back to dashboard" });
+    expect(backLink).toHaveAttribute("href", "/dashboard");
   });
 });
 

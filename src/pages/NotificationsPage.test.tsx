@@ -32,6 +32,9 @@ describe("NotificationsPage", () => {
     expect(
       screen.getByText(APP_REGISTRY.notifications.body),
     ).toBeInTheDocument();
+
+    const backLink = screen.getByRole("link", { name: "Back to dashboard" });
+    expect(backLink).toHaveAttribute("href", "/dashboard");
   });
 });
 
