@@ -1,5 +1,21 @@
 # Change Log
 
+## [Unreleased] — Perimeter hardening (security scan remediation)
+
+### Rationale
+- Address three perimeter-hardening findings from security scan: (1) missing recommended security headers, (2) CSP overly permissive, (3) external assets loaded without Subresource Integrity. Preserve evidence-driven verification for future scans.
+
+### Changes
+- **`vercel.json`:** Added **Permissions-Policy** (`camera=(), microphone=(), geolocation=(), interest-cohort=()`) and **X-DNS-Prefetch-Control** (`off`). Removed `'unsafe-eval'` from Content-Security-Policy `script-src`; retained `'unsafe-inline'` for script and style (documented as Vite/React trade-off).
+- **`src/index.css`:** Replaced Google Fonts `@import url('https://fonts.googleapis.com/...')` with self-hosted fonts via **@fontsource/playfair-display** and **@fontsource/dm-sans** (same families/weights). No external CSS or font URLs in production.
+- **`package.json`:** Added dependencies `@fontsource/playfair-display`, `@fontsource/dm-sans` (installed with `--legacy-peer-deps`).
+- **`docs/Security_Phase1_Results.md`:** New section "Perimeter Hardening (post-scan remediation)" documenting the three findings, fixes, residual risk (CSP unsafe-inline), and verification steps so future scans stay deterministic and explainable.
+
+### Verification
+- `npm run build` succeeds. Production bundle serves fonts from same origin; no requests to fonts.googleapis.com or fonts.gstatic.com. CSP without `'unsafe-eval'` verified; Permissions-Policy and X-DNS-Prefetch-Control apply on Vercel deploy per vercel.json.
+
+---
+
 ## [Unreleased] — Security Phase 3 verification
 
 ### Rationale

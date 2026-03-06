@@ -211,3 +211,38 @@ The following recommendations result from the Phase 1 inventory. Phase 2 executi
 
 - [x] 11. Re-scan and test — secrets scan, npm audit, headers (preview vs Vercel), cookies (code + manual note), no version/debug leak (build + dev guards).
 - [x] 12. Logs — ChangeLog updated; FAIL_LOG N/A.
+
+---
+
+## Perimeter Hardening (post-scan remediation)
+
+Addresses scan findings: **Missing recommended security headers**, **CSP overly permissive**, **External assets without SRI**.
+
+### 1. Missing recommended security headers — FIXED
+
+- **Finding:** Public response missing one or more important browser hardening headers.
+- **Fix:** In `vercel.json` added:
+  - **Permissions-Policy:** `camera=(), microphone=(), geolocation=(), interest-cohort=()` to restrict browser features and FLoC.
+  - **X-DNS-Prefetch-Control:** `off` to avoid unintended DNS prefetch leakage.
+- **Verification:** After deploy, run: `curl -sI https://<your-domain>/ | grep -iE 'Permissions-Policy|X-DNS-Prefetch-Control'`. Expect both headers present.
+
+### 2. Content-Security-Policy overly permissive — REDUCED
+
+- **Finding:** CSP included permissive directives `'unsafe-inline'` or `'unsafe-eval'`.
+- **Fix:**
+  - **Removed `'unsafe-eval'`** from `script-src`. Production build does not require it; verified with `npm run build`.
+  - **Retained `'unsafe-inline'`** for `script-src` and `style-src` because Vite’s production bootstrap and many React/Tailwind setups rely on inline scripts/styles unless nonces or hashes are added. Tightening further would require a nonce-based CSP (e.g. via plugin) and is left as a future improvement.
+- **Residual risk (documented):** `script-src 'self' 'unsafe-inline'` and `style-src 'self' 'unsafe-inline'` remain. This is a known trade-off for Vite/React without nonce support. Future scans will remain deterministic: same CSP string until nonce/hash implementation.
+
+### 3. External assets without Subresource Integrity — FIXED
+
+- **Finding:** At least one third-party script or stylesheet missing an SRI hash (supply-chain tampering risk).
+- **Root cause:** `src/index.css` loaded Google Fonts via `@import url('https://fonts.googleapis.com/...')`, i.e. external CSS (and indirectly woff2 from fonts.gstatic.com). SRI for that URL is impractical (Google can change the response).
+- **Fix:** Removed external font request. Fonts are now **self-hosted** via npm packages `@fontsource/playfair-display` and `@fontsource/dm-sans`. Same families and weights (Playfair 400/600/700 + italic 400/600; DM Sans 300/400/500/600/700 + italic 400). Font files are bundled and served same-origin; no third-party CSS or font URLs, so SRI is not required for these assets.
+- **Verification:** Build outputs font assets under `dist/assets/*.woff2` (and .woff). No request to `fonts.googleapis.com` or `fonts.gstatic.com` in production. Re-scan should report no external script/stylesheet without SRI for this app origin.
+
+### Evidence-driven verification (for future scans)
+
+- **Headers:** Exact header list and values are in `vercel.json`. Scan the production origin; expectations are documented above.
+- **CSP:** Single policy in `vercel.json`; no `'unsafe-eval'`; `'unsafe-inline'` retained and justified in this section.
+- **SRI:** No external scripts or stylesheets; fonts are first-party. If new external resources are added later, add `integrity=` and `crossorigin="anonymous"` or self-host and document here.
