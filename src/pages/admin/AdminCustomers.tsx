@@ -64,7 +64,7 @@ export default function AdminCustomers() {
 
   function exportCsv() {
     if (!data?.rows?.length) return;
-    const cols = ["customer_name", "customer_email", "customer_phone", "plan_id", "subscription_status", "next_shipping_at", "next_order_status", "last_update"];
+    const cols = ["customer_name", "customer_email", "customer_phone", "plan_id", "subscription_status", "next_shipping_at", "next_order_status", "next_order_payment_status", "last_update"];
     const header = cols.join(",");
     const escape = (v: unknown) => (v == null ? "" : String(v).includes(",") ? `"${String(v).replace(/"/g, '""')}"` : String(v));
     const rows = data.rows.map((row: Record<string, unknown>) => cols.map((c) => escape(row[c])).join(","));
@@ -141,6 +141,7 @@ export default function AdminCustomers() {
                     <TableHead>Subscription</TableHead>
                     <TableHead>Next shipping</TableHead>
                     <TableHead>Next order status</TableHead>
+                    <TableHead>Payment status</TableHead>
                     <TableHead>Last update</TableHead>
                     <TableHead className="w-[80px]"></TableHead>
                   </TableRow>
@@ -154,6 +155,7 @@ export default function AdminCustomers() {
                       <TableCell>{String(row.subscription_status ?? "—")}</TableCell>
                       <TableCell>{formatDate(row.next_shipping_at as string)}</TableCell>
                       <TableCell>{String(row.next_order_status ?? "—")}</TableCell>
+                      <TableCell>{String(row.next_order_payment_status ?? "—")}</TableCell>
                       <TableCell>{formatDate(row.last_update as string)}</TableCell>
                       <TableCell>
                         <Link

@@ -91,15 +91,8 @@ const App = () => (
                   <Route index element={<AdminOverview />} />
                   <Route path="customers" element={<AdminCustomers />} />
                   <Route path="customers/:userId" element={<AdminCustomerDetail />} />
+                  <Route path="registry-editor" element={<RegistryEditor />} />
                 </Route>
-                <Route
-                  path="/admin/registry-editor"
-                  element={
-                    <AdminRoute>
-                      <RegistryEditor />
-                    </AdminRoute>
-                  }
-                />
                 {/* Unknown paths redirect to home so the app never shows a 404 page. */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

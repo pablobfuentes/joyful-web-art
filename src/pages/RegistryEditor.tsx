@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { HexColorPicker } from "react-colorful";
-import Navbar from "@/components/Navbar";
 import { STYLE_REGISTRY, type StyleRegistry, type PaletteCell } from "@/config/style-registry";
 import { applyStyleRegistry } from "@/lib/apply-style-registry";
 import { APP_REGISTRY } from "@/config/app-registry";
@@ -1420,10 +1419,9 @@ export default function RegistryEditor() {
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-      <Navbar />
-      {/* Sticky header: title + Save/Reset */}
+      {/* Sticky header: title + Save/Reset (admin layout provides nav) */}
       <header className="shrink-0 border-b bg-background z-10">
-        <div className="container mx-auto pt-24 pb-4 px-6 max-w-6xl">
+        <div className="container mx-auto pt-4 pb-4 px-6 max-w-6xl">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="font-display text-3xl font-bold text-foreground mb-2">
