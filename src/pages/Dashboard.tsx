@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useTestUserData } from "@/hooks/useTestUserData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,7 @@ export default function Dashboard() {
   const name = user?.user_metadata?.full_name as string | undefined;
   const email = user?.email ?? "";
   const memberSince = user?.created_at;
+  const testData = useTestUserData();
 
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(name ?? "");
@@ -138,11 +140,20 @@ export default function Dashboard() {
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div className="rounded-lg border border-input bg-card p-4">
               <p className="text-sm text-muted-foreground">{data.subscriptionLabel}</p>
-              <p className="font-semibold">{data.subscriptionActive}</p>
+              <p className="font-semibold">
+                {testData ? testData.subscription.planName : data.subscriptionActive}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {testData ? data.subscriptionActive : null}
+              </p>
             </div>
             <div className="rounded-lg border border-input bg-card p-4">
               <p className="text-sm text-muted-foreground">{data.nextBoxLabel}</p>
-              <p className="font-semibold">—</p>
+              <p className="font-semibold">
+                {testData
+                  ? formatDate(testData.subscription.nextRenewalAt)
+                  : "—"}
+              </p>
             </div>
           </div>
 

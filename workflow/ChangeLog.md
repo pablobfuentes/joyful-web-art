@@ -1,5 +1,27 @@
 # Change Log
 
+## [Unreleased] — Admin Portal Phase 2 (execution)
+
+### Rationale
+- Execute PLAN_ADMIN_PORTAL.md: database schema, RLS, admin list view, audit triggers; admin UI; audit display. SYNC (customer dashboard from Supabase) deferred.
+
+### Changes
+- **DB-1:** `docs/ORDERS_CREATION_FLOW.md` — Documented orders creation (Stripe/webhook); where to attach subscription_id.
+- **DB-2–DB-5:** `docs/supabase_admin_portal_phase2_migration.sql` — Extended profiles; created subscriptions, products, order_items, admin_notes, audit_logs; extended orders with backfill; RLS; view `admin_customers_list`; triggers for audit_logs.
+- **UI-1:** `src/components/AdminLayout.tsx`, routes in `App.tsx` — Admin layout with nav (Overview, Customers, Registry Editor); routes `/admin`, `/admin/customers`, `/admin/customers/:userId`.
+- **UI-2:** `src/pages/admin/AdminOverview.tsx` — KPI cards from Supabase (active subscriptions, upcoming shipments, failed payments, pending fulfillment, delayed shipments).
+- **UI-3:** `src/pages/admin/AdminCustomers.tsx` — Customers table from `admin_customers_list`; sort, search (name/email), pagination; Export CSV (current page).
+- **UI-4:** `src/pages/admin/AdminCustomerDetail.tsx` — Customer detail with tabs: Profile, Subscription, Next Order, Order History, Shipment History, Notes, Audit Log; loads profile, email, subscriptions, orders+order_items, admin_notes, audit_logs.
+- **UI-5:** Edit modals on customer detail — Update subscription status; Update order status; Add tracking (carrier, tracking_number, shipped_at); Add internal note. All persist via Supabase; toast + query invalidate.
+- **UI-6:** Export CSV button on customers table (client-side, current page).
+- **AUDIT:** Triggers write to audit_logs; Audit Log tab shows entries for customer’s orders/subscriptions/notes.
+- **Plan:** `docs/PLAN_ADMIN_PORTAL.md` — DB-1–DB-5, UI-1–UI-6, AUDIT-1–AUDIT-2, LOG marked complete; SYNC deferred with note; TEST-1–TEST-4 left for manual verification after migration.
+
+### Verification
+- `npm run build` succeeds. Run `docs/supabase_admin_portal_phase2_migration.sql` in Supabase SQL Editor after phase1; then verify admin routes, KPIs, customers table, customer detail, and edit modals. SYNC (customer dashboard from Supabase) to be implemented separately.
+
+---
+
 ## [Unreleased] — Perimeter hardening (security scan remediation)
 
 ### Rationale

@@ -623,12 +623,24 @@ export const APP_REGISTRY = {
     title: "Order History",
     subtitle: "Review your past KumiBox orders.",
     emptyStateTitle: "No orders yet",
-    emptyStateDescription: "When you place your first order, it will appear here with status, date, and details."
+    emptyStateDescription: "When you place your first order, it will appear here with status, date, and details.",
+    orderDateColumn: "Date",
+    orderSummaryColumn: "Order",
+    statusColumn: "Status",
+    statusCompleted: "Completed",
+    statusPending: "Pending",
+    statusCancelled: "Cancelled"
   },
   subscriptionManagement: {
     title: "Subscription",
     subtitle: "Manage your KumiBox plan.",
-    body: "Here you’ll be able to see your current plan, next renewal date, and options to pause, cancel, or change your subscription."
+    body: "Here you’ll be able to see your current plan, next renewal date, and options to pause, cancel, or change your subscription.",
+    currentPlanLabel: "Current plan",
+    nextRenewalLabel: "Next renewal",
+    planStartedLabel: "Plan started",
+    pausePlan: "Pause plan",
+    cancelPlan: "Cancel subscription",
+    changePlan: "Change plan"
   },
   settings: {
     title: "Settings",
@@ -638,7 +650,13 @@ export const APP_REGISTRY = {
   notifications: {
     title: "Notifications",
     subtitle: "Control how KumiBox keeps in touch.",
-    body: "Choose which updates you want to receive about orders, subscription changes, and product news."
+    body: "Choose which updates you want to receive about orders, subscription changes, and product news.",
+    orderUpdatesLabel: "Order updates",
+    orderUpdatesDesc: "Shipping and delivery updates for your boxes",
+    subscriptionChangesLabel: "Subscription changes",
+    subscriptionChangesDesc: "Renewals, plan changes, and billing",
+    productNewsLabel: "Product news",
+    productNewsDesc: "New products, tips, and offers"
   },
   checkout: {
     title: "Completa tu pedido",

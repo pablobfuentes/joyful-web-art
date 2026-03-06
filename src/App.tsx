@@ -8,8 +8,12 @@ import { RegistryContentProvider } from "@/contexts/RegistryContentContext";
 import { StyleRegistryProvider } from "@/contexts/StyleRegistryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
+import { AdminLayout } from "@/components/AdminLayout";
 import Index from "./pages/Index";
 import RegistryEditor from "./pages/RegistryEditor";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminCustomerDetail from "./pages/admin/AdminCustomerDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -83,6 +87,11 @@ const App = () => (
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/checkout/success" element={<CheckoutSuccess />} />
                 <Route path="/checkout/cancel" element={<CheckoutCancel />} />
+                <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                  <Route index element={<AdminOverview />} />
+                  <Route path="customers" element={<AdminCustomers />} />
+                  <Route path="customers/:userId" element={<AdminCustomerDetail />} />
+                </Route>
                 <Route
                   path="/admin/registry-editor"
                   element={
