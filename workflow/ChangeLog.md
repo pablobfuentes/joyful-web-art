@@ -161,3 +161,39 @@
 - Visual:
   - **Testimonials:** Subtitle line shows configured emoji + text; orbiting avatars still animate; central card shows registry quotes and uses per-section card colors; fallback avatar comes from the new registry key.
   - **Past Editions:** Subtitle chip shows emoji from registry; edition cards use per-card background colors defined in `STYLE_REGISTRY.pastEditions.cards` and exposed in `RegistryEditor`.
+
+---
+
+## [Unreleased] — Dashboard Quick Actions & Account consolidation
+
+### Rationale
+- Consolidate user-facing account functionality into the authenticated `Dashboard` experience.
+- Give each Dashboard Quick Action (Order History, Subscription, Settings, Notifications) a real, protected destination instead of `#` anchors.
+- Deprecate the standalone `/account` route while keeping the Account page and registry section available for history/RegistryEditor.
+
+### Changes
+- **Routing (`src/App.tsx`):**
+  - Added protected routes for `/orders`, `/subscription`, `/settings`, and `/notifications`, each wrapped in `ProtectedRoute` and pointing to new page components.
+  - Removed the `/account` route so all account navigation flows through Dashboard + Quick Actions.
+- **Pages (`src/pages`):**
+  - Implemented `OrderHistory.tsx`, `SubscriptionManagement.tsx`, `SettingsPage.tsx`, and `NotificationsPage.tsx` using the shared shell (`Navbar`, padded main, centered content) and `useRegistryContent().getSectionContent("<sectionKey>")` for all copy.
+  - Left `Account.tsx` and `Account.test.tsx` in place as a documented, unused page; no longer reachable via routing but still visible in RegistryEditor and tests.
+- **Registry (`src/config/app-registry.ts`):**
+  - Uses previously added `dashboard.orderHistoryHref`, `subscriptionActionHref`, `settingsHref`, and `notificationsHref` to point to the new routes.
+  - Uses previously added `orderHistory`, `subscriptionManagement`, `settings`, and `notifications` sections for page titles/subtitles/body/empty states.
+- **Tests (`src/pages`):**
+  - Extended `Dashboard.test.tsx` to assert that each Quick Action link has the correct non-`#` `href` (`/orders`, `/subscription`, `/settings`, `/notifications`).
+  - Added page-level tests: `OrderHistory.test.tsx`, `SubscriptionManagement.test.tsx`, `SettingsPage.test.tsx`, `NotificationsPage.test.tsx` to verify each page renders its registry-driven heading and description/placeholder in the shared shell.
+  - Updated `Account.test.tsx` to tolerate the user’s display name appearing both in Navbar and in the Account card (`getAllByText("Test User")`).
+
+### Verification
+- `npm test` (Vitest) passes for the full suite, including:
+  - `src/pages/Dashboard.test.tsx`
+  - `src/pages/OrderHistory.test.tsx`
+  - `src/pages/SubscriptionManagement.test.tsx`
+  - `src/pages/SettingsPage.test.tsx`
+  - `src/pages/NotificationsPage.test.tsx`
+  - `src/pages/Account.test.tsx`
+- Manual reasoning: all new pages are read-only views that:
+  - Are only reachable via `ProtectedRoute`-guarded routes.
+  - Use `useRegistryContent` for text and do not introduce new network calls, forms, or side effects.

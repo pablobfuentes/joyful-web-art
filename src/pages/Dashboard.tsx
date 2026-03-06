@@ -150,7 +150,7 @@ export default function Dashboard() {
             <h2 className="font-display text-lg font-semibold">{data.quickActionsTitle}</h2>
             <ul className="mt-2 space-y-2">
               <li>
-                <Link to="#" className="text-primary hover:underline">
+                <Link to={data.orderHistoryHref} className="text-primary hover:underline">
                   {data.orderHistoryTitle}
                 </Link>
                 <span className="text-muted-foreground text-sm block">
@@ -158,7 +158,7 @@ export default function Dashboard() {
                 </span>
               </li>
               <li>
-                <Link to="#" className="text-primary hover:underline">
+                <Link to={data.subscriptionActionHref} className="text-primary hover:underline">
                   {data.subscriptionActionTitle}
                 </Link>
                 <span className="text-muted-foreground text-sm block">
@@ -166,7 +166,7 @@ export default function Dashboard() {
                 </span>
               </li>
               <li>
-                <Link to="#" className="text-primary hover:underline">
+                <Link to={data.settingsHref} className="text-primary hover:underline">
                   {data.settingsTitle}
                 </Link>
                 <span className="text-muted-foreground text-sm block">
@@ -174,7 +174,7 @@ export default function Dashboard() {
                 </span>
               </li>
               <li>
-                <Link to="#" className="text-primary hover:underline">
+                <Link to={data.notificationsHref} className="text-primary hover:underline">
                   {data.notificationsTitle}
                 </Link>
                 <span className="text-muted-foreground text-sm block">

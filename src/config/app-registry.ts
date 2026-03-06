@@ -613,7 +613,32 @@ export const APP_REGISTRY = {
     notificationsTitle: "Notifications",
     notificationsDesc: "Manage alerts",
     logOut: "Log Out",
-    backToHome: "Back to Home"
+    backToHome: "Back to Home",
+    orderHistoryHref: "/orders",
+    subscriptionActionHref: "/subscription",
+    settingsHref: "/settings",
+    notificationsHref: "/notifications"
+  },
+  orderHistory: {
+    title: "Order History",
+    subtitle: "Review your past KumiBox orders.",
+    emptyStateTitle: "No orders yet",
+    emptyStateDescription: "When you place your first order, it will appear here with status, date, and details."
+  },
+  subscriptionManagement: {
+    title: "Subscription",
+    subtitle: "Manage your KumiBox plan.",
+    body: "Here you’ll be able to see your current plan, next renewal date, and options to pause, cancel, or change your subscription."
+  },
+  settings: {
+    title: "Settings",
+    subtitle: "Fine-tune your account preferences.",
+    body: "Update details like language, communication preferences, and other options that personalize your experience."
+  },
+  notifications: {
+    title: "Notifications",
+    subtitle: "Control how KumiBox keeps in touch.",
+    body: "Choose which updates you want to receive about orders, subscription changes, and product news."
   },
   checkout: {
     title: "Completa tu pedido",
@@ -649,7 +674,22 @@ export const APP_REGISTRY = {
   },
   account: {
     title: "Account",
-    placeholder: "Account — protected. Add your flow here."
+    subtitle: "Manage your profile, security, and preferences.",
+    profileTitle: "Profile summary",
+    profileDesc: "View your account details. Edit your name and email on the dashboard.",
+    emailLabel: "Email",
+    nameLabel: "Name",
+    memberSinceLabel: "Member since",
+    editProfileLabel: "Edit profile",
+    editProfileHref: "/dashboard",
+    securityTitle: "Security",
+    securityDesc: "Keep your account secure.",
+    changePasswordLabel: "Change password",
+    changePasswordHref: "/forgot-password",
+    preferencesTitle: "Preferences",
+    preferencesDesc: "Notification and display options (coming soon).",
+    backToDashboard: "Back to Dashboard",
+    backToDashboardHref: "/dashboard"
   }
 } as const;
 

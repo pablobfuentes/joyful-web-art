@@ -61,4 +61,25 @@ describe("Dashboard", () => {
       screen.getByRole("link", { name: APP_REGISTRY.dashboard.changePasswordLabel }),
     ).toHaveAttribute("href", APP_REGISTRY.dashboard.changePasswordHref);
   });
+
+  it("links quick actions to dedicated pages", async () => {
+    renderDashboard();
+    await screen.findByText(mockUser.email);
+
+    expect(
+      screen.getByRole("link", { name: APP_REGISTRY.dashboard.orderHistoryTitle }),
+    ).toHaveAttribute("href", "/orders");
+
+    expect(
+      screen.getByRole("link", { name: APP_REGISTRY.dashboard.subscriptionActionTitle }),
+    ).toHaveAttribute("href", "/subscription");
+
+    expect(
+      screen.getByRole("link", { name: APP_REGISTRY.dashboard.settingsTitle }),
+    ).toHaveAttribute("href", "/settings");
+
+    expect(
+      screen.getByRole("link", { name: APP_REGISTRY.dashboard.notificationsTitle }),
+    ).toHaveAttribute("href", "/notifications");
+  });
 });

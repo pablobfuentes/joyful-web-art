@@ -74,7 +74,7 @@ const Navbar = () => {
           ) : user ? (
             <>
               <Link
-                to="/account"
+                to="/dashboard"
                 className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
               >
                 {displayName}
