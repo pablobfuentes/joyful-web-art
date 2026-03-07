@@ -499,11 +499,11 @@ export const APP_REGISTRY = {
       links: [
         {
           label: "Privacidad",
-          href: "privacy"
+          href: "/privacy"
         },
         {
           label: "Términos",
-          href: "/terms"
+          href: "#"
         },
         {
           label: "Accesibilidad",
@@ -514,9 +514,6 @@ export const APP_REGISTRY = {
   },
   privacy: {
     contactEmail: "contacto@kumibox.com"
-  },
-  terms: {
-    contactEmail: "soporte@kumibox.com"
   },
   login: {
     title: "Welcome Back",
@@ -713,8 +710,7 @@ export const APP_REGISTRY = {
     preferencesTitle: "Preferences",
     preferencesDesc: "Notification and display options (coming soon).",
     backToDashboard: "Back to Dashboard",
-    backToDashboardHref: "/dashboard",
-    placeholder: "Account — protected. Add your flow here."
+    backToDashboardHref: "/dashboard"
   }
 } as const;
 
