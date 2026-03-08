@@ -1,0 +1,2 @@
+# No submodules - prevents Netlify "No url found for submodule" errors.
+# .cursor/skills is ignored via .gitignore and must not be a submodule.
