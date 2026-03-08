@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { Menu } from "lucide-react";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useAuth } from "@/hooks/useAuth";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 /** Ensures nav/footer links are always an array (handles object shape from registry or localStorage). */
 function ensureLinks(
@@ -13,7 +17,11 @@ function ensureLinks(
   return [];
 }
 
+const navLinkClass =
+  "px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300";
+
 const Navbar = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { getSectionContent } = useRegistryContent();
   const data = getSectionContent("nav");
   const dashboardData = getSectionContent("dashboard");
@@ -42,7 +50,7 @@ const Navbar = () => {
         {data?.announcementBarEmoji ?? "🎉"} {data?.announcementBar ?? ""}
       </div>
 
-      <div className="container mx-auto flex items-center justify-between py-3 px-6">
+      <div className="container mx-auto flex items-center justify-between py-3 px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 group">
           <motion.span
             className="text-3xl"
@@ -58,11 +66,7 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-1">
           {links.map((item, i) => (
-            <a
-              key={item?.label ?? i}
-              href={item?.href ?? "#"}
-              className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
-            >
+            <a key={item?.label ?? i} href={item?.href ?? "#"} className={navLinkClass}>
               {item?.label ?? ""}
             </a>
           ))}
@@ -105,6 +109,73 @@ const Navbar = () => {
               </motion.div>
             </>
           )}
+        </div>
+
+        {/* Mobile menu: hamburger + sheet */}
+        <div className="md:hidden flex items-center">
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-foreground" aria-label="Open menu">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[min(320px,100vw-2rem)] flex flex-col pt-8">
+              <nav className="flex flex-col gap-1">
+                {links.map((item, i) => (
+                  <a
+                    key={item?.label ?? i}
+                    href={item?.href ?? "#"}
+                    className={`${navLinkClass} py-3 min-h-[44px] flex items-center`}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item?.label ?? ""}
+                  </a>
+                ))}
+              </nav>
+              <div className="mt-6 pt-6 border-t flex flex-col gap-2">
+                {loading ? (
+                  <span className="px-4 py-3 text-sm text-muted-foreground">...</span>
+                ) : user ? (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      className={`${navLinkClass} py-3 min-h-[44px] flex items-center`}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {displayName}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        handleLogOut();
+                      }}
+                      className={`${navLinkClass} py-3 min-h-[44px] text-left w-full flex items-center`}
+                    >
+                      {typeof dashboardData?.logOut === "string" ? dashboardData.logOut : "Log out"}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to={logIn.href ?? "/login"}
+                      className={`${navLinkClass} py-3 min-h-[44px] flex items-center`}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {logIn.label ?? "Log in"}
+                    </Link>
+                    <Link
+                      to={getStarted.href ?? "/register"}
+                      className="gradient-warm px-6 py-3 rounded-[var(--nav-cta-radius)] text-sm font-bold text-primary-foreground shadow-playful min-h-[44px] flex items-center justify-center"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {getStarted.label ?? "Get started"}
+                    </Link>
+                  </>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </motion.nav>

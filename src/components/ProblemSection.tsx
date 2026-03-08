@@ -115,7 +115,7 @@ const ProblemSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-4"
         >
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("why.title")}>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("why.title")}>
             {data.title}
           </h2>
           <p className="font-display text-2xl md:text-3xl text-muted-foreground italic mb-2" style={getStyleForPath("why.impactLine1")}>

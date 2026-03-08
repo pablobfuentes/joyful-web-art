@@ -55,7 +55,7 @@ const StepCard = ({
       >
         <div className="relative">
           <div
-            className="w-64 h-64 md:w-72 md:h-72 rounded-full relative overflow-visible shadow-playful"
+            className="w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full relative overflow-visible shadow-playful max-w-full"
             style={{ backgroundColor: "hsl(var(--howItWorks-step-card-" + index + "-bg))" }}
           >
             <div className="absolute inset-[-12px] rounded-full overflow-hidden">

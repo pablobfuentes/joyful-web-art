@@ -114,12 +114,12 @@ const CompatibilityTestSection = () => {
               <p className="font-display text-xl md:text-2xl font-bold mb-8" style={getStyleForPath(`compatibilityTest.questions.${currentQuestion}`, "--foreground")}>
                 {questions[currentQuestion]}
               </p>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <motion.button
                   onClick={() => handleAnswer(true)}
                   whileHover={{ scale: 1.08, rotate: -3 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex-1 gradient-warm py-4 rounded-full font-bold text-primary-foreground shadow-playful text-lg"
+                  className="flex-1 gradient-warm py-4 min-h-[44px] rounded-full font-bold text-primary-foreground shadow-playful text-lg"
                 >
                   Sí 👍
                 </motion.button>
@@ -127,7 +127,7 @@ const CompatibilityTestSection = () => {
                   onClick={() => handleAnswer(false)}
                   whileHover={{ scale: 1.08, rotate: 3 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex-1 py-4 rounded-full font-bold border-4 border-primary text-primary bg-background text-lg shadow-playful"
+                  className="flex-1 py-4 min-h-[44px] rounded-full font-bold border-4 border-primary text-primary bg-background text-lg shadow-playful"
                 >
                   No 👎
                 </motion.button>

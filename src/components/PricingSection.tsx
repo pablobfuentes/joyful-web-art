@@ -62,7 +62,7 @@ const PricingSection = () => {
                 viewport={{ once: true }}
                 transition={{ type: "spring", stiffness: 180, delay: index * 0.12 }}
                 whileHover={{ scale: 1.04, rotate: 0, y: -8 }}
-                className={`relative rounded-3xl p-8 shadow-playful border-4 overflow-visible flex flex-col ${isPopular ? "md:-mt-4 md:mb-[-16px] md:pb-10 ring-4 ring-[hsl(var(--primary)/0.3)]" : ""}`}
+                className={`relative rounded-3xl p-6 sm:p-8 shadow-playful border-4 overflow-visible flex flex-col ${isPopular ? "md:-mt-4 md:mb-[-16px] md:pb-10 ring-4 ring-[hsl(var(--primary)/0.3)]" : ""}`}
                 style={{
                   backgroundColor: "hsl(var(--pricing-card-bg))",
                   borderColor: ACCENT_KEYS.includes(plan.accentColor as (typeof ACCENT_KEYS)[number])

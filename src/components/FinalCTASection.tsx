@@ -10,7 +10,7 @@ const FinalCTASection = () => {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="relative py-32 px-6 bg-[hsl(var(--finalCta-section-bg))] overflow-hidden">
+    <section className="relative py-16 md:py-32 px-4 sm:px-6 bg-[hsl(var(--finalCta-section-bg))] overflow-hidden">
 
       <FloatingDoodle className="top-16 left-[8%] w-12 h-12 text-primary/25" delay={0}>
         <DoodleHeart className="w-full h-full" />

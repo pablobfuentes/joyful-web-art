@@ -8,11 +8,11 @@ export function AdminLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
       <header className="border-b bg-background px-4 py-3">
-        <div className="container mx-auto flex items-center justify-between">
+        <div className="container mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <Link to="/admin" className="font-display text-lg font-semibold text-primary">
             Admin
           </Link>
-          <nav className="flex items-center gap-1">
+          <nav className="flex flex-wrap items-center gap-1">
             <NavLink
               to="/admin"
               end

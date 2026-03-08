@@ -109,7 +109,7 @@ const PastEditionsSection = () => {
                 className="relative group cursor-pointer transition-all duration-500 ease-in-out md:w-[8%] md:[&[aria-current='true']]:w-[52%] md:[transition:width_var(--transition,300ms_ease_in)]"
               >
                 <motion.div
-                  className="relative h-40 md:h-full w-full overflow-hidden rounded-3xl shadow-playful border-4 border-background"
+                  className={`relative w-full overflow-hidden rounded-3xl shadow-playful border-4 border-background ${isActive ? "max-md:min-h-[40vh] max-md:max-h-[55vh]" : "h-40"} md:h-full`}
                   style={{
                     backgroundColor: `hsl(var(--pastEditions-card-${colorIndex}-bg))`,
                   }}

@@ -48,7 +48,7 @@ const ExperienceSection = () => {
   const steps = registryListToArray(data.steps) as Array<{ number?: string; title?: string; description?: string }>;
 
   return (
-    <section ref={sectionRef} id="experience" className="relative py-24 px-6 bg-[hsl(var(--experience-section-bg))] overflow-hidden">
+    <section ref={sectionRef} id="experience" className="relative py-24 px-6 max-md:px-4 bg-[hsl(var(--experience-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-40" />
 
       <FloatingDoodle className="top-16 left-[8%] w-11 h-11 text-primary/25" delay={0}>
@@ -92,10 +92,10 @@ const ExperienceSection = () => {
         </motion.div>
 
         {/* Timeline layout instead of grid */}
-        <div className="relative max-w-3xl mx-auto">
+        <div className="relative max-w-3xl mx-auto max-md:px-0">
           <div
             data-testid="experience-vertical-line"
-            className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-primary/20 rounded-full md:-translate-x-1/2 overflow-hidden"
+            className="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-primary/20 rounded-full md:-translate-x-1/2 overflow-hidden"
             aria-hidden="true"
           >
             <div
@@ -114,11 +114,11 @@ const ExperienceSection = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.6, delay: index * 0.12 }}
-                className={`relative flex items-start gap-6 mb-6 md:mb-8 ${isEven ? "md:flex-row" : "md:flex-row-reverse"} flex-row`}
+                className={`relative flex items-start gap-4 md:gap-6 mb-4 md:mb-8 ${isEven ? "md:flex-row" : "md:flex-row-reverse"} flex-row`}
                 style={{ minHeight: "28vh" }}
               >
                 <motion.div
-                  className="absolute left-6 md:left-1/2 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10 -translate-x-1/2"
+                  className="absolute left-4 md:left-1/2 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10 -translate-x-1/2"
                   whileHover={{ scale: 1.2, rotate: 10 }}
                 >
                   {step?.number ?? index + 1}
@@ -126,11 +126,10 @@ const ExperienceSection = () => {
                 <div className="w-14 shrink-0 md:hidden" />
                 <motion.div
                   whileHover={{ y: -6, scale: 1.02 }}
-                  className={`flex-1 ${isEven ? "md:pr-12 md:text-right" : "md:pl-12"} pl-6 md:pl-0`}
-                  style={{ maxWidth: "calc(50% - 2rem)" }}
+                  className={`flex-1 max-w-full max-md:min-w-[33.33vw] md:max-w-[calc(50%-2rem)] ${isEven ? "md:pr-12 md:text-right" : "md:pl-12"} pl-4 md:pl-0 max-md:pl-4`}
                 >
                   <div
-                    className="relative p-6 shadow-playful border-4 border-background overflow-visible transition-shadow hover:shadow-card-hover"
+                    className="relative p-4 md:p-6 shadow-playful border-4 border-background overflow-visible transition-shadow hover:shadow-card-hover"
                     style={{
                       backgroundColor: `hsl(var(--experience-card-${index}-bg))`,
                       borderRadius: isEven ? "2rem 0.5rem 2rem 0.5rem" : "0.5rem 2rem 0.5rem 2rem",

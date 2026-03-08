@@ -46,7 +46,18 @@ const TestimonialsSection = () => {
 
   const containerRadius = isMobile ? 150 : 240;
   const profileSize = isMobile ? 70 : 90;
-  const containerSize = containerRadius * 2 + 140;
+  const baseContainerSize = containerRadius * 2 + 140;
+
+  const [containerSize, setContainerSize] = useState(343);
+  useEffect(() => {
+    const update = () => {
+      const w = typeof window !== "undefined" ? window.innerWidth - 32 : 343;
+      setContainerSize(Math.min(baseContainerSize, Math.max(280, w)));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [baseContainerSize]);
 
   const getRotation = useCallback(
     (index: number): number =>

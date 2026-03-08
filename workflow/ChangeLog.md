@@ -1,5 +1,19 @@
 # Change Log
 
+## [Unreleased] — Mobile-only Past Editions + Experience optimizations
+
+### Rationale
+- Apply improvements only on mobile (max-md: / md:). Past Editions: selected card expands vertically when selected. Experience: cards at least 1/3 viewport width, tighter spacing and edges.
+
+### Changes
+- **PastEditionsSection.tsx:** On mobile, inactive cards keep `h-40`; active card uses `max-md:min-h-[40vh] max-md:max-h-[55vh]` so the selected picture expands vertically. Desktop layout unchanged (md:h-full, md:w-[8%], md:[&[aria-current='true']]:w-[52%]).
+- **ExperienceSection.tsx:** Mobile-only: section `max-md:px-4`; timeline line `left-4` (was left-6); step row `max-md:gap-4 max-md:mb-4`; timeline dot `left-4` on mobile; card wrapper `max-md:min-w-[33.33vw]` (cards at least 1/3 viewport width), `max-md:pl-4`; inner card `max-md:p-4`. Desktop unchanged (md: values preserved).
+
+### Verification
+- `npm run build` succeeds. Manual: desktop (≥768px) Past Editions and Experience unchanged; mobile: Past Editions selected card expands vertically; Experience cards wider (min 1/3 width), less padding/gaps.
+
+---
+
 ## [Unreleased] — Admin Portal Phase 2 (execution)
 
 ### Rationale

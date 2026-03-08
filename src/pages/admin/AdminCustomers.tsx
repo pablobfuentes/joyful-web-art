@@ -132,7 +132,8 @@ export default function AdminCustomers() {
             <p className="text-muted-foreground py-8">No customers found.</p>
           ) : (
             <>
-              <Table>
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                <Table className="min-w-[800px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
@@ -169,6 +170,7 @@ export default function AdminCustomers() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
               <div className="flex items-center justify-between pt-4">
                 <p className="text-sm text-muted-foreground">
                   {data.total} customer{data.total !== 1 ? "s" : ""}
