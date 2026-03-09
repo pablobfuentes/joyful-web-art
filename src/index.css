@@ -198,4 +198,10 @@
       radial-gradient(circle at 80% 20%, hsl(var(--lavender)) 0%, transparent 40%),
       radial-gradient(circle at 60% 80%, hsl(var(--mint)) 0%, transparent 45%);
   }
+
+  /* Numbers inside enumeration circles: always DM Sans Bold (not from registry) */
+  .circle-number {
+    font-family: "DM Sans", sans-serif;
+    font-weight: 700;
+  }
 }

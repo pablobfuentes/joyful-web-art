@@ -33,8 +33,6 @@ const CompatibilityTestSection = () => {
     setResult(null);
   };
 
-  const progressPercent = ((currentQuestion + (result ? 1 : 0)) / questions.length) * 100;
-
   return (
     <section id="compatibility" className="relative py-24 px-6 bg-[hsl(var(--compatibilityTest-section-bg))] overflow-hidden">
       <div className="absolute inset-0 bg-pattern-dots opacity-40" />
@@ -77,17 +75,6 @@ const CompatibilityTestSection = () => {
           )}
         </motion.div>
 
-        {/* Progress bar */}
-        <div className="mb-8 mx-auto max-w-md">
-          <div className="h-3 bg-background rounded-full overflow-hidden shadow-playful border-2 border-background">
-            <motion.div
-              className="h-full gradient-warm rounded-full"
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            />
-          </div>
-        </div>
-
         <AnimatePresence mode="wait">
           {result === null ? (
             <motion.div
@@ -96,7 +83,7 @@ const CompatibilityTestSection = () => {
               animate={{ opacity: 1, x: 0, rotate: 0 }}
               exit={{ opacity: 0, x: -40, rotate: -2 }}
               transition={{ duration: 0.4 }}
-              className="rounded-3xl p-8 md:p-10 shadow-playful border-4 border-peach-strong relative overflow-visible"
+              className="rounded-3xl p-8 md:p-10 shadow-playful border-4 border-white relative overflow-visible"
               style={{ backgroundColor: "hsl(var(--compatibilityTest-question-card-bg))" }}
             >
               {/* Floating emoji */}
@@ -139,7 +126,7 @@ const CompatibilityTestSection = () => {
               initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="rounded-3xl p-8 md:p-10 shadow-playful border-4 border-background text-center relative overflow-visible"
+              className="rounded-3xl p-8 md:p-10 shadow-playful border-4 border-white text-center relative overflow-visible"
               style={{ backgroundColor: "hsl(var(--compatibilityTest-result-card-bg))" }}
             >
               <motion.span

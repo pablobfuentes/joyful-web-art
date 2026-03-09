@@ -482,7 +482,7 @@ export const APP_REGISTRY = {
       links: [
         {
           label: "Instagram",
-          href: "https://www.instagram.com/kumibox.mx/"
+          href: "#"
         },
         {
           label: "TikTok",

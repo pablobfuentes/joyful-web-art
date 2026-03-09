@@ -68,7 +68,7 @@ const FAQSection = () => {
                   style={getStyleForPath(`faq.items.${index}.question`, "--foreground")}
                 >
                   <span className="flex items-center gap-3">
-                    <span className="w-8 h-8 gradient-warm rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold shrink-0 shadow-playful">
+                    <span className="w-8 h-8 gradient-warm rounded-full flex items-center justify-center text-primary-foreground circle-number text-sm shrink-0 shadow-playful">
                       {index + 1}
                     </span>
                     {item.question}

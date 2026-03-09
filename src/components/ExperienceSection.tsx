@@ -118,7 +118,7 @@ const ExperienceSection = () => {
                 style={{ minHeight: "28vh" }}
               >
                 <motion.div
-                  className="absolute left-4 md:left-1/2 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-xl font-bold shadow-playful border-4 border-background z-10 -translate-x-1/2"
+                  className="absolute left-4 md:left-1/2 w-14 h-14 gradient-warm rounded-full flex items-center justify-center text-primary-foreground circle-number text-xl shadow-playful border-4 border-background z-10 -translate-x-1/2"
                   whileHover={{ scale: 1.2, rotate: 10 }}
                 >
                   {step?.number ?? index + 1}

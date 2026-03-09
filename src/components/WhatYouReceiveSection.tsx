@@ -82,7 +82,7 @@ const WhatYouReceiveSection = () => {
                 {/* Number circle: center at card top-left corner, half extending out (wrapper keeps position when motion animates rotate) */}
                 <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 z-10">
                   <motion.div
-                    className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-lg font-bold shadow-playful"
+                    className="w-12 h-12 gradient-warm rounded-full flex items-center justify-center text-primary-foreground circle-number text-lg shadow-playful"
                     animate={{ rotate: [0, -4, 4, -4, 0] }}
                     transition={{ duration: 3, repeat: Infinity, repeatDelay: 0.8, delay: index * 0.15 }}
                   >

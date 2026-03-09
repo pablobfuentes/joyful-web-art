@@ -67,7 +67,7 @@ const StepCard = ({
             </div>
           </div>
           <motion.div
-            className="absolute -top-3 -right-3 w-16 h-16 gradient-warm rounded-full flex items-center justify-center text-primary-foreground font-display text-2xl font-bold shadow-playful border-4 border-background"
+            className="absolute -top-3 -right-3 w-16 h-16 gradient-warm rounded-full flex items-center justify-center text-primary-foreground circle-number text-2xl shadow-playful border-4 border-background"
             initial={{ scale: 0 }}
             animate={isInView ? { scale: 1 } : {}}
             transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
