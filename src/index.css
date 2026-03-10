@@ -17,6 +17,10 @@
 
 @layer base {
   :root {
+    /* So display/body fonts work before JS runs; applyStyleRegistry overwrites these from the style registry */
+    --font-display: "Playfair Display";
+    --font-body: "DM Sans";
+
     --background: 30 50% 97%;
     --foreground: 20 30% 15%;
 
@@ -203,5 +207,12 @@
   .circle-number {
     font-family: "DM Sans", sans-serif;
     font-weight: 700;
+  }
+
+  /* LemonMilk display font helper – used for key headings when the font files are present. */
+  .font-lemonmilk {
+    font-family: "LEMONMILK Bold", "LEMONMILK Regular", "Playfair Display", serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
   }
 }

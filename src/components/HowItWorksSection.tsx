@@ -37,6 +37,7 @@ const StepCard = ({
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const isEven = index % 2 === 0;
   const getStyle = typeof getStyleForPath === "function" ? getStyleForPath : noopStyle;
+  const descriptionColorVar = index === 0 ? "--primary-foreground" : "--muted-foreground";
 
   return (
     <motion.div
@@ -88,10 +89,15 @@ const StepCard = ({
         <span className="inline-block text-sm font-semibold mb-2" style={getStyle(`howItWorks.steps.${index}.label`, "--primary")}>
           {step.label}
         </span>
-        <h3 className="font-display text-2xl md:text-3xl font-bold mb-3" style={getStyle(`howItWorks.steps.${index}.title`, "--foreground")}>
+        <h3
+          className={`font-display font-bold mb-3 ${
+            index === 0 ? "font-lemonmilk text-[2.5rem] md:text-[3rem]" : "text-2xl md:text-3xl"
+          }`}
+          style={getStyle(`howItWorks.steps.${index}.title`, "--foreground")}
+        >
           {step.title}
         </h3>
-        <p className="leading-relaxed text-lg" style={getStyle(`howItWorks.steps.${index}.description`, "--muted-foreground")}>
+        <p className="leading-relaxed text-lg" style={getStyle(`howItWorks.steps.${index}.description`, descriptionColorVar)}>
           {step.description}
         </p>
       </div>
@@ -141,7 +147,7 @@ const HowItWorksSection = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-4xl md:text-6xl font-bold mb-8" style={getStyleForPath("howItWorks.title")}>
+          <h2 className="font-display font-lemonmilk text-4xl md:text-6xl font-bold mb-8" style={getStyleForPath("howItWorks.title")}>
             {data.title}
           </h2>
           <motion.a

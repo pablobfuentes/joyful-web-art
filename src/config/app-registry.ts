@@ -89,7 +89,7 @@ export const APP_REGISTRY = {
     ],
     resultDermatologist: "Te recomendamos consultar a tu dermatólogo antes de probar nuevos productos",
     resultGoodFit: "Perfecto. Esta experiencia fue diseñada para alguien como tú",
-    ctaButton: "Quiero acceso anticipado"
+    ctaButton: "Quiero unirme"
   },
   howItWorks: {
     title: "Como Funciona",
@@ -124,7 +124,7 @@ export const APP_REGISTRY = {
     subtitle: "What You Receive",
     subtitleBadgeEmoji: "📦",
     title: "Lo que recibes cada mes",
-    description: "Cinco productos coreanos. Una rutina completa. Diseñada para acompañarte hasta tu próxima entrega.",
+    description: "4 ó 5 productos coreanos. Una rutina completa. Diseñada para acompañarte hasta tu próxima entrega.",
     products: [
       {
         number: "1",
@@ -161,7 +161,7 @@ export const APP_REGISTRY = {
   pastEditions: {
     subtitleEmoji: "📚",
     subtitle: "Past Editions",
-    title: "See what we've curated",
+    title: "Nuestras elecciones pasadas",
     fallbackImage: "https://placehold.co/590x640/e8e4de/2d2620?text=Past+Edition",
     editions: [
       {
@@ -413,7 +413,7 @@ export const APP_REGISTRY = {
       },
       {
         question: "¿Recibiré el mismo tipo de producto dos veces?",
-        answer: "No. Cada caja incluye cinco categorías de productos distintas que funcionan como una sola rutina. No repetimos categorías en la misma caja."
+        answer: "No. Cada caja incluye 4 ó 5 categorías de productos distintas que funcionan como una sola rutina. No repetimos categorías en la misma caja."
       },
       {
         question: "¿Y si un producto no me funciona?",
@@ -442,14 +442,14 @@ export const APP_REGISTRY = {
     descriptionPrimary: "Una rutina completa. En tu puerta cada que lo necesitas.",
     descriptionSecondary: "Diseñada para usarse — no para olvidarse.",
     ctaButton: {
-      label: "Reservar mi lugar",
+      label: "Quiero unirme",
       href: "#pricing"
     },
     footer: "Cancela cuando quieras · Sin compromisos · Envíos cada 2 meses"
   },
   footer: {
     mission: {
-      title: "Ritual",
+      title: "Kumi",
       description: "Rutinas de skincare con sentido, entregadas con intención."
     },
     navigate: {
@@ -457,7 +457,7 @@ export const APP_REGISTRY = {
       links: [
         {
           label: "Tienda",
-          href: "#"
+          href: "#pricing"
         },
         {
           label: "Nuestra historia",
@@ -486,7 +486,7 @@ export const APP_REGISTRY = {
         },
         {
           label: "TikTok",
-          href: "#"
+          href: "https://www.tiktok.com/@kumibox.mx"
         }
       ]
     },
@@ -495,7 +495,7 @@ export const APP_REGISTRY = {
       placeholder: "tu@email.com"
     },
     bottomBar: {
-      copyright: "© 2025 Ritual. Todos los derechos reservados.",
+      copyright: "© 2026 Kumi. Todos los derechos reservados.",
       links: [
         {
           label: "Privacidad",

@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Playfair Display", "serif"],
-        body: ["DM Sans", "sans-serif"],
+        /* Use CSS variable so style registry (and any custom font) applies; fallback for before JS runs */
+        display: ["var(--font-display)", "Playfair Display", "serif"],
+        body: ["var(--font-body)", "DM Sans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

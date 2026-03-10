@@ -32,14 +32,6 @@ const FAQSection = () => {
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-16"
         >
-          <motion.span
-            className="inline-block bg-peach px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
-            style={getStyleForPath("faq.subtitle", "--foreground")}
-            animate={{ rotate: [-2, 2, -2] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            🤓 {data.subtitle}
-          </motion.span>
           <h2 className="font-display text-4xl md:text-6xl font-bold" style={getStyleForPath("faq.title", "--foreground")}>
             {data.title}
           </h2>

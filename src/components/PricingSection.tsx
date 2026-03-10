@@ -38,14 +38,6 @@ const PricingSection = () => {
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-16"
         >
-          <motion.span
-            className="inline-block bg-sunshine px-4 py-1 rounded-full text-sm font-bold text-foreground mb-4 shadow-playful"
-            animate={{ rotate: [2, -2, 2] }}
-            transition={{ duration: 3, repeat: Infinity }}
-            style={getStyleForPath("pricing.subtitle", "--foreground")}
-          >
-            💰 {data.subtitle}
-          </motion.span>
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("pricing.title", "--foreground")}>
             {data.title}
           </h2>

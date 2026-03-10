@@ -57,14 +57,6 @@ const CompatibilityTestSection = () => {
           animate={headerInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-12"
         >
-          <motion.span
-            className="inline-block bg-bubblegum px-4 py-1 rounded-full text-sm font-bold mb-4 shadow-playful"
-            style={getStyleForPath("compatibilityTest.subtitle", "--foreground")}
-            animate={{ rotate: [-2, 2, -2] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            ✨ {data.subtitle}
-          </motion.span>
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-4" style={getStyleForPath("compatibilityTest.title", "--foreground")}>
             {data.title}
           </h2>

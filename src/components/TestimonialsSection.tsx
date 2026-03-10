@@ -31,6 +31,8 @@ const makeSafeImage =
     target.src = fallback;
   };
 
+const SHOW_TESTIMONIALS = false;
+
 const TestimonialsSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const data = getSectionContent("testimonials");
@@ -87,6 +89,10 @@ const TestimonialsSection = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  if (!SHOW_TESTIMONIALS) {
+    return null;
+  }
 
   return (
     <section className="relative py-24 bg-[hsl(var(--testimonials-section-bg))] overflow-hidden">
