@@ -15,6 +15,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { APP_REGISTRY, type AppRegistry } from "@/config/app-registry";
+import { CONTENT_MODIFIERS_DEFAULT } from "@/config/content-modifiers";
 
 export const CONTENT_STORAGE_KEY = "app_registry_content_overrides";
 export const CONTENT_MODIFIERS_STORAGE_KEY = "app_registry_content_modifiers";
@@ -96,14 +97,20 @@ export function RegistryContentProvider({
   const [content, setContent] = useState<Record<string, unknown> | null>(() =>
     fromFile ? (initialContent as Record<string, unknown>) : readContentOverrides()
   );
-  const [contentModifiers, setContentModifiers] = useState<ContentModifiers>(() =>
-    fromFile ? (initialContentModifiers ?? {}) : readContentModifiers()
-  );
+  const [contentModifiers, setContentModifiers] = useState<ContentModifiers>(() => {
+    if (fromFile) return initialContentModifiers ?? {};
+    // Baseline from versioned snapshot, optionally layered with localStorage preview
+    const base = { ...CONTENT_MODIFIERS_DEFAULT };
+    const preview = readContentModifiers();
+    return { ...base, ...preview };
+  });
 
   const refresh = useCallback(() => {
     if (fromFile) return;
     setContent(readContentOverrides());
-    setContentModifiers(readContentModifiers());
+    // When refreshing in-browser, keep base snapshot modifiers and re-apply preview
+    const preview = readContentModifiers();
+    setContentModifiers({ ...CONTENT_MODIFIERS_DEFAULT, ...preview });
   }, [fromFile]);
 
   useEffect(() => {
