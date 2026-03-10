@@ -3,7 +3,7 @@
 ## 401 Unauthorized on create-checkout-session
 
 - **Date:** 2026-02-19
-- **Error:** Edge Function returned 401 Unauthorized. Network: `POST https://rtnispswkyybiliynezz.supabase.co/functions/v1/create-checkout-session` → 401.
+- **Error:** Edge Function returned 401 Unauthorized. Network: `POST https://ADDRESS.supabase.co/functions/v1/create-checkout-session` → 401.
 - **Root cause:** Supabase gateway rejects the request before it reaches the function (missing or invalid JWT in `Authorization` header).
 - **Reproduction:** Checkout page → select plan → fill form → click "Confirmar pedido".
 - **Environment:** `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`; anon key confirmed correct by user.
