@@ -28,6 +28,7 @@ import SettingsPage from "./pages/SettingsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import ComingSoon from "./pages/ComingSoon";
 
 const queryClient = new QueryClient();
 
@@ -36,12 +37,13 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <RegistryContentProvider>
             <StyleRegistryProvider>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/coming-soon" element={<ComingSoon />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />

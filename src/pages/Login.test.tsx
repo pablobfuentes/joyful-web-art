@@ -1,15 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import Login from "./Login";
 import { APP_REGISTRY } from "@/config/app-registry";
 import { renderWithAuth } from "@/test/render-with-auth";
 
 const signIn = vi.fn();
+const signInWithOAuth = vi.fn();
 
 function renderLogin() {
   return renderWithAuth(<Login />, {
     auth: {
       signIn,
+      ...( { signInWithOAuth } as object ),
     },
   });
 }
@@ -53,5 +55,17 @@ describe("Login", () => {
     renderLogin();
     const forgot = screen.getByRole("link", { name: APP_REGISTRY.login.forgotPassword });
     expect(forgot).toHaveAttribute("href", APP_REGISTRY.login.forgotPasswordHref);
+  });
+
+  it("renders social sign-in buttons and calls the matching provider", async () => {
+    signIn.mockResolvedValue({ error: null });
+    signInWithOAuth.mockResolvedValue({ error: null });
+    renderLogin();
+
+    expect(screen.getByRole("button", { name: /google/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /facebook/i })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /google/i }));
+    await waitFor(() => expect(signInWithOAuth).toHaveBeenNthCalledWith(1, "google"));
   });
 });

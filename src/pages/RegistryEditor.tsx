@@ -38,6 +38,7 @@ const SECTION_DISPLAY_NAMES: Record<string, string> = {
   faq: "FAQ",
   finalCta: "Final CTA",
   footer: "Footer",
+  comingSoon: "Coming Soon",
   login: "Login",
   register: "Register",
   forgotPassword: "Forgot Password",
@@ -1283,7 +1284,7 @@ export default function RegistryEditor() {
       if (sectionData.divider) {
         controls.push(renderDividerControls(sectionKey, sectionData.divider as Record<string, unknown>));
       }
-    } else if (sectionKey === "login" || sectionKey === "register" || sectionKey === "resetPassword" || sectionKey === "forgotPassword" || sectionKey === "dashboard" || sectionKey === "checkout" || sectionKey === "account" || sectionKey === "page") {
+    } else if (sectionKey === "comingSoon" || sectionKey === "login" || sectionKey === "register" || sectionKey === "resetPassword" || sectionKey === "forgotPassword" || sectionKey === "dashboard" || sectionKey === "checkout" || sectionKey === "account" || sectionKey === "page") {
       const page = sectionData.page as Record<string, unknown> | undefined;
       if (page && typeof page.backgroundIndex === "number") {
         controls.push(
@@ -1296,6 +1297,27 @@ export default function RegistryEditor() {
             </CardContent>
           </Card>
         );
+      }
+      if (sectionKey === "comingSoon") {
+        const image = sectionData.image as Record<string, unknown> | undefined;
+        if (image) {
+          controls.push(
+            <Card key="comingSoon-image">
+              <CardHeader>
+                <CardTitle className="text-lg">Hero Image</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {renderImagePathInput(
+                  "Image path",
+                  (image.path as string) || "",
+                  (path) => updateSection([sectionKey, "image", "path"], path),
+                  "e.g. hero-skincare.jpg",
+                  "coming-soon-image-path"
+                )}
+              </CardContent>
+            </Card>
+          );
+        }
       }
     } else if (sectionKey === "footer") {
       const section = sectionData.section as Record<string, unknown> | undefined;

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function Register() {
   const { getSectionContent } = useRegistryContent();
@@ -16,7 +17,8 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const { signUp } = useAuth();
+  const [socialSubmitting, setSocialSubmitting] = useState(false);
+  const { signUp, signInWithOAuth } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -34,6 +36,17 @@ export default function Register() {
       return;
     }
     navigate("/", { replace: true });
+  }
+
+  async function handleOAuth(provider: "google" | "facebook") {
+    setError(null);
+    setSocialSubmitting(true);
+    const { error: err } = await signInWithOAuth(provider);
+    setSocialSubmitting(false);
+
+    if (err) {
+      setError(data.socialErrorGeneric);
+    }
   }
 
   return (
@@ -104,6 +117,16 @@ export default function Register() {
               {submitting ? data.submitLoading : data.submitButton}
             </Button>
           </form>
+          <div className="mt-6">
+            <SocialAuthButtons
+              dividerText={data.socialDividerText}
+              googleLabel={data.googleButton}
+              facebookLabel={data.facebookButton}
+              showFacebook={false}
+              disabled={submitting || socialSubmitting}
+              onProviderClick={handleOAuth}
+            />
+          </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {data.alreadyHaveAccount}{" "}
             <Link to={data.signInHref} className="text-primary font-medium hover:underline">

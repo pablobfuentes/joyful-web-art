@@ -156,24 +156,32 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
   if (compatQuestionCard) root.style.setProperty("--compatibilityTest-question-card-bg", getPaletteHsl(cells, compatQuestionCard.backgroundIndex));
   if (compatResultCard) root.style.setProperty("--compatibilityTest-result-card-bg", getPaletteHsl(cells, compatResultCard.backgroundIndex));
   root.style.setProperty("--whatYouReceive-section-bg", getPaletteHsl(cells, registry.whatYouReceive.section.backgroundIndex));
-  const wyrCards = registry.whatYouReceive.cards ?? STYLE_REGISTRY.whatYouReceive.cards ?? [];
+  const wyrCards = (registry.whatYouReceive.cards ??
+    STYLE_REGISTRY.whatYouReceive.cards ??
+    []) as ReadonlyArray<{ readonly backgroundIndex: number }>;
   wyrCards.forEach((card, i) => {
     root.style.setProperty(`--whatYouReceive-card-${i}-bg`, getPaletteHsl(cells, card.backgroundIndex));
   });
   root.style.setProperty("--pastEditions-section-bg", getPaletteHsl(cells, registry.pastEditions.section.backgroundIndex));
-  const pastEditionsCards = registry.pastEditions.cards ?? (STYLE_REGISTRY.pastEditions as { cards?: Array<{ backgroundIndex: number }> }).cards ?? [];
-  pastEditionsCards.forEach((card: { backgroundIndex: number }, i: number) => {
+  const pastEditionsCards = (((registry.pastEditions as unknown as { cards?: ReadonlyArray<{ readonly backgroundIndex: number }> }).cards) ??
+    (STYLE_REGISTRY.pastEditions as unknown as { cards?: ReadonlyArray<{ readonly backgroundIndex: number }> }).cards ??
+    []) as ReadonlyArray<{ readonly backgroundIndex: number }>;
+  pastEditionsCards.forEach((card, i) => {
     root.style.setProperty(`--pastEditions-card-${i}-bg`, getPaletteHsl(cells, card.backgroundIndex));
   });
   root.style.setProperty("--experience-section-bg", getPaletteHsl(cells, registry.experience.section.backgroundIndex));
-  const experienceCards = registry.experience.cards ?? (STYLE_REGISTRY.experience as { cards?: Array<{ backgroundIndex: number }> }).cards ?? [];
-  experienceCards.forEach((card: { backgroundIndex: number }, i: number) => {
+  const experienceCards = (registry.experience.cards ??
+    (STYLE_REGISTRY.experience as unknown as { cards?: ReadonlyArray<{ readonly backgroundIndex: number }> }).cards ??
+    []) as ReadonlyArray<{ readonly backgroundIndex: number }>;
+  experienceCards.forEach((card, i) => {
     root.style.setProperty(`--experience-card-${i}-bg`, getPaletteHsl(cells, card.backgroundIndex));
   });
   root.style.setProperty("--deliveryWindows-section-bg", getPaletteHsl(cells, registry.deliveryWindows.section.backgroundIndex));
   root.style.setProperty("--testimonials-section-bg", getPaletteHsl(cells, registry.testimonials.section.backgroundIndex));
-  const testimonialsCards = registry.testimonials.cards ?? (STYLE_REGISTRY.testimonials as { cards?: Array<{ backgroundIndex: number }> }).cards ?? [];
-  testimonialsCards.forEach((card: { backgroundIndex: number }, i: number) => {
+  const testimonialsCards = (((registry.testimonials as unknown as { cards?: ReadonlyArray<{ readonly backgroundIndex: number }> }).cards) ??
+    (STYLE_REGISTRY.testimonials as unknown as { cards?: ReadonlyArray<{ readonly backgroundIndex: number }> }).cards ??
+    []) as ReadonlyArray<{ readonly backgroundIndex: number }>;
+  testimonialsCards.forEach((card, i) => {
     root.style.setProperty(`--testimonials-card-${i}-bg`, getPaletteHsl(cells, card.backgroundIndex));
   });
   root.style.setProperty("--pricing-section-bg", getPaletteHsl(cells, registry.pricing.section.backgroundIndex));
@@ -188,14 +196,19 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
     }
   });
   root.style.setProperty("--faq-section-bg", getPaletteHsl(cells, registry.faq.section.backgroundIndex));
-  const faqItem = registry.faq.item ?? (STYLE_REGISTRY.faq as { item?: { backgroundIndex: number } }).item;
+  const faqItem =
+    (registry.faq as unknown as { item?: { readonly backgroundIndex: number } }).item ??
+    (STYLE_REGISTRY.faq as unknown as { item?: { readonly backgroundIndex: number } }).item;
   if (faqItem) root.style.setProperty("--faq-item-bg", getPaletteHsl(cells, faqItem.backgroundIndex));
-  const pricingBottomBadges = registry.pricing.bottomBadges ?? (STYLE_REGISTRY.pricing as { bottomBadges?: Array<{ backgroundIndex: number }> }).bottomBadges ?? [];
-  pricingBottomBadges.forEach((badge: { backgroundIndex: number }, i: number) => {
+  const pricingBottomBadges = (((registry.pricing as unknown as { bottomBadges?: ReadonlyArray<{ readonly backgroundIndex: number }> }).bottomBadges) ??
+    (STYLE_REGISTRY.pricing as unknown as { bottomBadges?: ReadonlyArray<{ readonly backgroundIndex: number }> }).bottomBadges ??
+    []) as ReadonlyArray<{ readonly backgroundIndex: number }>;
+  pricingBottomBadges.forEach((badge, i) => {
     root.style.setProperty(`--pricing-bottom-badge-${i}-bg`, getPaletteHsl(cells, badge.backgroundIndex));
   });
   root.style.setProperty("--finalCta-section-bg", getPaletteHsl(cells, registry.finalCta.section.backgroundIndex));
   root.style.setProperty("--footer-section-bg", getPaletteHsl(cells, registry.footer.section.backgroundIndex));
+  root.style.setProperty("--comingSoon-page-bg", getPaletteHsl(cells, registry.comingSoon.page.backgroundIndex));
 
   const nav = registry.nav;
   root.style.setProperty("--nav-link-color", getPaletteHsl(cells, nav.link.textColorIndex));

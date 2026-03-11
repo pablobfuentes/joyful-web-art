@@ -13,6 +13,7 @@ export function createAuthValue(overrides: Partial<AuthContextValue> = {}): Auth
     user: null,
     loading: false,
     signIn: async () => ({ error: null }),
+    signInWithOAuth: async () => ({ error: null }),
     signOut: async () => {},
     signUp: async () => ({ error: null }),
     resetPasswordForEmail: async () => ({ error: null }),

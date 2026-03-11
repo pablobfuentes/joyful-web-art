@@ -233,3 +233,62 @@
 - Manual reasoning: all new pages are read-only views that:
   - Are only reachable via `ProtectedRoute`-guarded routes.
   - Use `useRegistryContent` for text and do not introduce new network calls, forms, or side effects.
+
+---
+
+## [Unreleased] — Social sign-in with Google and Facebook
+
+### Rationale
+- Add Google/Facebook sign-in to the existing auth flow while keeping Supabase Auth as the single source of truth for registered users.
+- Ensure new social users still flow through `auth.users` and the existing `public.profiles` trigger path instead of introducing a parallel user store.
+
+### Changes
+- **Auth (`src/contexts/AuthContext.tsx`):**
+  - Added `signInWithOAuth(provider)` for `google` and `facebook`.
+  - Uses `supabase.auth.signInWithOAuth(...)` with a safe redirect derived from the current `?redirect=` query when present, else `/`.
+- **Shared UI (`src/components/SocialAuthButtons.tsx`):**
+  - Added a reusable divider + provider button block for auth pages.
+- **Auth pages (`src/pages/Login.tsx`, `src/pages/Register.tsx`):**
+  - Added Google/Facebook buttons below the existing form.
+  - Wired provider clicks to `signInWithOAuth`.
+  - Reused existing inline error area for provider-level failures.
+- **Registry (`src/config/app-registry.ts`):**
+  - Added auth-page copy for social divider text, Google/Facebook button labels, and provider error message.
+- **Tests (`src/contexts/AuthContext.test.tsx`, `src/pages/Login.test.tsx`, `src/pages/Register.test.tsx`, `src/test/render-with-auth.tsx`):**
+  - Added focused coverage for provider dispatch and page rendering.
+  - Extended the auth render helper with a default `signInWithOAuth` stub.
+
+### Verification
+- `npm run test -- src/pages/Login.test.tsx src/pages/Register.test.tsx src/contexts/AuthContext.test.tsx` passes.
+- `npm run build` passes.
+- Manual rendered-product check on `http://127.0.0.1:8081/login` and `/register`:
+  - Desktop (`1280x800`): buttons visible, no overlap, layout remains usable.
+  - Mobile (`390x844`): buttons visible and stack correctly.
+
+---
+
+## [Unreleased] — Temporary Google-only social-auth rollout
+
+### Rationale
+- Google credentials are configured and ready to validate.
+- Facebook credentials are still pending, so the Facebook entry point should be hidden from users for now.
+- The underlying OAuth support should remain in place so Facebook can be re-enabled later without reworking `AuthContext`.
+
+### Changes
+- **Shared UI (`src/components/SocialAuthButtons.tsx`):**
+  - Added `showFacebook?: boolean` so the component can selectively hide Facebook while preserving the existing Google/Facebook provider handling contract.
+- **Auth pages (`src/pages/Login.tsx`, `src/pages/Register.tsx`):**
+  - Passed `showFacebook={false}` so only `Continuar con Google` is rendered in the current rollout.
+- **Tests (`src/pages/Login.test.tsx`, `src/pages/Register.test.tsx`):**
+  - Updated the page tests to assert that Google is visible, Facebook is absent, and Google still calls `signInWithOAuth("google")`.
+- **Workflow docs/logs:**
+  - Logged the red-phase failure where Facebook was still rendering.
+  - Added changelog + VMP audit evidence for the Google-only rollout and browser verification.
+
+### Verification
+- `npm run test -- src/pages/Login.test.tsx src/pages/Register.test.tsx src/contexts/AuthContext.test.tsx` passes (7 tests).
+- `npm run build` passes.
+- Browser smoke test on `http://127.0.0.1:8081/login` and `/register` confirms:
+  - Google button visible.
+  - No Facebook button or Facebook text rendered.
+  - Clicking Google redirects to Google Accounts with Supabase callback `https://rtnispswkyybiliynezz.supabase.co/auth/v1/callback`.

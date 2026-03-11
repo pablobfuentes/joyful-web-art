@@ -10,16 +10,28 @@ import {
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
+export type OAuthProvider = "google" | "facebook";
+
 export type AuthContextValue = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithOAuth: (provider: OAuthProvider) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   signUp: (email: string, password: string, name?: string) => Promise<{ error: Error | null }>;
   resetPasswordForEmail: (email: string) => Promise<{ error: Error | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
   updateProfile: (fullName: string) => Promise<{ error: Error | null }>;
 };
+
+function getOAuthRedirectTo() {
+  const currentUrl = new URL(window.location.href);
+  const redirect = currentUrl.searchParams.get("redirect");
+  const safePath =
+    redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/";
+
+  return new URL(safePath, window.location.origin).toString();
+}
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
@@ -45,6 +57,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error ? new Error(error.message) : null };
+  }, []);
+
+  const signInWithOAuth = useCallback(async (provider: OAuthProvider) => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: getOAuthRedirectTo(),
+      },
+    });
     return { error: error ? new Error(error.message) : null };
   }, []);
 
@@ -88,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       signIn,
+      signInWithOAuth,
       signOut,
       signUp,
       resetPasswordForEmail,
@@ -98,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       signIn,
+      signInWithOAuth,
       signOut,
       signUp,
       resetPasswordForEmail,

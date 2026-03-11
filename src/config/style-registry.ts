@@ -169,6 +169,11 @@ export type LoginStyles = {
   error: { backgroundIndex: number; textColorIndex: number };
 };
 
+export type ComingSoonStyles = {
+  page: { backgroundIndex: number };
+  image: ImageStyle;
+};
+
 export type PageStyles = {
   backgroundIndex?: number;
   page?: { backgroundIndex: number };
@@ -646,6 +651,16 @@ export const STYLE_REGISTRY = {
     },
     bottomBar: {
       borderColorIndex: 8
+    }
+  },
+  comingSoon: {
+    page: {
+      backgroundIndex: 0
+    },
+    image: {
+      path: "hero-skincare.jpg",
+      width: "100%",
+      height: "100%"
     }
   },
   login: {

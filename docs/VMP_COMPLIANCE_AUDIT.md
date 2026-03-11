@@ -195,3 +195,63 @@
   - **Performance review:** The update only changes static `<head>` tags and adds a tiny file-content regression test. There is no runtime performance impact on the application.
   - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` and the existing audit workflow requirements, including test-first execution, changelog update, and audit documentation.
 
+## 2026-03-10 – Social sign-in with Google and Facebook
+
+- **Feature:** Add Google and Facebook sign-in options to the existing Supabase-backed auth flow.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/contexts/AuthContext.test.tsx` – verifies `signInWithOAuth("google")` calls `supabase.auth.signInWithOAuth(...)`.
+  - `src/pages/Login.test.tsx` – verifies Google/Facebook auth buttons render and dispatch the matching provider from the login page.
+  - `src/pages/Register.test.tsx` – verifies Google/Facebook auth buttons render and dispatch the matching provider from the register page.
+  - Verification run: `npm run test -- src/pages/Login.test.tsx src/pages/Register.test.tsx src/contexts/AuthContext.test.tsx` passes.
+  - Build verification: `npm run build` passes.
+  - Rendered-product verification: browser validation on `http://127.0.0.1:8081/login` and `/register` at `1280x800` and `390x844` found no layout issues; buttons render and stack correctly.
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – sections “Social auth TDD mock hoisting failure”, “Social auth page-test mock return mismatch”, and “Social auth page-test async click sequencing”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Social sign-in: Google and Facebook via Supabase Auth”.
+- **Notes:**
+  - **Security review:** The implementation keeps Supabase Auth as the single auth system and uses the frontend-safe anon key only. No service-role key, provider secret, or admin credential is exposed in app code. OAuth redirect handling is constrained to an internal `?redirect=` path that must begin with `/`, preventing open redirects to external origins. Social users still land in Supabase `auth.users`; the existing `public.handle_new_user()` trigger remains the mechanism that creates `public.profiles` rows for new accounts.
+  - **Performance review:** The UI adds one small shared component and two extra buttons per auth page. Runtime overhead is negligible, and the async path only issues an OAuth request when a provider button is clicked. No additional background fetches or persistent polling were introduced.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md`, `workflow/Prompt.md`, and `docs/workflow/VMP_v2.1_Enhanced.txt`, including plan approval, TDD, failure logging, changelog update, and audit evidence.
+
+## 2026-03-10 – Temporary Google-only social-auth rollout
+
+- **Feature:** Temporarily hide Facebook from the auth UI while validating the newly configured Google OAuth flow.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/pages/Login.test.tsx` – verifies the login page shows Google, hides Facebook, and still dispatches `signInWithOAuth("google")`.
+  - `src/pages/Register.test.tsx` – verifies the register page shows Google, hides Facebook, and still dispatches `signInWithOAuth("google")`.
+  - `src/contexts/AuthContext.test.tsx` – verifies the Google OAuth path in the auth layer still calls Supabase correctly.
+  - Verification run: `npm run test -- src/pages/Login.test.tsx src/pages/Register.test.tsx src/contexts/AuthContext.test.tsx` passes (7 tests).
+  - Build verification: `npm run build` passes.
+  - Rendered-product verification: browser validation on `http://127.0.0.1:8081/login` and `/register` confirmed only `Continuar con Google` is shown; no Facebook button/text appeared; clicking Google redirected to `https://accounts.google.com/...` with Supabase callback `https://rtnispswkyybiliynezz.supabase.co/auth/v1/callback`.
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Google-only rollout still rendered Facebook”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Temporary Google-only social-auth rollout”.
+- **Notes:**
+  - **Security review:** This rollout does not widen the auth surface area. It only hides the Facebook entry point in the UI while keeping the already-implemented OAuth provider dispatch inside `AuthContext`. Google still uses Supabase Auth and the existing safe redirect guard, so there is no new credential exposure or redirect risk introduced by this change.
+  - **Performance review:** The change replaces a two-button layout with a single rendered provider button on the auth pages. Runtime cost is effectively unchanged or slightly lower, and there are no additional network requests until a user explicitly clicks Google.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md`, `workflow/Prompt.md`, and `docs/workflow/VMP_v2.1_Enhanced.txt`, including test-first execution, immediate failure logging, changelog update, and browser verification before completion.
+
+## 2026-03-10 – Coming soon page at `/coming-soon`
+
+- **Feature:** Port the committed coming-soon landing page into the current branch, keep the full site at `/`, and make the coming-soon content editable through the registry/editor flow.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/pages/ComingSoon.test.tsx` – verifies the page renders registry-driven content and applies registry-driven metadata.
+  - `src/components/AdminLayout.test.tsx` – verifies the admin shell includes a preview link to `/coming-soon`.
+  - `src/App.test.tsx` – verifies `/` still renders the full site and `/coming-soon` renders the coming-soon page.
+  - Verification runs:
+    - `npm run test -- --run src/pages/ComingSoon.test.tsx src/components/AdminLayout.test.tsx src/App.test.tsx`
+    - `npm run test`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – lines `117-125` (“Coming soon page split-text test matcher mismatch”).
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – lines `222-226` (“Coming soon page moved to `/coming-soon` with registry support”).
+- **Notes:**
+  - **Security review:** The new public route is static and registry-driven. It introduces no new inputs, auth changes, secrets, mutations, or network requests. Metadata updates are limited to `document.title` and the standard description meta tag. The admin preview shortcut is just an internal client-side link to the public route.
+  - **Performance review:** The new page is a lightweight presentational route with a small countdown interval, one image, and Framer Motion animations already used elsewhere in the site. No data fetching or heavy computation was added. Routing the page to `/coming-soon` preserves the existing homepage path and keeps testing flows for `/` unchanged.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md`, `workflow/Prompt.md`, and `docs/workflow/VMP_v2.1_Enhanced.txt`, including TDD, verification, failure logging, changelog update, and audit documentation.
+

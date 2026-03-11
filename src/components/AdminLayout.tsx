@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, Users, Palette } from "lucide-react";
+import { LayoutDashboard, Users, Palette, Rocket } from "lucide-react";
 
 /**
  * Layout for admin portal: header nav + outlet for /admin, /admin/customers, /admin/customers/:id, /admin/registry-editor.
@@ -44,6 +44,13 @@ export function AdminLayout() {
               <Palette className="h-4 w-4" />
               Registry Editor
             </NavLink>
+            <Link
+              to="/coming-soon"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <Rocket className="h-4 w-4" />
+              Coming Soon
+            </Link>
           </nav>
         </div>
       </header>

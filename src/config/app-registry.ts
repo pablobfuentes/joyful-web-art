@@ -8,6 +8,48 @@ export const APP_REGISTRY = {
   status: {
     loading: "Cargando..."
   },
+  comingSoon: {
+    metadata: {
+      title: "KumiBox | Muy pronto",
+      description: "KumiBox esta por llegar: skincare coreano curado, explicado paso a paso y entregado directo a tu puerta."
+    },
+    brand: {
+      name: "KumiBox",
+      emoji: "🦊"
+    },
+    launchDateIso: "2026-04-15T00:00:00",
+    badgeText: "Algo increible viene en camino",
+    headingPrefix: "Tu ritual coreano de skincare,",
+    headingHighlight: "directo a tu puerta",
+    description: "Estamos preparando algo especial para ti. Una caja de skincare coreano curada y explicada paso a paso, para que cuidar tu piel se sienta simple, divertido y efectivo.",
+    countdownLabels: {
+      days: "Dias",
+      hours: "Horas",
+      minutes: "Min",
+      seconds: "Seg"
+    },
+    featurePills: [
+      {
+        emoji: "🇰🇷",
+        text: "Directo de Seul"
+      },
+      {
+        emoji: "📦",
+        text: "Entrega cada 2 meses"
+      },
+      {
+        emoji: "🌿",
+        text: "Productos premium"
+      },
+      {
+        emoji: "📖",
+        text: "Guia paso a paso"
+      }
+    ],
+    socialCtaPrefix: "Siguenos en",
+    socialHandle: "@kumibox",
+    socialCtaSuffix: "para ser la primera en enterarte 💌"
+  },
   nav: {
     logoText: "KumiBox",
     logoEmoji: "🦊",
@@ -547,6 +589,10 @@ export const APP_REGISTRY = {
     noAccountText: "Todavia no tienes una cuenta?",
     signUpLink: "Registrarme",
     signUpHref: "/register",
+    socialDividerText: "o continua con",
+    googleButton: "Continuar con Google",
+    facebookButton: "Continuar con Facebook",
+    socialErrorGeneric: "No se pudo iniciar sesion con este proveedor. Intenta de nuevo.",
     errorTitle: "Error al iniciar sesion",
     errorGeneric: "Correo electronico o contrasena invalidos. Intenta de nuevo."
   },
@@ -566,6 +612,10 @@ export const APP_REGISTRY = {
     alreadyHaveAccount: "Ya tienes una cuenta?",
     signInLink: "Iniciar sesion",
     signInHref: "/login",
+    socialDividerText: "o continua con",
+    googleButton: "Continuar con Google",
+    facebookButton: "Continuar con Facebook",
+    socialErrorGeneric: "No se pudo iniciar sesion con este proveedor. Intenta de nuevo.",
     errorTitle: "Error al registrarte",
     errorGeneric: "No se pudo completar el registro. Intenta de nuevo."
   },

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function Login() {
   const { getSectionContent } = useRegistryContent();
@@ -14,7 +15,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const { signIn } = useAuth();
+  const [socialSubmitting, setSocialSubmitting] = useState(false);
+  const { signIn, signInWithOAuth } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
@@ -30,6 +32,17 @@ export default function Login() {
       return;
     }
     navigate(redirectTo.startsWith("/") ? redirectTo : "/", { replace: true });
+  }
+
+  async function handleOAuth(provider: "google" | "facebook") {
+    setError(null);
+    setSocialSubmitting(true);
+    const { error: err } = await signInWithOAuth(provider);
+    setSocialSubmitting(false);
+
+    if (err) {
+      setError(data.socialErrorGeneric);
+    }
   }
 
   return (
@@ -87,6 +100,16 @@ export default function Login() {
               {submitting ? data.submitLoading : data.submitButton}
             </Button>
           </form>
+          <div className="mt-6">
+            <SocialAuthButtons
+              dividerText={data.socialDividerText}
+              googleLabel={data.googleButton}
+              facebookLabel={data.facebookButton}
+              showFacebook={false}
+              disabled={submitting || socialSubmitting}
+              onProviderClick={handleOAuth}
+            />
+          </div>
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {data.noAccountText}{" "}
             <Link to={data.signUpHref} className="text-primary font-medium hover:underline">
