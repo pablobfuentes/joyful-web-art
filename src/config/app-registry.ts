@@ -15,9 +15,9 @@ export const APP_REGISTRY = {
     },
     brand: {
       name: "KumiBox",
-      emoji: "🦊"
+      imagePath: "Logo sin BG.png"
     },
-    launchDateIso: "2026-04-15T00:00:00",
+    launchDateIso: "2026-03-21T12:00:00",
     badgeText: "Algo increible viene en camino",
     headingPrefix: "Tu ritual coreano de skincare,",
     headingHighlight: "directo a tu puerta",
@@ -47,12 +47,12 @@ export const APP_REGISTRY = {
       }
     ],
     socialCtaPrefix: "Siguenos en",
-    socialHandle: "@kumibox",
+    socialHandle: "@kumibox.mx",
     socialCtaSuffix: "para ser la primera en enterarte 💌"
   },
   nav: {
     logoText: "KumiBox",
-    logoEmoji: "🦊",
+    logoImagePath: "Logo sin BG.png",
     announcementBar: "¡Envío GRATIS a todo México!",
     announcementBarEmoji: "",
     links: [

@@ -123,3 +123,54 @@
 - **Reproduction:** `npm run test -- --run src/pages/ComingSoon.test.tsx src/components/AdminLayout.test.tsx src/App.test.tsx`
 - **Fix attempt:** Update the test to assert rendered text content for the split brand name and to verify the social handle directly instead of assuming one uninterrupted text node.
 - **Verification:** `npm run test -- --run src/pages/ComingSoon.test.tsx src/components/AdminLayout.test.tsx src/App.test.tsx` passed, followed by a full `npm run test` pass.
+
+## Merge conflict broke app startup and blocked commits
+
+- **Date:** 2026-03-10
+- **Context:** Investigating why the app would not load locally and why commit/push was blocked after the coming-soon merge work.
+- **Error:** Vite and Vitest both failed to parse `src/App.tsx` because merge markers were still present; Git also reported unresolved conflicts (`UU src/App.tsx`, `AA src/pages/ComingSoon.tsx`).
+- **Root cause:** The branch was left in a partially merged state. `src/App.tsx` still contained conflict markers for the `/` vs `/coming-soon` routing decision, and `src/pages/ComingSoon.tsx` had an unresolved add/add conflict between the hardcoded imported page and the registry-driven version.
+- **Reproduction:** `git status --short --branch` and `npm run test -- --run src/App.test.tsx`
+- **Fix attempt:** Resolve both conflicted files by keeping the approved behavior: full site at `/`, coming soon at `/coming-soon`, and the registry-driven `ComingSoon` implementation.
+- **Verification:** Re-run `npm run test -- --run src/App.test.tsx src/pages/ComingSoon.test.tsx src/components/AdminLayout.test.tsx` and then the full `npm run test` suite; confirm `git status` no longer reports unmerged files.
+
+## Google sign-in button missing provider affordance
+
+- **Date:** 2026-03-11
+- **Context:** Improving the Google-only social sign-in UX so users can recognize the provider more quickly on the auth pages.
+- **Error:** The new red-phase test in `src/components/SocialAuthButtons.test.tsx` failed with `Unable to find an element by: [data-testid="google-logo"]`.
+- **Root cause:** `src/components/SocialAuthButtons.tsx` rendered the Google action as text-only, so there was no provider icon inside the shared button component used by both `Login` and `Register`.
+- **Reproduction:** `npm run test -- --run src/components/SocialAuthButtons.test.tsx`
+- **Fix attempt:** Add a shared inline Google SVG logo to `SocialAuthButtons` so every rendered Google button includes a visual provider cue without changing the auth logic.
+- **Verification:** `npm run test -- --run src/components/SocialAuthButtons.test.tsx src/pages/Login.test.tsx src/pages/Register.test.tsx` passed.
+
+## Coming soon countdown target still pointed at old launch date
+
+- **Date:** 2026-03-11
+- **Context:** Updating the coming-soon countdown to target March 21 at 12:00 PM.
+- **Error:** The new red-phase regression test failed because `APP_REGISTRY.comingSoon.launchDateIso` was still `2026-03-01T10:08:00`.
+- **Root cause:** The countdown target is registry-driven, but the launch timestamp in `src/config/app-registry.ts` had not been updated to the new requested date/time.
+- **Reproduction:** `npm run test -- --run src/pages/ComingSoon.test.tsx`
+- **Fix attempt:** Change `APP_REGISTRY.comingSoon.launchDateIso` to `2026-03-21T12:00:00` and re-run the focused test.
+- **Verification:** `npm run test -- --run src/pages/ComingSoon.test.tsx` passed.
+
+## Logo rendering still hardcoded to fox emoji
+
+- **Date:** 2026-03-11
+- **Context:** Replacing the fox emoji with the real `Logo sin BG.png` asset everywhere the brand logo appears and making those logo instances image-driven in the Registry Editor.
+- **Error:** New red-phase tests failed because both `Navbar` and `ComingSoon` still rendered `🦊` instead of an actual logo image, and `RegistryEditor` had no image-picker controls for those logo occurrences.
+- **Secondary test failures during implementation:** After the production fix, the original `ComingSoon` text matcher became ambiguous because the container and nested span both resolved to `KumiBox`, and the first `RegistryEditor` test approach depended on Radix tab activation that was unreliable in jsdom for this screen. The tests were tightened to assert the rendered logo image and the editor wiring directly instead of relying on ambiguous text or tab-state behavior.
+- **Root cause:** The registry modeled brand logos as text emoji fields (`nav.logoEmoji`, `comingSoon.brand.emoji`) and the UI rendered those fields directly. The editor therefore treated them as generic text content instead of branded image selections.
+- **Reproduction:** `npm run test -- --run src/components/Navbar.test.tsx src/pages/ComingSoon.test.tsx src/pages/RegistryEditor.test.tsx`
+- **Fix attempt:** Replace emoji-based logo registry fields with image-path fields, render logos through the registry image resolver, and add dedicated image-picker controls for each logo occurrence in `RegistryEditor`.
+- **Verification:** `npm run test -- --run src/components/Navbar.test.tsx src/pages/ComingSoon.test.tsx src/pages/RegistryEditor.test.tsx` passed; final `npm run test` passed for the full suite (28 files, 60 tests).
+
+## Coming soon page still showed stale logo/countdown from saved overrides
+
+- **Date:** 2026-03-11
+- **Context:** After switching the brand logo to `Logo sin BG.png`, the live coming-soon page still showed a misaligned logo, a `00-00-00-00` countdown, and the editor still surfaced the legacy fox icon path in saved content.
+- **Error:** New page-level regression tests showed two failures: the coming-soon brand lockup had no enforced vertical alignment hook, and stale saved content overrides could still carry `comingSoon.brand.emoji`, `nav.logoEmoji`, and the old `2026-03-01T10:08:00` launch date, which overrode the updated defaults.
+- **Root cause:** The registry loader accepted version-matching localStorage overrides without schema normalization. That let legacy fields survive after the registry shape changed, so the page and editor could drift from the current code until the user manually reset storage.
+- **Reproduction:** `npm run test -- --run src/pages/ComingSoon.test.tsx`
+- **Fix attempt:** Add a load-time normalization step in `RegistryContentContext` that migrates legacy logo/countdown overrides to the current schema and persists the cleaned result back to localStorage; update the coming-soon brand lockup to a flex-based centered row.
+- **Verification:** `npm run test -- --run src/pages/ComingSoon.test.tsx` passed (5 tests); final `npm run test` passed for the full suite (28 files, 62 tests).

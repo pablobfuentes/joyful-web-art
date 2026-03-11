@@ -750,6 +750,7 @@ export default function RegistryEditor() {
     if (!sectionData) return null;
 
     const controls: JSX.Element[] = [];
+    const sectionContent = getMergedSectionContent(sectionKey, content);
     const paletteOptions = getPaletteOptions();
     const gradientOptions = getGradientOptions();
     const shadowOptions = getShadowOptions();
@@ -782,6 +783,13 @@ export default function RegistryEditor() {
             </CardHeader>
             <CardContent className="space-y-4">
               {renderFontSelect("Font Family", [sectionKey, "logo", "fontFamily"], (logo.fontFamily as string) || "")}
+              {renderImagePathInput(
+                "Logo image",
+                (sectionContent.logoImagePath as string) || "",
+                (path) => updateContent([sectionKey, "logoImagePath"], path),
+                "e.g. Logo sin BG.png",
+                "nav-logo-image-path"
+              )}
             </CardContent>
           </Card>
         );
@@ -1300,6 +1308,7 @@ export default function RegistryEditor() {
       }
       if (sectionKey === "comingSoon") {
         const image = sectionData.image as Record<string, unknown> | undefined;
+        const brand = sectionContent.brand as Record<string, unknown> | undefined;
         if (image) {
           controls.push(
             <Card key="comingSoon-image">
@@ -1318,6 +1327,22 @@ export default function RegistryEditor() {
             </Card>
           );
         }
+        controls.push(
+          <Card key="comingSoon-brand-logo-image">
+            <CardHeader>
+              <CardTitle className="text-lg">Brand Logo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {renderImagePathInput(
+                "Brand logo image",
+                (brand?.imagePath as string) || "",
+                (path) => updateContent([sectionKey, "brand", "imagePath"], path),
+                "e.g. Logo sin BG.png",
+                "coming-soon-brand-logo-image-path"
+              )}
+            </CardContent>
+          </Card>
+        );
       }
     } else if (sectionKey === "footer") {
       const section = sectionData.section as Record<string, unknown> | undefined;
@@ -1342,7 +1367,10 @@ export default function RegistryEditor() {
   const renderContentControls = (sectionKey: string) => {
     const sectionContent = getMergedSectionContent(sectionKey, content);
     if (!sectionContent || typeof sectionContent !== "object" || Array.isArray(sectionContent)) return null;
-    const entries = getContentEntries(sectionContent, [sectionKey], [SECTION_DISPLAY_NAMES[sectionKey] ?? sectionKey]);
+    const hiddenImageContentPaths = new Set(["nav.logoImagePath", "comingSoon.brand.imagePath"]);
+    const entries = getContentEntries(sectionContent, [sectionKey], [SECTION_DISPLAY_NAMES[sectionKey] ?? sectionKey]).filter(
+      ({ path }) => !hiddenImageContentPaths.has(path.join("."))
+    );
     if (entries.length === 0) return null;
     const fontOptions = getFontOptions();
     const paletteOptions = getPaletteOptions();

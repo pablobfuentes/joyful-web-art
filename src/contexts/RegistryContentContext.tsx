@@ -74,9 +74,54 @@ function readContentOverrides(): Record<string, unknown> | null {
     const version = localStorage.getItem(CONTENT_VERSION_KEY);
     if (version !== String(CONTENT_STORAGE_VERSION)) return null;
     const raw = localStorage.getItem(CONTENT_STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as Record<string, unknown>;
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const normalized = normalizeContentOverrides(parsed);
+      if (JSON.stringify(normalized) !== JSON.stringify(parsed)) {
+        localStorage.setItem(CONTENT_STORAGE_KEY, JSON.stringify(normalized));
+      }
+      return normalized;
+    }
   } catch (_) {}
   return null;
+}
+
+function normalizeContentOverrides(overrides: Record<string, unknown>): Record<string, unknown> {
+  const normalized = JSON.parse(JSON.stringify(overrides)) as Record<string, unknown>;
+
+  const nav = normalized.nav;
+  if (nav && typeof nav === "object" && !Array.isArray(nav)) {
+    const navRecord = nav as Record<string, unknown>;
+    if (
+      typeof navRecord.logoEmoji === "string" &&
+      (typeof navRecord.logoImagePath !== "string" || !navRecord.logoImagePath.trim())
+    ) {
+      navRecord.logoImagePath = APP_REGISTRY.nav.logoImagePath;
+    }
+    delete navRecord.logoEmoji;
+  }
+
+  const comingSoon = normalized.comingSoon;
+  if (comingSoon && typeof comingSoon === "object" && !Array.isArray(comingSoon)) {
+    const comingSoonRecord = comingSoon as Record<string, unknown>;
+    if (comingSoonRecord.launchDateIso === "2026-03-01T10:08:00") {
+      comingSoonRecord.launchDateIso = APP_REGISTRY.comingSoon.launchDateIso;
+    }
+
+    const brand = comingSoonRecord.brand;
+    if (brand && typeof brand === "object" && !Array.isArray(brand)) {
+      const brandRecord = brand as Record<string, unknown>;
+      if (
+        typeof brandRecord.emoji === "string" &&
+        (typeof brandRecord.imagePath !== "string" || !brandRecord.imagePath.trim())
+      ) {
+        brandRecord.imagePath = APP_REGISTRY.comingSoon.brand.imagePath;
+      }
+      delete brandRecord.emoji;
+    }
+  }
+
+  return normalized;
 }
 
 function readContentModifiers(): ContentModifiers {

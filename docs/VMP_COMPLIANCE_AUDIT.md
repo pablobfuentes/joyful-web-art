@@ -255,3 +255,79 @@
   - **Performance review:** The new page is a lightweight presentational route with a small countdown interval, one image, and Framer Motion animations already used elsewhere in the site. No data fetching or heavy computation was added. Routing the page to `/coming-soon` preserves the existing homepage path and keeps testing flows for `/` unchanged.
   - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md`, `workflow/Prompt.md`, and `docs/workflow/VMP_v2.1_Enhanced.txt`, including TDD, verification, failure logging, changelog update, and audit documentation.
 
+## 2026-03-11 – Google sign-in logo affordance
+
+- **Feature:** Add a Google logo to the `Continuar con Google` button so the provider is easier to spot and understand on the auth pages.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/components/SocialAuthButtons.test.tsx` – verifies the shared Google button renders a logo and still dispatches the `google` provider on click.
+  - `src/pages/Login.test.tsx` – verifies the login page still renders the Google action correctly.
+  - `src/pages/Register.test.tsx` – verifies the register page still renders the Google action correctly.
+  - Verification runs:
+    - `npm run test -- --run src/components/SocialAuthButtons.test.tsx src/pages/Login.test.tsx src/pages/Register.test.tsx`
+    - `npm run test`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Google sign-in button missing provider affordance”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Google sign-in: add provider logo affordance”.
+- **Notes:**
+  - **Security review:** This change is presentational only. It does not alter OAuth providers, callback URLs, token handling, redirect validation, or any Supabase auth configuration.
+  - **Performance review:** The added inline SVG is negligible in size and removes the need for an extra image request. Runtime cost is effectively unchanged.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus the existing repo workflow/tests with TDD, immediate failure logging, changelog update, and audit documentation.
+
+## 2026-03-11 – Coming soon countdown target moved to March 21 noon
+
+- **Feature:** Update the coming-soon countdown so it counts down to March 21 at `12:00 PM`.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/pages/ComingSoon.test.tsx` – verifies the coming-soon page still renders normally and now locks the registry launch date to `2026-03-21T12:00:00`.
+  - Verification runs:
+    - `npm run test -- --run src/pages/ComingSoon.test.tsx`
+    - `npm run test`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Coming soon countdown target still pointed at old launch date”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Coming soon countdown target updated to March 21 at noon”.
+- **Notes:**
+  - **Security review:** This change only updates a registry timestamp used by a public countdown. It does not affect auth, routing, external integrations, or data handling.
+  - **Performance review:** No runtime logic was added; the existing countdown already recalculates against the configured target date. The change is effectively zero-cost beyond the normal one-second interval already in place.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus the existing repo workflow/tests with TDD, immediate failure logging, changelog update, and audit documentation.
+
+## 2026-03-11 – Brand logos switched to real image assets
+
+- **Feature:** Replace the fox emoji with the real `Logo sin BG.png` asset everywhere the product logo appears, and make each logo occurrence editable as an image in `RegistryEditor`.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/components/Navbar.test.tsx` – verifies the navbar renders the configured brand logo image.
+  - `src/pages/ComingSoon.test.tsx` – verifies the coming-soon page renders the configured brand logo image while keeping the existing registry-driven copy and metadata coverage.
+  - `src/pages/RegistryEditor.test.tsx` – verifies the editor wiring contains dedicated image-picker controls for the navigation logo and the coming-soon brand logo.
+  - Verification runs:
+    - `npm run test -- --run src/components/Navbar.test.tsx src/pages/ComingSoon.test.tsx src/pages/RegistryEditor.test.tsx`
+    - `npm run test`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Logo rendering still hardcoded to fox emoji”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Brand logo system: replace fox emoji with real image and make logo pickers editable in RegistryEditor”.
+- **Notes:**
+  - **Security review:** This change is limited to registry-configured image paths rendered through the existing image resolver. It introduces no new auth flow, no executable content, no new external requests beyond normal image loading, and no new user-controlled input outside the existing admin/editor workflow.
+  - **Performance review:** The navbar and coming-soon page now render a small static image instead of a single emoji glyph. The added cost is negligible, and because the default asset lives in `/public`, the browser can cache it normally across both routes. The new shared `BrandLogo` component also centralizes logo resolution instead of duplicating logic.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus the existing repo workflow/tests with TDD, immediate failure logging, changelog update, and audit documentation.
+
+## 2026-03-11 – Coming soon stale-override migration and brand alignment
+
+- **Feature:** Fix the remaining coming-soon issues caused by stale saved registry overrides and align the title/logo lockup vertically.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/pages/ComingSoon.test.tsx` – verifies the page renders the aligned brand lockup and migrates stale saved logo/countdown overrides so the live page still shows the current image logo and future countdown target.
+  - Verification runs:
+    - `npm run test -- --run src/pages/ComingSoon.test.tsx`
+    - `npm run test`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Coming soon page still showed stale logo/countdown from saved overrides”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Coming soon follow-up: migrate stale saved overrides and align brand lockup”.
+- **Notes:**
+  - **Security review:** The migration step only normalizes known registry content keys already stored in localStorage. It does not expand privileges, execute arbitrary data, or introduce new external inputs. The logic is narrowly scoped to the known legacy logo/countdown fields for safe schema evolution.
+  - **Performance review:** The normalization runs once during content override load and performs a tiny JSON clone/object cleanup. Runtime cost is negligible, and it reduces future drift/debugging cost by self-healing stale content instead of repeatedly rendering outdated values.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus the existing repo workflow/tests with TDD, immediate failure logging, changelog update, and audit documentation.
+

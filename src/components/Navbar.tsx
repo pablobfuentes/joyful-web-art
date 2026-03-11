@@ -6,6 +6,7 @@ import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import BrandLogo from "@/components/BrandLogo";
 
 /** Ensures nav/footer links are always an array (handles object shape from registry or localStorage). */
 function ensureLinks(
@@ -52,13 +53,11 @@ const Navbar = () => {
 
       <div className="container mx-auto flex items-center justify-between py-3 px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 group">
-          <motion.span
-            className="text-3xl"
-            animate={{ rotate: [0, -10, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-          >
-            {data?.logoEmoji ?? "🦊"}
-          </motion.span>
+          <BrandLogo
+            name={data?.logoText ?? "KumiBox"}
+            imagePath={typeof data?.logoImagePath === "string" ? data.logoImagePath : undefined}
+            className="h-10 w-10 object-contain"
+          />
           <span className="font-display text-2xl font-bold text-gradient">
             {data?.logoText ?? ""}
           </span>

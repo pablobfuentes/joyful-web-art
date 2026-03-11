@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import heroImage from "@/assets/hero-skincare.jpg";
+import BrandLogo from "@/components/BrandLogo";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useStyleRegistry } from "@/contexts/StyleRegistryContext";
 import { resolveRegistryImageSrc } from "@/lib/registry-images";
@@ -119,13 +120,18 @@ const ComingSoon = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="mb-6"
+            className="mb-6 flex items-center justify-center gap-3"
+            data-testid="coming-soon-brand-lockup"
           >
             <span className="font-display text-5xl font-bold tracking-tight text-foreground sm:text-6xl">
               {data.brand.name.slice(0, 4)}
               <span className="text-primary">{data.brand.name.slice(4)}</span>
             </span>
-            <span className="ml-2 text-4xl sm:text-5xl">{data.brand.emoji}</span>
+            <BrandLogo
+              name={data.brand.name}
+              imagePath={typeof data.brand.imagePath === "string" ? data.brand.imagePath : undefined}
+              className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14"
+            />
           </motion.div>
 
           <motion.div
