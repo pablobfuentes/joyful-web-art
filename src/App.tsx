@@ -9,6 +9,7 @@ import { StyleRegistryProvider } from "@/contexts/StyleRegistryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import { AdminLayout } from "@/components/AdminLayout";
+import ComingSoon from "./pages/ComingSoon";
 import Index from "./pages/Index";
 import RegistryEditor from "./pages/RegistryEditor";
 import AdminOverview from "./pages/admin/AdminOverview";
