@@ -42,7 +42,8 @@ const App = () => (
           <RegistryContentProvider>
             <StyleRegistryProvider>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<ComingSoon />} />
+                <Route path="/full-site" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
