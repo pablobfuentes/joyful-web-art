@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 function formatDate(iso: string) {
   try {
-    return new Date(iso).toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString("es-MX", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -30,7 +30,7 @@ export default function SubscriptionManagement() {
           <div className="flex items-center gap-2">
             <Link
               to="/dashboard"
-              aria-label="Back to dashboard"
+              aria-label="Volver al panel"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               ←

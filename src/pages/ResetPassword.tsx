@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
+import { APP_REGISTRY } from "@/config/app-registry";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,7 @@ export default function ResetPassword() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="pt-28 pb-16 flex items-center justify-center">
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{APP_REGISTRY.status.loading}</p>
         </main>
       </div>
     );

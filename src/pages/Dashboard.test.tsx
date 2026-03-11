@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { describe, it, expect } from "vitest";
+import { screen } from "@testing-library/react";
 import Dashboard from "./Dashboard";
 import { APP_REGISTRY } from "@/config/app-registry";
+import { renderWithAuth } from "@/test/render-with-auth";
 
 const mockUser = {
   id: "user-1",
@@ -12,33 +11,39 @@ const mockUser = {
   user_metadata: { full_name: "Test User" },
 };
 
-vi.mock("@/lib/supabase", () => ({
-  supabase: {
-    auth: {
-      getSession: () =>
-        Promise.resolve({
-          data: {
-            session: {
-              user: mockUser,
-            },
-          },
-        }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    },
-  },
-}));
-
 function renderDashboard() {
-  return render(
-    <MemoryRouter>
-      <AuthProvider>
-        <Dashboard />
-      </AuthProvider>
-    </MemoryRouter>,
-  );
+  return renderWithAuth(<Dashboard />, {
+    auth: {
+      user: mockUser,
+    },
+  });
 }
 
 describe("Dashboard", () => {
+  it("renders dashboard actions in Spanish", async () => {
+    renderDashboard();
+    await screen.findByText(mockUser.email);
+
+    expect(
+      screen.getByRole("heading", { name: "Acciones rapidas" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Historial de pedidos" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Suscripcion" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Configuracion" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Notificaciones" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("button", { name: "Cerrar sesion" }).length,
+    ).toBeGreaterThanOrEqual(1);
+  });
+
   it("renders welcome and account information from app registry", async () => {
     renderDashboard();
     expect(

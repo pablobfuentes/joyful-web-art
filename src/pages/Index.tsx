@@ -7,6 +7,7 @@ import CompatibilityTestSection from "@/components/CompatibilityTestSection";
 import WhatYouReceiveSection from "@/components/WhatYouReceiveSection";
 import PastEditionsSection from "@/components/PastEditionsSection";
 import ExperienceSection from "@/components/ExperienceSection";
+import DeliveryWindowsSection from "@/components/DeliveryWindowsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
@@ -43,6 +44,7 @@ const Index = () => {
   const whatDiv = registry.whatYouReceive.divider!;
   const pastDiv = registry.pastEditions.divider!;
   const expDiv = registry.experience.divider!;
+  const deliveryDiv = registry.deliveryWindows.divider!;
   const testDiv = registry.testimonials.divider!;
   const priceDiv = registry.pricing.divider!;
   const faqDiv = registry.faq.divider!;
@@ -92,6 +94,12 @@ const Index = () => {
         topColor={`hsl(var(--palette-${expDiv.topColorIndex}))`}
         bottomColor={`hsl(var(--palette-${expDiv.bottomColorIndex}))`}
         variant={DIVIDER_VARIANT_MAP[expDiv.style] ?? "wave2"}
+      />
+      <DeliveryWindowsSection />
+      <WaveDivider
+        topColor={`hsl(var(--palette-${deliveryDiv.topColorIndex}))`}
+        bottomColor={`hsl(var(--palette-${deliveryDiv.bottomColorIndex}))`}
+        variant={DIVIDER_VARIANT_MAP[deliveryDiv.style] ?? "wave2"}
       />
       <TestimonialsSection />
       <WaveDivider

@@ -1,18 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import { render, screen } from "@testing-library/react";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { screen } from "@testing-library/react";
 import { APP_REGISTRY } from "@/config/app-registry";
 import OrderHistory from "./OrderHistory";
+import { renderWithAuth } from "@/test/render-with-auth";
 
 function renderOrderHistory() {
-  return render(
-    <MemoryRouter>
-      <AuthProvider>
-        <OrderHistory />
-      </AuthProvider>
-    </MemoryRouter>,
-  );
+  return renderWithAuth(<OrderHistory />);
 }
 
 describe("OrderHistory page", () => {
@@ -37,7 +30,7 @@ describe("OrderHistory page", () => {
       screen.getByText(APP_REGISTRY.orderHistory.emptyStateDescription),
     ).toBeInTheDocument();
 
-    const backLink = screen.getByRole("link", { name: "Back to dashboard" });
+    const backLink = screen.getByRole("link", { name: "Volver al panel" });
     expect(backLink).toHaveAttribute("href", "/dashboard");
   });
 });

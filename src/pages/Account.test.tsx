@@ -1,9 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { describe, it, expect } from "vitest";
+import { screen } from "@testing-library/react";
 import Account from "./Account";
 import { APP_REGISTRY } from "@/config/app-registry";
+import { renderWithAuth } from "@/test/render-with-auth";
 
 const mockUser = {
   id: "user-1",
@@ -12,30 +11,12 @@ const mockUser = {
   user_metadata: { full_name: "Test User" },
 };
 
-vi.mock("@/lib/supabase", () => ({
-  supabase: {
-    auth: {
-      getSession: () =>
-        Promise.resolve({
-          data: {
-            session: {
-              user: mockUser,
-            },
-          },
-        }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    },
-  },
-}));
-
 function renderAccount() {
-  return render(
-    <MemoryRouter>
-      <AuthProvider>
-        <Account />
-      </AuthProvider>
-    </MemoryRouter>,
-  );
+  return renderWithAuth(<Account />, {
+    auth: {
+      user: mockUser,
+    },
+  });
 }
 
 describe("Account", () => {

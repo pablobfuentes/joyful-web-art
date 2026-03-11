@@ -28,11 +28,11 @@ const Navbar = () => {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const displayName =
-    (user?.user_metadata?.full_name as string | undefined) || user?.email?.split("@")[0] || "Account";
+    (user?.user_metadata?.full_name as string | undefined) || user?.email?.split("@")[0] || "Cuenta";
 
   const links = ensureLinks(data?.links);
-  const logIn = data?.logIn && typeof data.logIn === "object" ? data.logIn : { label: "Log in", href: "/login" };
-  const getStarted = data?.getStarted && typeof data.getStarted === "object" ? data.getStarted : { label: "Get started", href: "/register" };
+  const logIn = data?.logIn && typeof data.logIn === "object" ? data.logIn : { label: "Iniciar sesion", href: "/login" };
+  const getStarted = data?.getStarted && typeof data.getStarted === "object" ? data.getStarted : { label: "Registrarme", href: "/register" };
 
   async function handleLogOut() {
     await signOut();
@@ -88,7 +88,7 @@ const Navbar = () => {
                 onClick={handleLogOut}
                 className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
               >
-                {typeof dashboardData?.logOut === "string" ? dashboardData.logOut : "Log out"}
+                {typeof dashboardData?.logOut === "string" ? dashboardData.logOut : "Cerrar sesion"}
               </button>
             </>
           ) : (
@@ -97,14 +97,14 @@ const Navbar = () => {
                 to={logIn.href ?? "/login"}
                 className="px-4 py-2 rounded-[var(--nav-cta-radius)] text-sm font-semibold text-[hsl(var(--nav-link-color))] hover:bg-[hsl(var(--nav-link-hover-bg))] hover:text-[hsl(var(--nav-link-hover-text))] transition-all duration-300"
               >
-                {logIn.label ?? "Log in"}
+                {logIn.label ?? "Iniciar sesion"}
               </Link>
               <motion.div whileHover={{ scale: 1.08, rotate: -2 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   to={getStarted.href ?? "/register"}
                   className="gradient-warm px-6 py-2.5 rounded-[var(--nav-cta-radius)] text-sm font-bold text-primary-foreground shadow-playful hover:shadow-card-hover transition-shadow inline-block"
                 >
-                  {getStarted.label ?? "Get started"}
+                  {getStarted.label ?? "Registrarme"}
                 </Link>
               </motion.div>
             </>
@@ -115,7 +115,7 @@ const Navbar = () => {
         <div className="md:hidden flex items-center">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-foreground" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="text-foreground" aria-label="Abrir menu">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
@@ -152,7 +152,7 @@ const Navbar = () => {
                       }}
                       className={`${navLinkClass} py-3 min-h-[44px] text-left w-full flex items-center`}
                     >
-                      {typeof dashboardData?.logOut === "string" ? dashboardData.logOut : "Log out"}
+                      {typeof dashboardData?.logOut === "string" ? dashboardData.logOut : "Cerrar sesion"}
                     </button>
                   </>
                 ) : (
@@ -162,14 +162,14 @@ const Navbar = () => {
                       className={`${navLinkClass} py-3 min-h-[44px] flex items-center`}
                       onClick={() => setMobileOpen(false)}
                     >
-                      {logIn.label ?? "Log in"}
+                      {logIn.label ?? "Iniciar sesion"}
                     </Link>
                     <Link
                       to={getStarted.href ?? "/register"}
                       className="gradient-warm px-6 py-3 rounded-[var(--nav-cta-radius)] text-sm font-bold text-primary-foreground shadow-playful min-h-[44px] flex items-center justify-center"
                       onClick={() => setMobileOpen(false)}
                     >
-                      {getStarted.label ?? "Get started"}
+                      {getStarted.label ?? "Registrarme"}
                     </Link>
                   </>
                 )}

@@ -12,7 +12,7 @@ import Navbar from "@/components/Navbar";
 function formatDate(iso: string | undefined) {
   if (!iso) return "—";
   try {
-    return new Date(iso).toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString("es-MX", {
       year: "numeric",
       month: "long",
       day: "numeric",

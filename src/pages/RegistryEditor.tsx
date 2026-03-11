@@ -30,8 +30,9 @@ const SECTION_DISPLAY_NAMES: Record<string, string> = {
   howItWorks: "How It Works",
   compatibilityTest: "Compatibility Test",
   whatYouReceive: "What You Receive",
-  pastEditions: "Past Editions",
+  pastEditions: "Ediciones pasadas",
   experience: "Experience",
+  deliveryWindows: "Delivery Windows",
   testimonials: "Testimonials",
   pricing: "Pricing",
   faq: "FAQ",
@@ -40,10 +41,10 @@ const SECTION_DISPLAY_NAMES: Record<string, string> = {
   login: "Login",
   register: "Register",
   forgotPassword: "Forgot Password",
-  resetPassword: "Reset Password",
+  resetPassword: "Restablecer contrasena",
   dashboard: "Dashboard",
   checkout: "Checkout",
-  account: "Account",
+  account: "Cuenta",
   page: "Page",
 };
 
@@ -1035,7 +1036,7 @@ export default function RegistryEditor() {
       if (sectionData.divider) {
         controls.push(renderDividerControls(sectionKey, sectionData.divider as Record<string, unknown>));
       }
-    } else if (sectionKey === "compatibilityTest" || sectionKey === "pricing" || sectionKey === "finalCta" || sectionKey === "faq" || sectionKey === "whatYouReceive" || sectionKey === "pastEditions" || sectionKey === "experience" || sectionKey === "testimonials") {
+    } else if (sectionKey === "compatibilityTest" || sectionKey === "pricing" || sectionKey === "finalCta" || sectionKey === "faq" || sectionKey === "whatYouReceive" || sectionKey === "pastEditions" || sectionKey === "experience" || sectionKey === "deliveryWindows" || sectionKey === "testimonials") {
       const section = sectionData.section as Record<string, unknown> | undefined;
       if (section && typeof section.backgroundIndex === "number") {
         controls.push(

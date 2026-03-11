@@ -1,18 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import { render, screen } from "@testing-library/react";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { screen } from "@testing-library/react";
 import { APP_REGISTRY } from "@/config/app-registry";
 import SubscriptionManagement from "./SubscriptionManagement";
+import { renderWithAuth } from "@/test/render-with-auth";
 
 function renderSubscriptionManagement() {
-  return render(
-    <MemoryRouter>
-      <AuthProvider>
-        <SubscriptionManagement />
-      </AuthProvider>
-    </MemoryRouter>,
-  );
+  return renderWithAuth(<SubscriptionManagement />);
 }
 
 describe("SubscriptionManagement page", () => {
@@ -33,7 +26,7 @@ describe("SubscriptionManagement page", () => {
       screen.getByText(APP_REGISTRY.subscriptionManagement.body),
     ).toBeInTheDocument();
 
-    const backLink = screen.getByRole("link", { name: "Back to dashboard" });
+    const backLink = screen.getByRole("link", { name: "Volver al panel" });
     expect(backLink).toHaveAttribute("href", "/dashboard");
   });
 });

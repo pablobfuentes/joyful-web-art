@@ -14,7 +14,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-2">
             <Link
               to="/dashboard"
-              aria-label="Back to dashboard"
+              aria-label="Volver al panel"
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               ←

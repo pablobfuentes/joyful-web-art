@@ -84,7 +84,7 @@ export default function Login() {
               </Link>
             </div>
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Signing in..." : data.submitButton}
+              {submitting ? data.submitLoading : data.submitButton}
             </Button>
           </form>
           <p className="mt-6 text-center text-sm text-muted-foreground">

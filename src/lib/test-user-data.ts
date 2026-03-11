@@ -34,7 +34,7 @@ export type TestUserData = {
 };
 
 const DEFAULT_PLAN_ID = "kumibox-monthly";
-const DEFAULT_PLAN_NAME = "KumiBox Monthly";
+const DEFAULT_PLAN_NAME = "KumiBox mensual";
 
 function addMonths(date: Date, months: number): Date {
   const out = new Date(date);

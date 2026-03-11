@@ -170,6 +170,7 @@ export function applyStyleRegistry(registry: StyleRegistry): void {
   experienceCards.forEach((card: { backgroundIndex: number }, i: number) => {
     root.style.setProperty(`--experience-card-${i}-bg`, getPaletteHsl(cells, card.backgroundIndex));
   });
+  root.style.setProperty("--deliveryWindows-section-bg", getPaletteHsl(cells, registry.deliveryWindows.section.backgroundIndex));
   root.style.setProperty("--testimonials-section-bg", getPaletteHsl(cells, registry.testimonials.section.backgroundIndex));
   const testimonialsCards = registry.testimonials.cards ?? (STYLE_REGISTRY.testimonials as { cards?: Array<{ backgroundIndex: number }> }).cards ?? [];
   testimonialsCards.forEach((card: { backgroundIndex: number }, i: number) => {

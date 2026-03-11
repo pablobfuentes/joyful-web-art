@@ -193,7 +193,7 @@ const TestimonialsSection = () => {
                     type="button"
                     onClick={prev}
                     className="p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-                    aria-label="Previous testimonial"
+                    aria-label="Testimonio anterior"
                   >
                     <ChevronLeft size={16} />
                   </button>
@@ -201,7 +201,7 @@ const TestimonialsSection = () => {
                     type="button"
                     onClick={next}
                     className="p-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-                    aria-label="Next testimonial"
+                    aria-label="Siguiente testimonio"
                   >
                     <ChevronRight size={16} />
                   </button>

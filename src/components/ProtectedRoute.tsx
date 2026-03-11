@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { APP_REGISTRY } from "@/config/app-registry";
 import { useAuth } from "@/hooks/useAuth";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -8,7 +9,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-[40vh] flex items-center justify-center">
-        <div className="animate-pulse font-display text-muted-foreground">Loading...</div>
+        <div className="animate-pulse font-display text-muted-foreground">
+          {APP_REGISTRY.status.loading}
+        </div>
       </div>
     );
   }

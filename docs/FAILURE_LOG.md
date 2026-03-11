@@ -1,5 +1,23 @@
 # Failure log
 
+## Vite config test discovery mismatch
+
+- **Date:** 2026-03-11
+- **Context:** Adding a regression test for the intermittent local `npm run dev` 404 caused by a port conflict on `8080`.
+- **Error:** `npm run test -- vite.config.test.ts` and then `npm run test -- src/vite.config.test.ts` both returned `No test files found, exiting with code 1`.
+- **Root cause:** This repository's Vitest setup only discovers tests under `src/**/*.{test,spec}.{ts,tsx}` and also excludes filenames matching `vite.config.*`, so both the root-level file and the renamed-in-place `src/vite.config.test.ts` were ignored. A follow-up import-based test then failed with an esbuild `TextEncoder ... instanceof Uint8Array` invariant violation because importing `vite.config.ts` in this test environment pulled in tooling code that jsdom/Vitest did not handle correctly.
+- **Fix:** Rename the regression test to a non-excluded filename under `src/` and assert against the `vite.config.ts` file contents directly instead of importing the config module.
+- **Verification:** Re-run the focused Vitest command against the relocated test file and confirm it executes.
+
+## Auth page test warnings cleanup
+
+- **Date:** 2026-03-10
+- **Context:** Removing auth-related React test warnings and finishing the Spanish sweep for customer-facing auth/loading states.
+- **Error:** The first test setup reused `AuthProvider` inside page tests, which triggered async session resolution during render and produced noisy auth-related warnings. A follow-up login test refactor also failed with `ReferenceError: Cannot access 'signInWithPassword' before initialization` because the `vi.mock()` factory referenced a non-hoisted top-level mock.
+- **Root cause:** The tests were mounting the live auth effect instead of supplying a fixed auth context value, so they inherited async provider behavior that the page assertions did not need. The login test then compounded this by using a hoisted module mock incorrectly.
+- **Fix:** Added `src/test/render-with-auth.tsx` to wrap test renders in a static `AuthContext.Provider` plus `MemoryRouter` future flags, then migrated the affected page tests to use that helper instead of `AuthProvider` or Supabase auth mocks.
+- **Verification:** `npm run test -- src/config/app-registry.localization.test.ts src/pages/Login.test.tsx src/pages/ResetPassword.test.tsx src/components/ProtectedRoute.test.tsx src/pages/Dashboard.test.tsx src/pages/Account.test.tsx src/pages/OrderHistory.test.tsx src/pages/SettingsPage.test.tsx src/pages/NotificationsPage.test.tsx src/pages/SubscriptionManagement.test.tsx` passed (`20` tests).
+
 ## 401 Unauthorized on create-checkout-session
 
 - **Date:** 2026-02-19
@@ -41,3 +59,17 @@
 - **Root cause:** `@testing-library/dom` was not installed even though it is a peer dependency of `@testing-library/react`. A first attempt to install it with `npm install -D @testing-library/dom` failed with an `ERESOLVE` peer-dependency conflict on `eslint` / `eslint-plugin-react-hooks`.
 - **Fix:** Install `@testing-library/dom` as a devDependency using `npm install -D @testing-library/dom --legacy-peer-deps` to bypass the peer-dependency conflict for this dev-only library.
 - **Verification:** Re-run the relevant Vitest command and confirm the missing-module error is gone and tests execute.
+
+## Delivery windows verification blockers
+
+- **Date:** 2026-03-10
+- **Context:** Implementing and verifying the new `When will I receive my Skincare?` landing-page section.
+- **Error 1:** A targeted test command failed to spawn with `Command failed to spawn: Aborted`.
+- **Root cause 1:** Transient shell/tooling spawn failure while invoking a single-test Vitest command.
+- **Fix attempt 1:** Re-ran the tests with a fresh command invocation; the targeted Vitest run completed successfully.
+- **Verification 1:** `npm run test -- --run src/components/DeliveryWindowsSection.test.tsx src/lib/delivery-windows.test.ts` passed.
+
+- **Error 2:** Live-page verification initially showed the delivery section was not actually between Experience and Testimonials because Testimonials was not rendering.
+- **Root cause 2:** `src/components/TestimonialsSection.tsx` contained a hardcoded `SHOW_TESTIMONIALS = false`, so the section intentionally returned `null`.
+- **Fix attempt 2:** Temporarily toggled the gate to `true` for live verification, confirmed placement and interaction behavior, then restored it to `false` per request. Updated the Testimonials test to match the intentional hidden-state final behavior.
+- **Verification 2:** Temporary live verification passed with Testimonials enabled; final codebase verification passed with `npm run test -- --run` and `npm run build` after restoring `SHOW_TESTIMONIALS = false`.
