@@ -1,5 +1,26 @@
 # Failure log
 
+## Checkout pricing anchor changed route but still landed at hero
+
+- **Date:** 2026-03-11
+- **Context:** Re-checking the checkout `Volver a planes` fix after the link target was updated but the live app still returned to the top hero section.
+- **Error:** The checkout link changed the URL back to `/#pricing`, but the app still landed at the top of the home page instead of scrolling to the pricing section.
+- **Secondary test failure during implementation:** The first regression-test attempt failed with `Failed to resolve import "@testing-library/user-event"` because this repository does not include that helper package.
+- **Root cause:** The React app had no router-aware hash-scroll behavior, so route changes with hashes updated the URL without triggering `scrollIntoView` for the target section. The test harness issue was separate and came from using a dependency that is not installed in this repo.
+- **Reproduction:** `npm run test -- --run src/components/HashScrollHandler.test.tsx`
+- **Fix attempt:** Add a global `HashScrollHandler` tied to `useLocation()` so `/#section` navigation scrolls to the matching element after route changes, and rewrite the regression test to use `fireEvent` instead of `@testing-library/user-event`.
+- **Verification:** `npm run test -- --run src/components/HashScrollHandler.test.tsx src/pages/CheckoutNavigation.test.tsx` passed.
+
+## Checkout pricing back-link used router navigation instead of a real anchor
+
+- **Date:** 2026-03-11
+- **Context:** Updating the checkout `Volver a planes` action so it reliably returns to the pricing section on the landing page.
+- **Error:** The new red-phase regression test failed because both checkout screens exposed buttons that called `navigate("/#pricing")`, so Testing Library could not find pricing back actions as links and the hash jump remained dependent on router behavior.
+- **Root cause:** Checkout-to-pricing navigation was implemented as imperative React Router navigation instead of real anchor links. That made hash-based section jumps less robust than the rest of the site’s pricing anchors and duplicated the same pattern in both `Checkout` and `CheckoutCancel`.
+- **Reproduction:** `npm run test -- --run src/pages/CheckoutNavigation.test.tsx`
+- **Fix attempt:** Replace both pricing return actions with real anchors pointing to `/#pricing` and add focused regression coverage for both pages.
+- **Verification:** `npm run test -- --run src/pages/CheckoutNavigation.test.tsx` passed.
+
 ## Vite config test discovery mismatch
 
 - **Date:** 2026-03-11
@@ -114,6 +135,66 @@
 - **Fix attempt:** Add conditional provider rendering so Google remains available while Facebook is hidden in the UI, keeping the auth-layer OAuth implementation intact for later re-enablement.
 - **Verification:** Re-run the focused auth-page tests and confirm Google is visible, Facebook is absent, and the Google click path still reaches `signInWithOAuth("google")`.
 
+## Hostinger deploy mirror still pointed at stale bundles
+
+- **Date:** 2026-03-10
+- **Context:** Starting the approved sync of the `Hostinger` deployment folder to the latest page build.
+- **Error:** The new regression test `src/hostinger-deploy-sync.test.ts` failed because `Hostinger/index.html` still referenced `/assets/index-Dmx6LUBb.js` and `/assets/index-CNNEYgXU.css` rather than the latest expected entry bundles.
+- **Root cause:** The `Hostinger` mirror had not been updated after the most recent frontend changes, so the deployable HTML and entry assets were stale.
+- **Reproduction:** `npm run test -- src/hostinger-deploy-sync.test.ts`
+- **Fix attempt:** Build the current production output, archive the replaced `Hostinger` entry files into `Hostinger/history`, and copy the latest built files into `Hostinger`.
+- **Verification:** Re-run the deploy-sync test and confirm `Hostinger/index.html` references the latest JS/CSS bundle names and those files exist in `Hostinger/assets`.
+
+## Hostinger sync test hardcoded an outdated latest bundle name
+
+- **Date:** 2026-03-10
+- **Context:** Refining the new deploy-sync regression test after generating the fresh production build.
+- **Error:** The first test version expected `index-DCegv0xG.js` / `index-eTEYPA51.css`, but the new build produced `index-Cm9BMrr-.js` / `index-CNNEYgXU.css`.
+- **Root cause:** The test used previously observed bundle hashes instead of deriving the current expected asset references from the fresh `dist/index.html`.
+- **Reproduction:** `npm run build` followed by `npm run test -- src/hostinger-deploy-sync.test.ts` with the hardcoded expected bundle names.
+- **Fix attempt:** Make the test read `dist/index.html`, extract the current JS/CSS entry assets dynamically, and compare the `Hostinger` mirror against those values.
+- **Verification:** Re-run the targeted test and confirm it now only fails when `Hostinger` differs from the latest freshly built `dist` output.
+
+## PowerShell command chaining mismatch during Hostinger sync
+
+- **Date:** 2026-03-10
+- **Context:** Inspecting `Hostinger` and `dist` just before the archive/copy step.
+- **Error:** A shell command failed with `The token '&&' is not a valid statement separator in this version.`
+- **Root cause:** The workspace shell is PowerShell, so the bash-style `&&` separator was not valid in that command context.
+- **Reproduction:** Use `Get-ChildItem ... && Get-ChildItem ...` in a `functions.Shell` call on this machine.
+- **Fix attempt:** Re-run the inspection command using PowerShell-compatible sequencing such as `;`.
+- **Verification:** Confirm the corrected directory-inspection command succeeds and the deployment sync continues normally.
+
+## Hostinger refresh automation missing package shortcut
+
+- **Date:** 2026-03-10
+- **Context:** Starting TDD for a one-command Hostinger refresh workflow.
+- **Error:** `src/hostinger-sync-script.test.ts` failed because `package.json` had no `hostinger:refresh` script.
+- **Root cause:** The Hostinger refresh was still a manual sequence with no package-level command wrapper.
+- **Reproduction:** `npm run test -- src/hostinger-sync-script.test.ts`
+- **Fix attempt:** Add a package script that wraps the build + Hostinger sync flow into one command.
+- **Verification:** Re-run the targeted automation test and confirm the package-script assertion passes.
+
+## Hostinger refresh automation missing PowerShell script
+
+- **Date:** 2026-03-10
+- **Context:** The same TDD cycle for Hostinger refresh automation.
+- **Error:** `src/hostinger-sync-script.test.ts` failed because `scripts/sync-hostinger.ps1` did not exist.
+- **Root cause:** There was no reusable script implementing the timestamped archive + copy behavior for `Hostinger`.
+- **Reproduction:** `npm run test -- src/hostinger-sync-script.test.ts`
+- **Fix attempt:** Create `scripts/sync-hostinger.ps1` with parameterized `Hostinger`/`dist` paths and timestamped history snapshots.
+- **Verification:** Re-run the targeted automation test and confirm the script existence/behavior assertions pass.
+
+## Hostinger refresh PowerShell script param block was in the wrong place
+
+- **Date:** 2026-03-10
+- **Context:** Re-running the focused Hostinger automation test after adding the first version of `scripts/sync-hostinger.ps1`.
+- **Error:** The script exited non-zero with `StrictModeFunctionCallWithParens` at the `param(` line.
+- **Root cause:** PowerShell requires the `param(...)` block to appear before executable statements. The initial script set strict mode and error preference before `param`, so the parser treated `param(` as an invalid function-style call.
+- **Reproduction:** `powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\sync-hostinger.ps1 ...`
+- **Fix attempt:** Move `param(...)` to the top of the script and apply strict-mode/error settings after parameter declaration.
+- **Verification:** Re-run the direct script command and `npm run test -- src/hostinger-sync-script.test.ts` and confirm the script exits cleanly and performs the expected sync.
+
 ## Coming soon page split-text test matcher mismatch
 
 - **Date:** 2026-03-10
@@ -174,3 +255,13 @@
 - **Reproduction:** `npm run test -- --run src/pages/ComingSoon.test.tsx`
 - **Fix attempt:** Add a load-time normalization step in `RegistryContentContext` that migrates legacy logo/countdown overrides to the current schema and persists the cleaned result back to localStorage; update the coming-soon brand lockup to a flex-based centered row.
 - **Verification:** `npm run test -- --run src/pages/ComingSoon.test.tsx` passed (5 tests); final `npm run test` passed for the full suite (28 files, 62 tests).
+
+## Footer delivery anchor and how-it-works CTA drift from stale public registry
+
+- **Date:** 2026-03-11
+- **Context:** Removing the `Ve un ejemplo de rutina` CTA and fixing the footer `Envíos` link after the live Hostinger build still rendered `href="#"`.
+- **Error:** The new red-phase tests failed because `HowItWorksSection` still rendered the sample-routine CTA, and `public/registry.json` still did not expose `Envíos -> #delivery-windows`. A follow-up regeneration attempt using `node --experimental-strip-types` failed immediately with `bad option: --experimental-strip-types`.
+- **Root cause:** Two separate sources of truth had drifted: `src/config/app-registry.ts` still defined the CTA, and the deployed/public file-backed registry still contained stale footer/navigation content. The first regeneration attempt also assumed Node could execute TypeScript directly, which this environment does not support.
+- **Reproduction:** `npm run test -- --run src/components/HowItWorksSection.test.tsx src/config/get-default-registry.test.ts`; `node --experimental-strip-types --input-type=module -e "..."`.
+- **Fix attempt:** Hide the CTA at the source registry level, guard the component so empty CTA data does not render, and regenerate `public/registry.json` from the current TS registry sources using a source-text parsing approach instead of direct TS execution.
+- **Verification:** Re-run the focused Vitest command plus `npm run build` after regenerating the public registry.

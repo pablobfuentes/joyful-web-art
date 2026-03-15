@@ -9,6 +9,7 @@ import { StyleRegistryProvider } from "@/contexts/StyleRegistryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import { AdminLayout } from "@/components/AdminLayout";
+import HashScrollHandler from "@/components/HashScrollHandler";
 import ComingSoon from "./pages/ComingSoon";
 import Index from "./pages/Index";
 import RegistryEditor from "./pages/RegistryEditor";
@@ -41,6 +42,7 @@ const App = () => (
         <AuthProvider>
           <RegistryContentProvider>
             <StyleRegistryProvider>
+              <HashScrollHandler />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/coming-soon" element={<ComingSoon />} />

@@ -1,5 +1,35 @@
 # Change Log
 
+## [Unreleased] — Admin-only Export Users CSV
+
+### Rationale
+- Admin-only feature to export all customer/service data into a single CSV for operations and customer service. Access enforced by RLS; no backend endpoint or secrets in client.
+
+### Changes
+- **DB:** `docs/supabase_admin_export_customers_view.sql` — New view `admin_export_customers` (one row per user) joining profiles, get_user_email, subscriptions, order count, last_payment_date, admin_notes aggregate, next order and last shipment laterals. Run in Supabase SQL Editor after Phase 1 and Phase 2.
+- **`docs/PLAN_EXPORT_USERS_CSV.md`:** Implementation plan, field mapping, and migration reference.
+- **`src/lib/admin-export-csv.ts`:** Fetch all rows from view (chunked 500), build CSV with human-readable headers, date format YYYY-MM-DD HH:mm, filename `users_export_YYYY-MM-DD_HH-mm.csv`, download with BOM for Excel/Sheets.
+- **`src/pages/admin/AdminCustomers.tsx`:** "Export Customer Data" button (primary); loading state and success/error message; existing "Export CSV (page)" unchanged.
+- **`src/lib/admin-export-csv.test.ts`:** Tests for fetchAllExportRows (chunking), buildAndDownloadCsv (headers + filename), runExportCustomerData (fetch + download flow), and error propagation.
+
+### Verification
+- `npm run test -- --run src/lib/admin-export-csv.test.ts` passes (5 tests). After running the new SQL migration in Supabase, as admin: open /admin/customers → "Export Customer Data" → CSV downloads with one row per user and expected columns; open in Excel/Sheets to confirm.
+
+---
+
+## [Unreleased] — Homepage SEO copy comparison document
+
+### Rationale
+- User requested a side-by-side review artifact for conversion-first homepage SEO copy decisions before any page or registry implementation.
+
+### Changes
+- **`docs/HOMEPAGE_SEO_COPY_COMPARISON.md`:** Added a review-only comparison document covering homepage metadata, hero copy, pricing intro, selected FAQ rewrites, trust-block proposal, final CTA refinements, and an approval matrix. The document compares current copy vs proposed copy and explains why each recommendation supports SEO and conversion.
+
+### Verification
+- Confirmed the document was created in `docs/` only. No page code, component code, or registry content was modified as part of this request.
+
+---
+
 ## [Unreleased] — Mobile-only Past Editions + Experience optimizations
 
 ### Rationale
@@ -292,3 +322,64 @@
   - Google button visible.
   - No Facebook button or Facebook text rendered.
   - Clicking Google redirects to Google Accounts with Supabase callback `https://rtnispswkyybiliynezz.supabase.co/auth/v1/callback`.
+
+---
+
+## [Unreleased] — Hostinger deploy folder refreshed from latest build with in-place history snapshot
+
+### Rationale
+- The `Hostinger` upload folder was stale and still referenced an older built JS entry bundle than the current production build.
+- The old deploy surface needed to be preserved for rollback, but the live upload folder needed the latest generated `index.html` and `assets`.
+
+### Changes
+- **Regression test (`src/hostinger-deploy-sync.test.ts`):**
+  - Added a focused file-system test that reads `dist/index.html`, extracts the current JS/CSS entry asset names, and verifies `Hostinger/index.html` references the same files and that those files exist under `Hostinger/assets`.
+- **Build output refresh:**
+  - Ran `npm run build` to generate the latest production output in `dist/`.
+- **Hostinger archive + sync:**
+  - Created `Hostinger/history/20260311-224505/`.
+  - Moved the previous `Hostinger/index.html` and full `Hostinger/assets/` directory into that timestamped history snapshot.
+  - Copied the fresh `dist/index.html` and `dist/assets/` back into `Hostinger/`.
+- **Workflow docs/logs:**
+  - Logged the stale-deploy red phase, the stale hardcoded bundle test assumption, and the PowerShell command-separator mismatch.
+
+### Verification
+- `npm run build` passes.
+- `npm run test -- src/hostinger-deploy-sync.test.ts` passes.
+- `Hostinger/index.html` now references:
+  - `/assets/index-Cm9BMrr-.js`
+  - `/assets/index-CNNEYgXU.css`
+- The previous generated deploy surface is archived at `Hostinger/history/20260311-224505/`.
+
+---
+
+## [Unreleased] — One-command Hostinger refresh automation
+
+### Rationale
+- The Hostinger refresh workflow was still manual even after the deploy-sync regression test was added.
+- A single command is safer and faster than repeating build/archive/copy steps by hand, especially with timestamped history snapshots.
+
+### Changes
+- **PowerShell script (`scripts/sync-hostinger.ps1`):**
+  - Added a parameterized script that refreshes `Hostinger` from `dist`.
+  - Supports optional `-HostingerDir`, `-DistDir`, and `-Timestamp` arguments for testability and controlled snapshots.
+  - Moves the current generated deploy surface (`index.html` and `assets/`) into `Hostinger/history/<timestamp>/`.
+  - Copies the latest `dist/index.html` and `dist/assets/` back into `Hostinger/`.
+- **Package scripts (`package.json`):**
+  - Added `hostinger:sync` to run the PowerShell sync script directly.
+  - Added `hostinger:refresh` to run `build` and then `hostinger:sync` in one command.
+- **Tests (`src/hostinger-sync-script.test.ts`):**
+  - Added coverage that asserts `package.json` exposes the one-command script.
+  - Added a temp-directory integration test that executes the PowerShell script and verifies:
+    - old generated deploy files are archived,
+    - new built files are copied in,
+    - non-generated Hostinger files are preserved.
+
+### Verification
+- `npm run test -- src/hostinger-sync-script.test.ts` passes (2 tests).
+- `npm run hostinger:refresh` passes end-to-end.
+- `npm run test -- src/hostinger-sync-script.test.ts src/hostinger-deploy-sync.test.ts` passes (3 tests).
+- `Hostinger/index.html` now references:
+  - `/assets/index-MQghwU3t.js`
+  - `/assets/index-CQTMGJSs.css`
+- The latest real refresh snapshot is archived at `Hostinger/history/20260312-095329/`.

@@ -91,14 +91,14 @@ export default function Checkout() {
       <main className="relative z-10 pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Back link */}
-          <motion.button
-            onClick={() => navigate("/#pricing")}
+          <motion.a
+            href="/#pricing"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="text-muted-foreground hover:text-foreground font-bold mb-6 inline-block transition-colors"
           >
             {data.backLink}
-          </motion.button>
+          </motion.a>
 
           <AnimatePresence mode="wait">
             <motion.div

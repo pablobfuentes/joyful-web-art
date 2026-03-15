@@ -57,3 +57,51 @@
 - **Reproduction**: Run `npm run test -- src/pages/Login.test.tsx src/pages/Register.test.tsx` after changing the tests to expect Google visible and Facebook hidden.
 - **Fix attempt**: Make the social-auth UI render providers conditionally so Google remains enabled while Facebook is hidden without removing the underlying OAuth support from `AuthContext`.
 - **Verification**: Re-run the focused auth-page tests and confirm Google renders, Facebook is absent, and the Google click still calls `signInWithOAuth("google")`.
+
+## Entry 9: Hostinger deploy folder still referenced stale built entry bundles
+- **Date**: 2026-03-10
+- **Failure**: New regression test `src/hostinger-deploy-sync.test.ts` failed because `Hostinger/index.html` still referenced `/assets/index-Dmx6LUBb.js` and `/assets/index-CNNEYgXU.css` instead of the latest expected build entry files.
+- **Root cause**: The deployment mirror in `Hostinger` had not been refreshed after the latest frontend changes, so its top-level `index.html` and entry assets were out of sync with the current production build output.
+- **Reproduction**: Run `npm run test -- src/hostinger-deploy-sync.test.ts`.
+- **Fix attempt**: Generate the current production build, archive the stale `Hostinger` entry files into `Hostinger/history`, then copy the latest built `index.html` and referenced assets into `Hostinger`.
+- **Verification**: Re-run `npm run test -- src/hostinger-deploy-sync.test.ts` and confirm the refreshed `Hostinger` folder references the latest bundle names and contains those files.
+
+## Entry 10: Initial Hostinger sync test hardcoded a stale latest bundle hash
+- **Date**: 2026-03-10
+- **Failure**: The first version of `src/hostinger-deploy-sync.test.ts` hardcoded `index-DCegv0xG.js` / `index-eTEYPA51.css`, but a fresh build produced `index-Cm9BMrr-.js` and `index-CNNEYgXU.css`.
+- **Root cause**: The test relied on a previously observed build output instead of deriving the current expected entry assets from the latest `dist/index.html`.
+- **Reproduction**: Build the project with `npm run build`, then run `npm run test -- src/hostinger-deploy-sync.test.ts` using the hardcoded bundle names.
+- **Fix attempt**: Update the regression test to read `dist/index.html`, extract the current JS/CSS asset references, and compare `Hostinger/index.html` against those dynamically.
+- **Verification**: Re-run `npm run test -- src/hostinger-deploy-sync.test.ts` and confirm it fails only when `Hostinger` differs from the freshly built `dist` output.
+
+## Entry 11: PowerShell rejected bash-style command chaining during Hostinger sync
+- **Date**: 2026-03-10
+- **Failure**: A verification command using `&&` failed with `The token '&&' is not a valid statement separator in this version.`
+- **Root cause**: The workspace shell is PowerShell, not a shell that accepts `&&` in that invocation context.
+- **Reproduction**: Run a multi-command `functions.Shell` call with `Get-ChildItem ... && Get-ChildItem ...` in this workspace.
+- **Fix attempt**: Re-run the command using PowerShell-compatible sequencing (for example `;`) instead of `&&`.
+- **Verification**: Confirm the directory-inspection command succeeds and the sync proceeds with the corrected separator.
+
+## Entry 12: Hostinger refresh automation test failed because no npm shortcut existed
+- **Date**: 2026-03-10
+- **Failure**: New red-phase test `src/hostinger-sync-script.test.ts` failed because `package.json` did not expose a `hostinger:refresh` command.
+- **Root cause**: The repo had no package-level automation entry for the Hostinger refresh flow; the process was still manual.
+- **Reproduction**: Run `npm run test -- src/hostinger-sync-script.test.ts`.
+- **Fix attempt**: Add a package script that performs the one-command Hostinger refresh flow.
+- **Verification**: Re-run `npm run test -- src/hostinger-sync-script.test.ts` and confirm the package-script assertion passes.
+
+## Entry 13: Hostinger refresh automation test failed because the PowerShell script was missing
+- **Date**: 2026-03-10
+- **Failure**: The same red-phase test failed because `scripts/sync-hostinger.ps1` did not exist yet.
+- **Root cause**: There was no reusable script implementing the archive-and-copy behavior for the Hostinger deployment mirror.
+- **Reproduction**: Run `npm run test -- src/hostinger-sync-script.test.ts`.
+- **Fix attempt**: Create `scripts/sync-hostinger.ps1` with parameterized Hostinger/dist paths and timestamped history archiving.
+- **Verification**: Re-run `npm run test -- src/hostinger-sync-script.test.ts` and confirm the script existence/behavior assertions pass.
+
+## Entry 14: Hostinger refresh PowerShell script failed because param block was not first
+- **Date**: 2026-03-10
+- **Failure**: After creating `scripts/sync-hostinger.ps1`, the focused test still failed and a direct script run exited with `StrictModeFunctionCallWithParens` at the `param(` line.
+- **Root cause**: In PowerShell, the `param(...)` block must appear before executable statements. The script set `$ErrorActionPreference` and `Set-StrictMode` before `param`, so PowerShell treated `param(` as a function-style invocation instead of a valid script parameter block.
+- **Reproduction**: Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\sync-hostinger.ps1 ...`.
+- **Fix attempt**: Move the `param(...)` block to the top of the script, then apply strict mode and error settings after parameters are declared.
+- **Verification**: Re-run the direct script invocation and `npm run test -- src/hostinger-sync-script.test.ts` and confirm the script exits 0 and performs the expected archive/copy behavior.

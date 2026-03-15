@@ -24,14 +24,14 @@ export default function CheckoutCancel() {
             >
               {data.cancelBackToCheckout}
             </motion.button>
-            <motion.button
-              onClick={() => navigate("/#pricing")}
+            <motion.a
+              href="/#pricing"
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               className="border-2 border-primary px-6 py-3 rounded-full font-bold text-primary"
             >
               {data.cancelBackToPricing}
-            </motion.button>
+            </motion.a>
           </div>
         </div>
       </main>

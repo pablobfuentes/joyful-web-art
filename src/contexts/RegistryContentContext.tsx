@@ -89,6 +89,24 @@ function readContentOverrides(): Record<string, unknown> | null {
 function normalizeContentOverrides(overrides: Record<string, unknown>): Record<string, unknown> {
   const normalized = JSON.parse(JSON.stringify(overrides)) as Record<string, unknown>;
 
+  const howItWorks = normalized.howItWorks;
+  if (howItWorks && typeof howItWorks === "object" && !Array.isArray(howItWorks)) {
+    const howItWorksRecord = howItWorks as Record<string, unknown>;
+    const ctaButton = howItWorksRecord.ctaButton;
+    if (ctaButton && typeof ctaButton === "object" && !Array.isArray(ctaButton)) {
+      const ctaButtonRecord = ctaButton as Record<string, unknown>;
+      const isLegacySampleRoutineCta =
+        ctaButtonRecord.label === "Ve un ejemplo de rutina" &&
+        ctaButtonRecord.href === "#experience" &&
+        !APP_REGISTRY.howItWorks.ctaButton.label &&
+        !APP_REGISTRY.howItWorks.ctaButton.href;
+
+      if (isLegacySampleRoutineCta) {
+        delete howItWorksRecord.ctaButton;
+      }
+    }
+  }
+
   const nav = normalized.nav;
   if (nav && typeof nav === "object" && !Array.isArray(nav)) {
     const navRecord = nav as Record<string, unknown>;

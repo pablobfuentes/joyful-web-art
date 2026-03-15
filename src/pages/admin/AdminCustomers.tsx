@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, FileDown } from "lucide-react";
+import { runExportCustomerData } from "@/lib/admin-export-csv";
 
 const PAGE_SIZE = 20;
 const SORT_COLUMNS = ["customer_name", "customer_email", "subscription_status", "next_shipping_at", "last_update"] as const;
@@ -50,6 +51,8 @@ export default function AdminCustomers() {
   const [sortBy, setSortBy] = useState<string>(SORT_COLUMNS[0]);
   const [sortAsc, setSortAsc] = useState(true);
   const [search, setSearch] = useState("");
+  const [exportAllLoading, setExportAllLoading] = useState(false);
+  const [exportAllMessage, setExportAllMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-customers", page, sortBy, sortAsc, search],
@@ -78,6 +81,23 @@ export default function AdminCustomers() {
     URL.revokeObjectURL(url);
   }
 
+  async function handleExportAllCustomerData() {
+    setExportAllMessage(null);
+    setExportAllLoading(true);
+    try {
+      await runExportCustomerData();
+      setExportAllMessage({ type: "success", text: "Export downloaded." });
+      setTimeout(() => setExportAllMessage(null), 4000);
+    } catch (err) {
+      setExportAllMessage({
+        type: "error",
+        text: `Export failed: ${err instanceof Error ? err.message : String(err)}`,
+      });
+    } finally {
+      setExportAllLoading(false);
+    }
+  }
+
   if (error) {
     return (
       <div className="space-y-6">
@@ -95,11 +115,31 @@ export default function AdminCustomers() {
       <Card>
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4">
           <CardTitle className="text-base">Customer list</CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleExportAllCustomerData}
+              disabled={exportAllLoading}
+            >
+              <FileDown className="h-4 w-4 mr-1" />
+              {exportAllLoading ? "Exporting…" : "Export Customer Data"}
+            </Button>
             <Button variant="outline" size="sm" onClick={exportCsv} disabled={!data?.rows?.length}>
               <Download className="h-4 w-4 mr-1" />
-              Export CSV
+              Export CSV (page)
             </Button>
+            {exportAllMessage && (
+              <span
+                className={
+                  exportAllMessage.type === "error"
+                    ? "text-sm text-destructive"
+                    : "text-sm text-muted-foreground"
+                }
+              >
+                {exportAllMessage.text}
+              </span>
+            )}
             <Input
               placeholder="Search name or email…"
               value={search}

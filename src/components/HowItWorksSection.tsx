@@ -109,6 +109,8 @@ const HowItWorksSection = () => {
   const { getSectionContent, getStyleForPath } = useRegistryContent();
   const { registry } = useStyleRegistry();
   const data = getSectionContent("howItWorks");
+  const ctaButton =
+    data?.ctaButton && typeof data.ctaButton === "object" ? data.ctaButton : null;
   const headerRef = useRef(null);
   const headerInView = useInView(headerRef, { once: true, margin: "-100px" });
   const ctaRef = useRef(null);
@@ -150,15 +152,17 @@ const HowItWorksSection = () => {
           <h2 className="font-display font-lemonmilk text-4xl md:text-6xl font-bold mb-8" style={getStyleForPath("howItWorks.title")}>
             {data.title}
           </h2>
-          <motion.a
-            href={data.ctaButton.href}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="inline-block gradient-warm px-6 py-3 rounded-full text-sm font-bold text-primary-foreground shadow-playful"
-            style={getStyleForPath("howItWorks.ctaButton")}
-          >
-            {data.ctaButton.label}
-          </motion.a>
+          {ctaButton?.label && ctaButton?.href ? (
+            <motion.a
+              href={ctaButton.href}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-block gradient-warm px-6 py-3 rounded-full text-sm font-bold text-primary-foreground shadow-playful"
+              style={getStyleForPath("howItWorks.ctaButton")}
+            >
+              {ctaButton.label}
+            </motion.a>
+          ) : null}
         </motion.div>
 
         <div className="space-y-20 max-w-4xl mx-auto">

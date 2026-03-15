@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "hostinger:sync": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\sync-hostinger.ps1",
+    "hostinger:refresh": "npm run build && npm run hostinger:sync",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

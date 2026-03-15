@@ -1,5 +1,16 @@
 # VMP Compliance Audit
 
+## 2026-03-10 – Admin-only Export Users CSV
+
+- **Feature:** Admin-only "Export Customer Data" button that downloads one CSV with one row per user (profiles, subscription, orders, notes, shipping); RLS restricts view to admins.
+- **Status:** ✅ Compliant
+- **Tests / verification:**
+  - `src/lib/admin-export-csv.test.ts` — fetchAllExportRows (view + chunking), buildAndDownloadCsv (headers + filename pattern), runExportCustomerData (fetch + download), error when Supabase returns error.
+  - `npm run test -- --run src/lib/admin-export-csv.test.ts` passes (5 tests).
+- **Failure log references:** None (no implementation failures).
+- **Changelog references:** `workflow/ChangeLog.md` — "Admin-only Export Users CSV"; `docs/CHANGELOG_AI.md` — "Admin-only Export Users CSV".
+- **Notes:** Security: export uses existing Supabase client; only admins can read `admin_export_customers` (view security_invoker = on). No service role or Stripe keys in frontend. Button only in admin Customers page (AdminRoute).
+
 ## 2026-03-11 – Local dev server port hardening
 
 - **Feature:** Eliminate intermittent local `npm run dev` 404s caused by a port collision on the old Vite dev port.
@@ -330,4 +341,140 @@
   - **Security review:** The migration step only normalizes known registry content keys already stored in localStorage. It does not expand privileges, execute arbitrary data, or introduce new external inputs. The logic is narrowly scoped to the known legacy logo/countdown fields for safe schema evolution.
   - **Performance review:** The normalization runs once during content override load and performs a tiny JSON clone/object cleanup. Runtime cost is negligible, and it reduces future drift/debugging cost by self-healing stale content instead of repeatedly rendering outdated values.
   - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus the existing repo workflow/tests with TDD, immediate failure logging, changelog update, and audit documentation.
+
+## 2026-03-11 – Hostinger deployment folder refresh
+
+- **Feature:** Refresh the `Hostinger` upload folder with the newest production build and archive the prior export into `History`.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - Verification runs:
+    - `npm run build`
+    - Filesystem verification of `Hostinger` and `History` after sync
+- **Failure log references:**
+  - None. This deployment refresh completed without intermediate failures that required corrective implementation.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Hostinger deployment folder refreshed from the latest production build”.
+- **Notes:**
+  - **Evidence:** Previous deployable files were moved to `History/Hostinger-2026-03-11_171929`; `Hostinger` was repopulated from the new `dist` build; `.htaccess` was restored into `Hostinger` to preserve SPA routing behavior on Hostinger.
+  - **Security review:** This change only updates static deployment artifacts and preserves the existing rewrite rule file. It introduces no new secrets, permissions, network endpoints, or executable backend logic.
+  - **Performance review:** The refreshed folder now matches the current optimized Vite production build, removing drift between local source and upload artifacts. No additional runtime overhead was introduced beyond what is already bundled in the verified build output.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus build verification, artifact backup, changelog update, and audit documentation.
+
+## 2026-03-11 – Remove how-it-works CTA and fix footer delivery anchor
+
+- **Feature:** Remove the `Ve un ejemplo de rutina` CTA from `Como Funciona` and fix the live footer `Envíos` anchor by correcting the public registry snapshot used in production.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/components/HowItWorksSection.test.tsx` – verifies the sample-routine CTA no longer renders.
+  - `src/config/get-default-registry.test.ts` – verifies the public registry snapshot stays aligned with the source defaults for the how-it-works CTA and the `Envíos -> #delivery-windows` footer link.
+  - Verification runs:
+    - `npm run test -- --run src/components/HowItWorksSection.test.tsx src/config/get-default-registry.test.ts`
+    - `npm run build`
+    - `npm run test`
+    - Browser verification on `http://127.0.0.1:4173`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Footer delivery anchor and how-it-works CTA drift from stale public registry”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “How-it-works CTA removed and Hostinger footer delivery link fixed”.
+- **Notes:**
+  - **Evidence:** The rebuilt `dist/registry.json` now contains `howItWorks.ctaButton = { label: \"\", href: \"\" }` and the footer navigate link `Envíos -> #delivery-windows`; the refreshed `Hostinger` folder was archived to `History/Hostinger-2026-03-11_180844` before copying the fixed build.
+  - **Security review:** This change only affects static registry-driven content and anchor targets. It adds no new permissions, network calls, auth paths, or user-controlled execution surfaces.
+  - **Performance review:** The component change removes a rendered CTA and the registry refresh only updates static JSON/config payloads. Runtime impact is negligible, and correcting the registry snapshot prevents future production drift between the bundle and file-backed content.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus TDD verification, failure logging, changelog update, build verification, and browser confirmation.
+
+## 2026-03-11 – Fix checkout return-to-pricing navigation
+
+- **Feature:** Make the checkout `Volver a planes` action and the cancel-screen `Ver planes` action return to the landing-page pricing section through real anchor links.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/pages/CheckoutNavigation.test.tsx` – verifies both checkout screens render pricing return actions as `/#pricing` links.
+  - Verification runs:
+    - `npm run test -- --run src/pages/CheckoutNavigation.test.tsx`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Checkout pricing back-link used router navigation instead of a real anchor”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Checkout pricing return links switched to real anchors”.
+- **Notes:**
+  - **Evidence:** `src/pages/Checkout.tsx` and `src/pages/CheckoutCancel.tsx` now use direct `href="/#pricing"` links instead of imperative `navigate("/#pricing")` button handlers, and the focused regression test covers both occurrences so the pattern cannot drift back.
+  - **Security review:** This change only alters client-side navigation targets to an existing in-page pricing anchor. It introduces no new permissions, secrets, backend calls, or user-input handling paths.
+  - **Performance review:** Replacing router-triggered button clicks with static anchor links removes a small amount of client-side routing work and keeps the behavior aligned with the rest of the site’s lightweight section links. Runtime impact is negligible and slightly simpler.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus TDD verification, failure logging, changelog update, and diagnostics review.
+
+## 2026-03-11 – Add global hash-scroll handling for route transitions
+
+- **Feature:** Ensure route transitions that include hashes like `/#pricing` actually scroll to the target section instead of only updating the URL.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/components/HashScrollHandler.test.tsx` – verifies a checkout-to-home navigation with `#pricing` triggers scrolling to the pricing section.
+  - `src/pages/CheckoutNavigation.test.tsx` – verifies the checkout entry points still render `/#pricing` links.
+  - Verification runs:
+    - `npm run test -- --run src/components/HashScrollHandler.test.tsx src/pages/CheckoutNavigation.test.tsx`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – section “Checkout pricing anchor changed route but still landed at hero”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Hash-based landing-page navigation now scrolls after route changes”.
+- **Notes:**
+  - **Evidence:** `src/components/HashScrollHandler.tsx` is mounted in `src/App.tsx` and watches `location.hash` to call `scrollIntoView({ behavior: "smooth", block: "start" })` on the matching section, which closes the gap between URL updates and visible scroll position.
+  - **Security review:** This change only reads the current route hash and scrolls to an existing DOM element by id. It introduces no new API calls, storage access, secrets, or user-controlled code execution.
+  - **Performance review:** The handler runs only when the route hash changes, performs a simple DOM lookup, and exits immediately when there is no hash. Runtime impact is negligible while improving navigation reliability.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` and `docs/workflow/VMP_v2.1_Enhanced.txt` were not present in the repository during this implementation cycle, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md` plus TDD verification, failure logging, changelog update, and diagnostics review.
+
+## 2026-03-10 – Hostinger deploy folder refreshed with in-place history snapshot
+
+- **Feature:** Update the `Hostinger` upload folder to the latest generated build and move the replaced generated deploy surface into `Hostinger/history`.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/hostinger-deploy-sync.test.ts` – verifies `Hostinger/index.html` and `Hostinger/assets` match the current entry asset references extracted from `dist/index.html`.
+  - Verification runs:
+    - `npm run build`
+    - `npm run test -- src/hostinger-deploy-sync.test.ts`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – sections “Hostinger deploy mirror still pointed at stale bundles”, “Hostinger sync test hardcoded an outdated latest bundle name”, and “PowerShell command chaining mismatch during Hostinger sync”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Hostinger deploy folder refreshed from the latest build with in-place history backup”.
+- **Notes:**
+  - **Evidence:** The previous generated deploy surface was archived to `Hostinger/history/20260311-224505/`; `Hostinger/index.html` now references `/assets/index-Cm9BMrr-.js` and `/assets/index-CNNEYgXU.css`; the focused regression test passes against the refreshed folder.
+  - **Security review:** This change is limited to static deployment artifacts and a local history snapshot. It introduces no new secrets, permissions, network paths, or runtime auth/data behavior.
+  - **Performance review:** The upload folder now matches the already-optimized latest build, so runtime behavior only benefits from serving the newest generated assets. The archive/copy step is a one-time local filesystem operation with no deployed overhead.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md`, `workflow/Prompt.md`, and the available workflow evidence with TDD, immediate failure logging, changelog update, and fresh verification before completion.
+
+## 2026-03-10 – One-command Hostinger refresh automation
+
+- **Feature:** Add a single-command automation flow for refreshing `Hostinger` from the latest build while preserving timestamped rollback snapshots.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - `src/hostinger-sync-script.test.ts` – verifies `package.json` exposes the `hostinger:refresh` command and executes the PowerShell script against temp directories to confirm archive/copy behavior.
+  - `src/hostinger-deploy-sync.test.ts` – verifies the real `Hostinger` folder matches the latest built entry asset references from `dist/index.html`.
+  - Verification runs:
+    - `npm run test -- src/hostinger-sync-script.test.ts`
+    - `npm run hostinger:refresh`
+    - `npm run test -- src/hostinger-sync-script.test.ts src/hostinger-deploy-sync.test.ts`
+- **Failure log references:**
+  - `docs/FAILURE_LOG.md` – sections “Hostinger refresh automation missing package shortcut”, “Hostinger refresh automation missing PowerShell script”, and “Hostinger refresh PowerShell script param block was in the wrong place”.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “One-command Hostinger refresh automation”.
+- **Notes:**
+  - **Evidence:** `scripts/sync-hostinger.ps1` now exists; `package.json` exposes `hostinger:sync` and `hostinger:refresh`; the end-to-end command created a real snapshot at `Hostinger/history/20260312-095329/`; `Hostinger/index.html` now references `/assets/index-MQghwU3t.js` and `/assets/index-CQTMGJSs.css`.
+  - **Security review:** This automation only manipulates local static deployment artifacts. It does not introduce secrets, remote deployment credentials, auth changes, or new runtime attack surface.
+  - **Performance review:** The script adds no runtime cost to the site itself. It reduces operational friction and helps keep `Hostinger` aligned with the already-optimized Vite build, which lowers the risk of serving stale assets.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md`, `workflow/Prompt.md`, and the available workflow evidence with TDD, immediate failure logging, changelog update, and fresh command verification before completion.
+
+## 2026-03-12 – Homepage SEO copy comparison document
+
+- **Feature:** Prepare a review-only Markdown document with side-by-side current vs proposed homepage SEO copy before any implementation.
+- **Status:** ✅ Compliant
+- **Tests:**
+  - Document verification only:
+    - confirmed `docs/HOMEPAGE_SEO_COPY_COMPARISON.md` exists
+    - confirmed the request produced no page, component, or registry-content changes
+- **Failure log references:**
+  - None. No implementation failures occurred during this document-only request.
+- **Changelog references:**
+  - `docs/CHANGELOG_AI.md` – section “Homepage SEO copy comparison document prepared for side-by-side review”
+  - `workflow/ChangeLog.md` – section “Homepage SEO copy comparison document”
+- **Notes:**
+  - **Evidence:** The new document includes current vs proposed copy for metadata, hero, pricing intro, selected FAQ entries, trust copy, final CTA refinements, and an approval matrix so the user can approve items selectively before implementation.
+  - **Security review:** This request only created documentation. It introduced no runtime behavior, no secrets, no network calls, and no user-facing code changes.
+  - **Performance review:** This request only created a static Markdown review artifact. It has no performance impact on the site.
+  - **Checklist note:** `docs/VMP_COMPLIANCE_CHECKLIST.md` was not present in the repository, so compliance was validated against `.cursor/VMP_COMPLIANCE_REMINDER.md`, `workflow/Prompt.md`, and the available workflow requirements for approval-first planning, logging, and no-code-change execution.
 

@@ -139,8 +139,8 @@ export const APP_REGISTRY = {
   howItWorks: {
     title: "Como Funciona",
     ctaButton: {
-      label: "Ve un ejemplo de rutina",
-      href: "#experience"
+      label: "",
+      href: ""
     },
     steps: [
       {
@@ -402,11 +402,11 @@ export const APP_REGISTRY = {
         id: "gift",
         name: "Kumi Gift",
         emoji: "🎁",
-        priceAmount: "$899",
+        priceAmount: "$999",
         pricePeriod: "1 vez",
         description: "Perfecta para descubrir la experiencia Kumi",
         features: [
-          "3 ó 4 productos full size",
+          "La rutina básica. Limpia, trata, húmecta",
           "Guía de rutina paso a paso",
           "Empaque especial de regalo"
         ],
@@ -422,7 +422,7 @@ export const APP_REGISTRY = {
         pricePeriod: "/ cada 2 meses",
         description: "La rutina ideal para resultados consistentes",
         features: [
-          "5 productos complementarios",
+          "4 a 5 productos ",
           "Rutina completa sin repeticiones",
           "Tamaños que duran hasta tu próxima caja",
           "Envío incluido"
@@ -435,12 +435,12 @@ export const APP_REGISTRY = {
         id: "premium",
         name: "Kumi Ritual",
         emoji: "👑",
-        priceAmount: "$1799",
+        priceAmount: "$2099",
         pricePeriod: "/ cada 2 meses",
         description: "Para las obsesionadas del K-beauty",
         features: [
-          "Todo lo de Kumi Essential",
-          "2 ó 3 productos adicionales",
+          "La rutina extendida",
+          "7 productos para 7 pasos",
           "Acceso a ediciones limitadas",
           "Descuento exclusivo en tienda",
           "Envío prioritario"
@@ -529,7 +529,7 @@ export const APP_REGISTRY = {
         },
         {
           label: "Envíos",
-          href: "#"
+          href: "#delivery-windows"
         }
       ]
     },
