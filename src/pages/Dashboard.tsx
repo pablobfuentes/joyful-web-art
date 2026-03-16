@@ -7,6 +7,7 @@ import { useTestUserData } from "@/hooks/useTestUserData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUserAddresses } from "@/hooks/useUserAddresses";
 import Navbar from "@/components/Navbar";
 
 function formatDate(iso: string | undefined) {
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const [editName, setEditName] = useState(name ?? "");
   const [saving, setSaving] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const { defaultAddress } = useUserAddresses();
 
   async function handleLogOut() {
     await signOut();
@@ -124,6 +126,25 @@ export default function Dashboard() {
                     </span>{" "}
                     {formatDate(memberSince)}
                   </p>
+                  <p>
+                    <span className="text-muted-foreground">
+                      {data.shippingAddressLabel ?? "Dirección de envío"}:
+                    </span>{" "}
+                    {defaultAddress
+                      ? [
+                          defaultAddress.street,
+                          defaultAddress.street_number_ext,
+                          defaultAddress.street_number_int,
+                          defaultAddress.colonia,
+                          defaultAddress.municipio,
+                          defaultAddress.state,
+                          defaultAddress.postal_code,
+                          defaultAddress.country,
+                        ]
+                          .filter(Boolean)
+                          .join(", ")
+                      : "—"}
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">
                   <Button type="button" variant="outline" size="sm" onClick={startEditing}>
@@ -131,6 +152,9 @@ export default function Dashboard() {
                   </Button>
                   <Button asChild variant="ghost" size="sm">
                     <Link to={data.changePasswordHref}>{data.changePasswordLabel}</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link to={data.settingsHref}>Editar dirección</Link>
                   </Button>
                 </div>
               </>

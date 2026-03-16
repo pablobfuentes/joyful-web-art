@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, Truck, AlertCircle, Clock, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Package, Truck, AlertCircle, Clock, Calendar, FileDown } from "lucide-react";
+import { toast } from "sonner";
+import { runExportCourierData } from "@/lib/admin-export-courier-csv";
 
 async function fetchAdminKpis() {
   const [
@@ -47,6 +51,7 @@ async function fetchAdminKpis() {
  * Admin overview: KPI cards from Supabase (subscriptions + orders).
  */
 export default function AdminOverview() {
+  const [exportingCourier, setExportingCourier] = useState(false);
   const { data: kpis, isLoading, error } = useQuery({
     queryKey: ["admin-kpis"],
     queryFn: fetchAdminKpis,
@@ -76,7 +81,30 @@ export default function AdminOverview() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-bold">Overview</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-display text-2xl font-bold">Overview</h1>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={exportingCourier}
+          onClick={async () => {
+            setExportingCourier(true);
+            try {
+              await runExportCourierData();
+              toast.success("Courier CSV export downloaded.");
+            } catch (e) {
+              const msg = e instanceof Error ? e.message : "Failed to export courier CSV.";
+              toast.error(msg);
+            } finally {
+              setExportingCourier(false);
+            }
+          }}
+        >
+          <FileDown className="mr-2 h-4 w-4" />
+          {exportingCourier ? "Exporting courier CSV…" : "Export courier CSV"}
+        </Button>
+      </div>
       {isLoading ? (
         <p className="text-muted-foreground">Loading KPIs…</p>
       ) : (

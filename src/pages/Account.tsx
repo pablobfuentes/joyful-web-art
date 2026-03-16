@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserAddresses } from "@/hooks/useUserAddresses";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 
@@ -24,6 +25,7 @@ export default function Account() {
   const name = user?.user_metadata?.full_name as string | undefined;
   const email = user?.email ?? "";
   const memberSince = user?.created_at;
+  const { defaultAddress } = useUserAddresses();
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,6 +56,25 @@ export default function Account() {
                   {data.memberSinceLabel}:
                 </span>{" "}
                 {formatDate(memberSince)}
+              </p>
+              <p>
+                <span className="text-muted-foreground">
+                  {data.shippingAddressLabel ?? "Dirección de envío"}:
+                </span>{" "}
+                {defaultAddress
+                  ? [
+                      defaultAddress.street,
+                      defaultAddress.street_number_ext,
+                      defaultAddress.street_number_int,
+                      defaultAddress.colonia,
+                      defaultAddress.municipio,
+                      defaultAddress.state,
+                      defaultAddress.postal_code,
+                      defaultAddress.country,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")
+                  : "—"}
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
