@@ -1,0 +1,103 @@
+Política de Cancelación de Suscripción
+
+KumiBox
+
+Última actualización: [Fecha]
+
+1. Cancelación de suscripción
+
+Los usuarios pueden cancelar su suscripción en cualquier momento a través de:
+
+Su cuenta dentro del sitio web de KumiBox (método preferente)
+
+Solicitud por correo electrónico a: soporte@kumibox.com
+
+La cancelación se procesa de forma inmediata en el sistema.
+
+2. Efecto de la cancelación
+
+Al cancelar su suscripción:
+
+El acceso al servicio permanece activo hasta el siguiente ciclo de cobro aplicable
+
+No se generarán cargos futuros después de la cancelación, siempre que esta se realice antes de la fecha de corte correspondiente
+
+Si la cancelación se realiza después de la fecha de corte, el siguiente envío ya programado será procesado y enviado con normalidad.
+
+3. Fechas de corte y cargos
+
+KumiBox opera con un sistema de suscripción automatizado a través de Stripe.
+
+El usuario reconoce que:
+
+Los cargos se realizan automáticamente cada 2 meses, en la fecha correspondiente a su suscripción
+
+Existen fechas operativas de corte (día 15 y fin de mes), pero el cargo depende de la fecha individual de suscripción del usuario
+
+Para evitar el siguiente cargo, el usuario deberá cancelar su suscripción antes de su próxima fecha de cobro programada
+
+Una vez realizado el cargo, este no podrá ser detenido.
+
+4. Política de no reembolsos
+
+KumiBox no ofrece reembolsos en los siguientes casos:
+
+Cancelaciones realizadas después de la fecha de cobro
+
+Cargos procesados correctamente conforme al ciclo de suscripción
+
+Desconocimiento del modelo de suscripción por parte del usuario
+
+Toda cancelación aplicará únicamente para ciclos futuros.
+
+5. Fallos de pago
+
+En caso de que un pago no pueda ser procesado:
+
+Se realizará un segundo intento automático de cobro
+
+El usuario será notificado del fallo
+
+Si el pago no se completa después del segundo intento:
+
+La suscripción será cancelada automáticamente
+
+El usuario deberá suscribirse nuevamente para reactivar el servicio
+
+6. Pausas de suscripción
+
+KumiBox permite a los usuarios pausar su suscripción desde su cuenta.
+
+Al pausar:
+
+No se generarán cargos durante el periodo de pausa
+
+No se enviarán cajas durante ese periodo
+
+El servicio podrá reanudarse en cualquier momento
+
+7. Canal oficial de cancelación
+
+El único canal válido para cancelar una suscripción es:
+
+A través de la cuenta del usuario en el sitio web
+
+O mediante solicitud directa al correo oficial de soporte
+
+KumiBox no se hace responsable por solicitudes de cancelación realizadas a través de:
+
+Redes sociales
+
+Mensajes informales
+
+Canales no oficiales
+
+8. Aceptación del usuario
+
+Al suscribirse, el usuario reconoce y acepta que:
+
+Está contratando un servicio de suscripción recurrente automática
+
+Es su responsabilidad gestionar su cancelación antes de la fecha de cobro
+
+No habrá reembolsos una vez procesado un cargo

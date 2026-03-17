@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import { APP_REGISTRY } from "@/config/app-registry";
 
 export default function Terms() {
-  const contactEmail = APP_REGISTRY.terms?.contactEmail ?? "soporte@kumibox.com";
+  const contactEmail = APP_REGISTRY.terms?.contactEmail ?? "contacto@kumibox.mx";
 
   return (
     <div className="min-h-screen bg-background">

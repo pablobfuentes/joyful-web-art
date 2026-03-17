@@ -557,24 +557,28 @@ export const APP_REGISTRY = {
       links: [
         {
           label: "Privacidad",
-          href: "privacy"
+          href: "/privacy"
         },
         {
           label: "Términos",
           href: "/terms"
         },
         {
-          label: "Accesibilidad",
-          href: "#"
+          label: "Cancelación",
+          href: "/politicas-de-cancelacion"
+        },
+        {
+          label: "Envíos",
+          href: "/politicas-de-envio"
         }
       ]
     }
   },
   privacy: {
-    contactEmail: "contacto@kumibox.com"
+    contactEmail: "contacto@kumibox.mx"
   },
   terms: {
-    contactEmail: "soporte@kumibox.com"
+    contactEmail: "contacto@kumibox.mx"
   },
   login: {
     title: "Bienvenida de nuevo",
