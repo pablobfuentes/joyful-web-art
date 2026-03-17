@@ -25,9 +25,19 @@ export default function Checkout() {
   const planId = searchParams.get("plan") || "monthly";
   const selectedPlan = plans.find((p) => p.id === planId) || plans[1];
 
-  const [form, setForm] = useState({ name: "", email: "", address: "", city: "", state: "", zip: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    colonia: "",
+    city: "",
+    state: "",
+    zip: "",
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
 
   const isGift = selectedPlan.id === "gift";
   const loginRequired = !isGift && !user && !authLoading;
@@ -45,6 +55,7 @@ export default function Checkout() {
       ...f,
       email: user.email ?? f.email,
       name: (user.user_metadata?.full_name as string) ?? f.name,
+      phone: (user.user_metadata?.phone as string) ?? f.phone,
     }));
   }, [user]);
 
@@ -54,15 +65,13 @@ export default function Checkout() {
     setForm((f) => ({
       name: f.name || defaultAddress.full_name,
       email: f.email || defaultAddress.email || f.email,
+      phone: f.phone || defaultAddress.phone,
       address:
         f.address ||
-        [
-          defaultAddress.street,
-          defaultAddress.street_number_ext,
-          defaultAddress.street_number_int,
-        ]
+        [defaultAddress.street, defaultAddress.street_number_ext, defaultAddress.street_number_int]
           .filter(Boolean)
           .join(" "),
+      colonia: f.colonia || defaultAddress.colonia,
       city: f.city || defaultAddress.municipio,
       state: f.state || defaultAddress.state,
       zip: f.zip || defaultAddress.postal_code,
@@ -72,7 +81,15 @@ export default function Checkout() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
-  const canSubmit = form.name && form.email && form.address && form.city && form.state && form.zip;
+  const canSubmit =
+    form.name &&
+    form.email &&
+    form.phone &&
+    form.address &&
+    form.colonia &&
+    form.city &&
+    form.state &&
+    form.zip;
 
   if (authLoading && !isGift) {
     return (
@@ -164,16 +181,29 @@ export default function Checkout() {
                             className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
                           />
                         </div>
-                        <div>
-                          <label className="text-sm font-bold text-foreground mb-1 block">{data.emailLabel}</label>
-                          <input
-                            name="email"
-                            type="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            placeholder={data.emailPlaceholder}
-                            className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
-                          />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-bold text-foreground mb-1 block">{data.emailLabel}</label>
+                            <input
+                              name="email"
+                              type="email"
+                              value={form.email}
+                              onChange={handleChange}
+                              placeholder={data.emailPlaceholder}
+                              className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-bold text-foreground mb-1 block">Número telefónico</label>
+                            <input
+                              name="phone"
+                              type="tel"
+                              value={form.phone}
+                              onChange={handleChange}
+                              placeholder="10 dígitos, sin espacios"
+                              className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
+                            />
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -190,61 +220,93 @@ export default function Checkout() {
                       </h3>
                       <div className="space-y-4">
                         <div>
-                          <label className="text-sm font-bold text-foreground mb-1 block">{data.addressLabel}</label>
+                          <label className="text-sm font-bold text-foreground mb-1 block">Calle y número</label>
                           <input
                             name="address"
                             value={form.address}
                             onChange={handleChange}
-                            placeholder={data.addressPlaceholder}
+                            placeholder="Calle y número exterior / interior"
                             className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-bold text-foreground mb-1 block">{data.cityLabel}</label>
+                            <label className="text-sm font-bold text-foreground mb-1 block">Colonia</label>
                             <input
-                              name="city"
-                              value={form.city}
+                              name="colonia"
+                              value={form.colonia}
                               onChange={handleChange}
-                              placeholder={data.cityPlaceholder}
+                              placeholder="Colonia"
                               className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-bold text-foreground mb-1 block">{data.stateLabel}</label>
+                            <label className="text-sm font-bold text-foreground mb-1 block">Ciudad</label>
                             <input
-                              name="state"
-                              value={form.state}
+                              name="city"
+                              value={form.city}
                               onChange={handleChange}
-                              placeholder={data.statePlaceholder}
+                              placeholder="Ciudad / Municipio"
                               className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
                             />
                           </div>
                         </div>
-                        <div className="w-1/2">
-                          <label className="text-sm font-bold text-foreground mb-1 block">{data.zipLabel}</label>
-                          <input
-                            name="zip"
-                            value={form.zip}
-                            onChange={handleChange}
-                            placeholder={data.zipPlaceholder}
-                            className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
-                          />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-bold text-foreground mb-1 block">Estado</label>
+                            <input
+                              name="state"
+                              value={form.state}
+                              onChange={handleChange}
+                              placeholder="Estado"
+                              className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-bold text-foreground mb-1 block">Código postal</label>
+                            <input
+                              name="zip"
+                              value={form.zip}
+                              onChange={handleChange}
+                              placeholder="Código postal"
+                              className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
+                            />
+                          </div>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          Dirección actual tomada de tu perfil.{" "}
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-xs text-muted-foreground">
+                            Dirección actual tomada de tu perfil.{" "}
+                            <button
+                              type="button"
+                              className="underline font-semibold"
+                              onClick={() =>
+                                navigate(
+                                  `/settings?from=checkout&plan=${encodeURIComponent(planId)}`
+                                )
+                              }
+                            >
+                              Cambiar dirección de envío
+                            </button>
+                          </p>
                           <button
                             type="button"
-                            className="underline font-semibold"
-                            onClick={() =>
-                              navigate(
-                                `/settings?from=checkout&plan=${encodeURIComponent(planId)}`
-                              )
-                            }
+                            onClick={() => setShowInfo((v) => !v)}
+                            className="shrink-0 w-6 h-6 rounded-full bg-background border border-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                            aria-label="¿Por qué te pedimos esta información?"
                           >
-                            Cambiar dirección de envío
+                            ?
                           </button>
-                        </p>
+                        </div>
+                        {showInfo && (
+                          <div className="mt-3 bg-background border border-muted shadow-card rounded-xl p-3 text-[11px]">
+                            <p className="font-bold mb-1">¿Por qué te pedimos esta información?</p>
+                            <p className="text-muted-foreground">
+                              El servicio de paquetería requiere cada uno de estos campos para entregarte tu KumiBox a
+                              tiempo o contactarte en caso de cualquier eventualidad. Si tienes dudas sobre el manejo
+                              de tu información, puedes consultar nuestro Aviso de Privacidad.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </motion.div>
 
