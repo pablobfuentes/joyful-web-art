@@ -551,7 +551,9 @@ export const APP_REGISTRY = {
       placeholder: "tu@correo.com"
     },
     bottomBar: {
-      copyright: "© 2026 Kumi. Todos los derechos reservados.",
+      // Version string added so we can see which deploy is live (approximate from Git history).
+      // Example footer render: "© 2026 Kumi. v0.11.0 · Todos los derechos reservados."
+      copyright: "© 2026 Kumi. v0.11.0 · Todos los derechos reservados.",
       links: [
         {
           label: "Privacidad",

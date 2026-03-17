@@ -49,7 +49,32 @@
 - **Fix attempt:**
   1. Explicit auth in `src/lib/checkout.ts`: send `Authorization: Bearer <session.access_token || anon_key>` so the header is always set.
   2. Add `verify_jwt = false` for `create-checkout-session` in `supabase/config.toml` and redeploy so the function accepts requests without JWT verification (function only creates Stripe Checkout session; payment happens on Stripe).
-- **Verification:** After changes, re-test checkout (gift and logged-in flows).
+-- **Verification:** After changes, re-test checkout (gift and logged-in flows).
+
+## 401 Unauthorized on create-order (Edge Function)
+
+- **Date:** 2026-03-16
+- **Context:** Wiring new `create-order` + `update-shipment-address` Supabase Edge Functions to create `orders` + `shipments` backed by `user_addresses` and `courier_settings`.
+- **Error:** Browser network panel showed `POST https://rtnispswkyybiliynezz.supabase.co/functions/v1/create-order 401 (Unauthorized)` even when the user was logged in and Supabase function logs showed both anon and authenticated JWTs present.
+- **Initial root cause hypothesis:** The Edge Function's use of `SUPABASE_SERVICE_ROLE_KEY` and `auth.getUser()` was incorrect for this environment; missing or mis-scoped secrets caused auth to fail before our logic ran.
+- **Fix attempt 1:** Switch the function client to use `SUPABASE_ANON_KEY` and pass the Authorization header from the browser (`session.access_token || anonKey`) so the function sees the same JWT as PostgREST.
+- **Fix attempt 2:** Remove `auth.getUser()` and all explicit user-id checks from the Edge Functions and rely on **RLS** instead:
+  - `create-order`:
+    - Uses an anon-key client.
+    - Queries `user_addresses` without filtering by `user_id`; RLS ensures it only returns rows for the caller.
+    - Inserts `orders.user_id` from `addr.user_id` on the selected address row.
+    - Inserts a `shipments` snapshot based on that address plus `courier_settings` defaults.
+  - `update-shipment-address`:
+    - Loads `shipments` joined to `orders` by id; RLS enforces that only shipments belonging to the caller are visible.
+    - Applies a cutoff computed from `orders.created_at`.
+    - Loads the new address from `user_addresses` without an explicit `user_id` filter; RLS again restricts the result to the caller.
+- **Additional instrumentation:** Added `[create-order]` debug logs in the function (request auth header presence, parsed `planId`, address lookup result, and insert errors) and `[checkout]` logs in `src/lib/checkout.ts` around `supabase.functions.invoke("create-order")` and `"create-checkout-session"`.
+- **Fix attempt 3 (config.toml `verify_jwt = false`):**
+  - Added `[functions.create-order] verify_jwt = false` to `supabase/config.toml`.
+  - **Result:** Still 401. Supabase logs confirmed `execution_id: null` (function never ran) and same `deployment_id` suffix `_5`, proving `config.toml` change was NOT applied — user had not yet redeployed, OR `config.toml` is not propagated to the hosted project by a plain `supabase functions deploy`.
+- **Root cause (confirmed):** Supabase Edge Function gateway is rejecting the request before the function executes (`execution_id: null`). The `config.toml` `verify_jwt` flag applies only to the **local** Supabase dev runtime; to disable JWT verification on the **hosted** project the function must be deployed with `--no-verify-jwt`.
+- **Fix attempt 4 (deploy flag):** `supabase functions deploy create-order --no-verify-jwt`. This explicitly tells the Supabase cloud to skip gateway JWT verification for this function, mirroring the approach that fixed `create-checkout-session`. Data security is still enforced by RLS inside Postgres.
+- **Verification:** After deploying with `--no-verify-jwt`, the `deployment_id` suffix should increment (e.g. `_6`), `execution_id` should be non-null in the next log entry, and the function should return 200.
 
 ## 502 Bad Gateway on create-checkout-session
 

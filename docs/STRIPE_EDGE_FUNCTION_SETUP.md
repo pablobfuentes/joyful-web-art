@@ -6,9 +6,11 @@ This guide walks you through setting up the **create-checkout-session** Supabase
 
 ## Quick start: First-time setup (follow in order)
 
-1. **Get your Stripe Price IDs** (not Product IDs)  
-   - Stripe Dashboard → **Product catalog** → open each product (Monthly, Gift, Premium) → **Pricing** tab → copy the **Price ID** (starts with `price_`).  
-   - If you only have one price per product, you’ll have three IDs: e.g. `price_xxx`, `price_yyy`, `price_zzz`.
+1. **Create Stripe Products & Prices**  
+   - In Stripe Dashboard → **Product catalog**, create (or use existing) products for **Monthly** and **Premium** subscriptions, and optionally **Gift**.  
+   - For each product, add a **Price**:  
+     - **Monthly / Premium:** use a **recurring** price (e.g. monthly). Copy the **Price ID** (`price_...`).  
+     - **Gift:** use a **one-time** price. Copy the **Price ID** (`price_...`).
 
 2. **Get your Stripe secret key**  
    - Stripe Dashboard → **Developers** → **API keys** → copy **Secret key** (`sk_test_...` for test mode).  
@@ -27,14 +29,19 @@ This guide walks you through setting up the **create-checkout-session** Supabase
 
 5. **Set Edge Function secrets in Supabase**  
    - Dashboard → **Project Settings** (gear) → **Edge Functions** → **Secrets**.  
-   - Add these four (names exactly as below):
+   - **Required:** `STRIPE_SECRET_KEY` (`sk_test_...`).  
+   - **Required for subscription plans:** `STRIPE_PRICE_ID` (recurring Price ID for monthly).  
+   - **Optional:** `STRIPE_PRICE_ID_PREMIUM` (recurring Price ID for premium); if omitted, premium is not offered.  
+   - **Optional:** `STRIPE_PRICE_ID_GIFT` (one-time Price ID for gift); if omitted, gift is not offered.
 
-   | Name                  | Value |
-   |-----------------------|--------|
-   | `STRIPE_SECRET_KEY`   | `sk_test_...` (your Stripe secret key) |
-   | `STRIPE_PRICE_ID`     | Price ID for **monthly** plan (`price_...`) |
-   | `STRIPE_PRICE_ID_GIFT`| Price ID for **gift** plan (`price_...`) |
-   | `STRIPE_PRICE_ID_PREMIUM` | Price ID for **premium** plan (`price_...`) |
+   | Name | Value |
+   |------|--------|
+   | `STRIPE_SECRET_KEY` | Your Stripe secret key (`sk_test_...`) — **required** |
+   | `STRIPE_PRICE_ID` | Recurring Price ID for monthly plan (`price_...`) — **required** |
+   | `STRIPE_PRICE_ID_PREMIUM` | (Optional) Recurring Price ID for premium. Omit if you don’t offer premium. |
+   | `STRIPE_PRICE_ID_GIFT` | (Optional) One-time Price ID for gift. Omit if you don’t offer gift. |
+
+   **Important:** Monthly and premium must be **recurring** prices (subscription). Gift must be a **one-time** price (payment).
 
 6. **Deploy the function** (from your project root, e.g. `WebPage2`)  
    ```bash
@@ -56,11 +63,11 @@ This guide walks you through setting up the **create-checkout-session** Supabase
      `supabase functions deploy create-checkout-session`  
    - The frontend also sends an explicit `Authorization: Bearer <token>` header (session or anon key).
 
-9. **If you get 502 Bad Gateway (or a Stripe error message in the UI)**  
-   - The Edge Function gets **STRIPE_SECRET_KEY** and the **Price IDs** from **Supabase Dashboard → Project Settings → Edge Functions → Secrets**, **not** from `.env.local`. Changing `.env.local` does not affect the function.
-   - In the Dashboard, set each of the four secrets to the correct value. For the three price secrets, use **Price IDs** (they start with `price_`), not Product IDs (`prod_`). In Stripe: Product catalog → open product → **Pricing** tab → copy the Price ID.
-   - If the app shows a Stripe error message under the button, that message comes from Stripe (e.g. invalid price or key). Fix the secret values and try again.
-   - To see the exact error in Supabase: **Edge Functions** → **create-checkout-session** → **Logs**, and look for the line `Stripe error: ...`.
+9. **If you get "payment mode but passed a recurring price" (or 502 / Stripe error in the UI)**  
+   - You're on the **Gift** plan but **STRIPE_PRICE_ID_GIFT** is set to a **recurring** price. Stripe requires gift to use a **one-time** price.
+   - **Fix:** In [Stripe Dashboard](https://dashboard.stripe.com) → **Products** → open your Gift product → **Pricing** tab. Add a **one-time** price (not “Recurring”). Copy the new Price ID (`price_...`). In **Supabase** → **Project Settings** → **Edge Functions** → **Secrets**, set **STRIPE_PRICE_ID_GIFT** to that one-time Price ID. No need to change code; redeploy only if you want the clearer error message: `supabase functions deploy create-checkout-session`.
+   - The Edge Function reads secrets from **Supabase** only, not `.env.local`. Use **Price IDs** (`price_...`), not Product IDs (`prod_`). Monthly/premium = **recurring**; gift = **one-time**.
+   - To see the exact error: **Edge Functions** → **create-checkout-session** → **Logs** → look for `Stripe error: ...`.
 
 ---
 
@@ -71,7 +78,13 @@ This guide walks you through setting up the **create-checkout-session** Supabase
 - **Body:** `{ planId, successUrl, cancelUrl, clientReferenceId? }`
 - **Response:** `{ url }` — redirect the user to this URL for Stripe Checkout.
 
-The function reads **Stripe Price IDs** and **STRIPE_SECRET_KEY** from **Supabase Edge Function secrets** (never from `.env.local`).
+The function uses the **exact Stripe Price ID** for the chosen plan:
+
+- **planId `"monthly"`** → `STRIPE_PRICE_ID` (recurring) → Checkout in **subscription** mode.
+- **planId `"premium"`** → `STRIPE_PRICE_ID_PREMIUM` (recurring) → **subscription** mode.
+- **planId `"gift"`** → `STRIPE_PRICE_ID_GIFT` (one-time) → Checkout in **payment** mode.
+
+If a plan’s Price ID is not set in secrets, the function returns a clear error. No default product; parameters (price, quantity, mode) are determined per plan from env.
 
 ---
 
@@ -88,16 +101,17 @@ The function reads **Stripe Price IDs** and **STRIPE_SECRET_KEY** from **Supabas
 1. Open **[Supabase Dashboard](https://supabase.com/dashboard)** → select your project.
 2. Go to **Project Settings** (gear) → **Edge Functions** → **Secrets**  
    Or: **Edge Functions** in the left sidebar → **Manage secrets** / **Secrets**.
-3. Add these secrets (names must match exactly):
+3. Add secrets (names must match exactly).
 
-   | Secret name               | Value                                      |
-   |---------------------------|--------------------------------------------|
-   | `STRIPE_SECRET_KEY`       | Your Stripe secret key (`sk_test_...` or `sk_live_...`) |
-   | `STRIPE_PRICE_ID`         | Stripe **Price** ID for monthly plan (e.g. `price_xxx`)  |
-   | `STRIPE_PRICE_ID_GIFT`    | Stripe **Price** ID for gift plan          |
-   | `STRIPE_PRICE_ID_PREMIUM` | Stripe **Price** ID for premium plan       |
+   **Required:**
+   - `STRIPE_SECRET_KEY` — your Stripe secret key (`sk_test_...` or `sk_live_...`).
+   - `STRIPE_PRICE_ID` — **recurring** Stripe Price ID for the monthly plan (`price_...`).
 
-4. In Stripe Dashboard: **Products** → select a product → **Pricing** → copy the **Price ID** (starts with `price_`). Use these in the table above. If you use Product IDs by mistake, the function will return a Stripe error; fix by pasting the correct Price IDs.
+   **Optional (per plan):**
+   - `STRIPE_PRICE_ID_PREMIUM` — **recurring** Price ID for premium. Omit if you don’t offer premium.
+   - `STRIPE_PRICE_ID_GIFT` — **one-time** Price ID for gift. Omit if you don’t offer gift.
+
+   Subscription Checkout requires **recurring** prices; gift uses **one-time** price.
 
 ---
 
@@ -149,7 +163,7 @@ curl -X POST "https://YOUR_PROJECT_REF.supabase.co/functions/v1/create-checkout-
   -d '{"planId":"monthly","successUrl":"https://yoursite.com/checkout/success","cancelUrl":"https://yoursite.com/checkout/cancel"}'
 ```
 
-You should get a JSON response with `"url": "https://checkout.stripe.com/..."`. If you get `"Server configuration error"`, the secret `STRIPE_SECRET_KEY` is missing. If Stripe returns an error, check that the secrets are **Price** IDs (e.g. `price_xxx`), not Product IDs.
+You should get a JSON response with `"url": "https://checkout.stripe.com/..."`. If you get `"Server configuration error"`, the secret `STRIPE_SECRET_KEY` is missing. If you get a message that the plan is not configured, set the matching `STRIPE_PRICE_ID` (or `STRIPE_PRICE_ID_PREMIUM` / `STRIPE_PRICE_ID_GIFT`). If Stripe returns an error, ensure monthly/premium use **recurring** prices and gift uses a **one-time** price.
 
 ---
 

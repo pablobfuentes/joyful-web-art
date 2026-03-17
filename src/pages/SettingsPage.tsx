@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Link } from "react-router-dom";
 import { useRegistryContent } from "@/contexts/RegistryContentContext";
@@ -10,8 +11,12 @@ import { Label } from "@/components/ui/label";
 export default function SettingsPage() {
   const { getSectionContent } = useRegistryContent();
   const data = getSectionContent("settings");
-   const { addresses, defaultAddress, addAddress, adding, setDefault, settingDefault, deleteAddress, deleting } =
+  const { addresses, defaultAddress, addAddress, adding, setDefault, settingDefault, deleteAddress, deleting } =
     useUserAddresses();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const from = searchParams.get("from");
+  const plan = searchParams.get("plan") || "monthly";
 
   const [form, setForm] = useState({
     full_name: "",
@@ -88,6 +93,31 @@ export default function SettingsPage() {
 
           <div className="mt-6 rounded-lg border border-input bg-card p-4 space-y-4">
             <p className="text-sm text-muted-foreground">{data.body}</p>
+
+            {from === "checkout" && (
+              <div className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <span>
+                  Estás editando tu dirección de envío para completar tu compra.
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => navigate(`/checkout?plan=${encodeURIComponent(plan)}`)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => navigate(`/checkout?plan=${encodeURIComponent(plan)}`)}
+                  >
+                    Aceptar
+                  </Button>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-3">
               <h2 className="font-display text-lg font-semibold">Direcciones de envío</h2>

@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import { FloatingDoodle, DoodleHeart, DoodleSparkle, DoodleStar } from "@/components/Doodles";
 import { useAuth } from "@/contexts/AuthContext";
 import { createCheckoutSession } from "@/lib/checkout";
+import { useUserAddresses } from "@/hooks/useUserAddresses";
 
 const accentBg: Record<string, string> = {
   lavender: "bg-lavender",
@@ -20,6 +21,7 @@ export default function Checkout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { defaultAddress } = useUserAddresses();
   const planId = searchParams.get("plan") || "monthly";
   const selectedPlan = plans.find((p) => p.id === planId) || plans[1];
 
@@ -45,6 +47,27 @@ export default function Checkout() {
       name: (user.user_metadata?.full_name as string) ?? f.name,
     }));
   }, [user]);
+
+  // Prefill address fields from default saved address (if any)
+  useEffect(() => {
+    if (!defaultAddress) return;
+    setForm((f) => ({
+      name: f.name || defaultAddress.full_name,
+      email: f.email || defaultAddress.email || f.email,
+      address:
+        f.address ||
+        [
+          defaultAddress.street,
+          defaultAddress.street_number_ext,
+          defaultAddress.street_number_int,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      city: f.city || defaultAddress.municipio,
+      state: f.state || defaultAddress.state,
+      zip: f.zip || defaultAddress.postal_code,
+    }));
+  }, [defaultAddress]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -208,6 +231,20 @@ export default function Checkout() {
                             className="w-full rounded-xl border-2 border-muted px-4 py-3 text-foreground bg-background focus:border-[hsl(var(--primary))] focus:outline-none transition-colors"
                           />
                         </div>
+                        <p className="text-xs text-muted-foreground">
+                          Dirección actual tomada de tu perfil.{" "}
+                          <button
+                            type="button"
+                            className="underline font-semibold"
+                            onClick={() =>
+                              navigate(
+                                `/settings?from=checkout&plan=${encodeURIComponent(planId)}`
+                              )
+                            }
+                          >
+                            Cambiar dirección de envío
+                          </button>
+                        </p>
                       </div>
                     </motion.div>
 

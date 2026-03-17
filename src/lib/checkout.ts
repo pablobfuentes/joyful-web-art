@@ -16,11 +16,39 @@ export type CreateCheckoutSessionParams = {
   clientReferenceId?: string;
 };
 
+async function createOrderForPlan(planId: string): Promise<{ orderId: string | null; error: string | null }> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const token = session?.access_token ?? anonKey ?? "";
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const { data, error } = await supabase.functions.invoke("create-order", {
+    body: { planId },
+    headers,
+  });
+
+  if (error) {
+    return { orderId: null, error: error.message || "No se pudo crear el pedido." };
+  }
+  if (data?.error) {
+    return { orderId: null, error: String(data.error) };
+  }
+  return { orderId: data?.orderId ?? null, error: null };
+}
+
 export async function createCheckoutSession(
   params: CreateCheckoutSessionParams
 ): Promise<{ url: string | null; error: string | null }> {
   const successUrl = params.successUrl ?? `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = params.cancelUrl ?? `${origin}/checkout/cancel`;
+
+  // First, create order + shipment snapshot using the user's default address
+  const { orderId, error: orderError } = await createOrderForPlan(params.planId);
+  if (orderError || !orderId) {
+    return { url: null, error: orderError ?? "No se pudo crear el pedido." };
+  }
 
   const {
     data: { session },
@@ -34,12 +62,13 @@ export async function createCheckoutSession(
       planId: params.planId,
       successUrl,
       cancelUrl,
-      clientReferenceId: params.clientReferenceId ?? undefined,
+      clientReferenceId: params.clientReferenceId ?? orderId,
     },
     headers,
   });
 
   if (error) {
+    console.error("[checkout] createCheckoutSession invoke error", error);
     return { url: null, error: error.message || "No se pudo iniciar el pago." };
   }
 
