@@ -529,6 +529,17 @@ export const STYLE_REGISTRY = {
     section: {
       backgroundIndex: 0
     },
+    /** One palette slot per edition (cycles 0–3). Length should match app-registry pastEditions.editions. */
+    cards: [
+      { backgroundIndex: 0 },
+      { backgroundIndex: 1 },
+      { backgroundIndex: 2 },
+      { backgroundIndex: 3 },
+      { backgroundIndex: 0 },
+      { backgroundIndex: 1 },
+      { backgroundIndex: 2 },
+      { backgroundIndex: 3 }
+    ],
     divider: {
       style: "sawtooth",
       topColorIndex: 0,

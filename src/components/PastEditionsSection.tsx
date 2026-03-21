@@ -95,7 +95,7 @@ const PastEditionsSection = () => {
 
             return (
               <li
-                key={edition?.name ?? index}
+                key={`past-edition-${index}`}
                 onClick={() => setActiveIndex(index)}
                 aria-current={isActive}
                 className="relative group cursor-pointer transition-all duration-500 ease-in-out md:w-[8%] md:[&[aria-current='true']]:w-[52%] md:[transition:width_var(--transition,300ms_ease_in)]"
@@ -112,10 +112,6 @@ const PastEditionsSection = () => {
                     alt={(edition as { name?: string }).name ?? ""}
                     onError={onImageError}
                     className={`absolute left-1/2 top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 object-cover transition-all duration-500 ease-in-out ${isActive ? "scale-105 grayscale-0" : "scale-100 grayscale"}`}
-                  />
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent transition-opacity duration-500 ease-in-out"
-                    style={{ opacity: isActive ? 1 : 0 }}
                   />
                   <div
                     className="absolute bottom-0 left-0 w-full p-4 md:p-6 text-left text-white transition-all duration-500 ease-in-out"

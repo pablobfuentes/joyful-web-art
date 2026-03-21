@@ -4,6 +4,11 @@
 
 ### Added
 
+- **Registry Editor — Past Editions carousel file pickers**
+  - **Goal:** Replace URL text inputs for edition images with per-slide file pickers, preview, add/remove slides, and dev-time writes to `public/past-editions/`; keep `edition.image` as a string URL (path or data URL).
+  - **Changes:** (1) `src/lib/past-edition-image-upload.ts` — validation (image/*, max 5 MB), `resolvePastEditionImageUrl` (dev POST to `__registry-upload-past-edition`, else data URL). (2) `vite.config.ts` — dev-only middleware writes base64 payload to `public/past-editions/`. (3) `src/pages/RegistryEditor.tsx` — `renderPastEditionsCarouselContent`, filter generic content rows under `pastEditions.editions.*`. (4) `src/config/style-registry.ts` — `pastEditions.cards` array aligned with default edition count. (5) `public/past-editions/.gitkeep`. (6) Tests: `past-edition-image-upload.test.ts`, `RegistryEditor.test.tsx` assertions.
+  - **Verification:** `npx vitest run src/lib/past-edition-image-upload.test.ts src/pages/RegistryEditor.test.tsx src/components/PastEditionsSection.test.tsx` passes.
+
 - **Admin-only Export Users CSV**
   - **Goal:** One-button export of all customer data (profiles, subscription, orders, notes) into a single CSV for admin operations; backend enforcement via RLS only.
   - **Changes:** (1) `docs/supabase_admin_export_customers_view.sql` — view `admin_export_customers` (one row per user). (2) `src/lib/admin-export-csv.ts` — chunked fetch, CSV build with human-readable headers and `users_export_YYYY-MM-DD_HH-mm.csv` filename. (3) `src/pages/admin/AdminCustomers.tsx` — "Export Customer Data" button, loading/success/error UX; "Export CSV (page)" kept. (4) `src/lib/admin-export-csv.test.ts` — 5 tests for fetch, chunking, CSV build, download flow, and error. (5) `docs/PLAN_EXPORT_USERS_CSV.md` — plan and field mapping.

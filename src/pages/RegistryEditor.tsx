@@ -14,7 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
+import { registryListToArray } from "@/lib/utils";
+import { defaultPastEditionEntry, resolvePastEditionImageUrl } from "@/lib/past-edition-image-upload";
 import { toast } from "sonner";
 
 // Dev-only logging (Phase 2 security: no verbose logs in production)
@@ -231,6 +233,8 @@ export default function RegistryEditor() {
   const [availableFonts, setAvailableFonts] = useState<string[]>([]);
   const [scanningFonts, setScanningFonts] = useState(false);
   const [fontToAdd, setFontToAdd] = useState<string>("");
+  /** Past Editions carousel: which row is uploading an image (for disabled state). */
+  const [pastEditionUploadIndex, setPastEditionUploadIndex] = useState<number | null>(null);
 
   // Helper: Get contrast color (white or black) for text over a background
   const getContrastColor = useCallback((hex: string): string => {
@@ -1363,13 +1367,187 @@ export default function RegistryEditor() {
     return controls.length > 0 ? <div className="space-y-4">{controls}</div> : null;
   };
 
+  /** Past Editions: file picker per slide + add/remove; avoids deepSet issues on nested arrays. */
+  const renderPastEditionsCarouselContent = () => {
+    const merged = getMergedSectionContent("pastEditions", content) as Record<string, unknown>;
+    const editions = registryListToArray(
+      merged.editions as unknown as readonly Record<string, unknown>[]
+    ) as Array<Record<string, unknown>>;
+
+    const fallback = (merged.fallbackImage as string) || "";
+
+    const setEditionsArray = (next: Array<Record<string, unknown>>) => {
+      setContent((prev) => ({
+        ...prev,
+        pastEditions: {
+          ...(prev.pastEditions as object),
+          editions: next,
+        },
+      }));
+      setRegistry((prev) => {
+        const cycle = [0, 1, 2, 3];
+        const oldCards = prev.pastEditions.cards ?? [];
+        const cards = Array.from({ length: next.length }, (_, i) => ({
+          backgroundIndex:
+            typeof oldCards[i]?.backgroundIndex === "number"
+              ? oldCards[i].backgroundIndex
+              : cycle[i % cycle.length],
+        }));
+        return {
+          ...prev,
+          pastEditions: {
+            ...prev.pastEditions,
+            cards,
+          },
+        };
+      });
+    };
+
+    const patchEdition = (index: number, patch: Record<string, string>) => {
+      const next = editions.map((e, i) => (i === index ? { ...e, ...patch } : e));
+      setEditionsArray(next);
+    };
+
+    const handleImageFile = async (index: number, file: File | undefined) => {
+      if (!file) return;
+      setPastEditionUploadIndex(index);
+      try {
+        const url = await resolvePastEditionImageUrl(file);
+        patchEdition(index, { image: url });
+        toast.success("Imagen actualizada.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "No se pudo cargar la imagen.");
+      } finally {
+        setPastEditionUploadIndex(null);
+      }
+    };
+
+    const addEdition = () => {
+      setEditionsArray([...editions, defaultPastEditionEntry() as Record<string, unknown>]);
+    };
+
+    const removeEdition = (index: number) => {
+      const next = editions.filter((_, i) => i !== index);
+      setEditionsArray(next);
+    };
+
+    return (
+      <Card key="pastEditions-carousel">
+        <CardHeader>
+          <CardTitle className="text-lg">Carrusel — imágenes y datos</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Cada edición tiene su propio selector de archivo. Las imágenes se guardan en{" "}
+            <code className="text-xs">public/past-editions/</code> al desarrollar; si no hay servidor de subida, se
+            incrusta la imagen en el registro.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {editions.map((edition, index) => {
+            const imageUrl = (edition.image as string) || "";
+            const previewSrc =
+              imageUrl ||
+              fallback ||
+              "https://placehold.co/200x280/e8e4de/2d2620?text=Sin+imagen";
+            const fileInputId = `past-edition-image-${index}`;
+            return (
+              <div
+                key={`past-edition-editor-${index}`}
+                className="rounded-lg border border-border p-4 space-y-3"
+              >
+                <div className="flex flex-wrap gap-4 items-start">
+                  <div className="w-36 shrink-0 rounded-md overflow-hidden border bg-muted aspect-[590/640]">
+                    <img
+                      src={previewSrc}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const el = e.target as HTMLImageElement;
+                        if (fallback && el.src !== fallback) el.src = fallback;
+                      }}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-[200px] space-y-3">
+                    <input
+                      id={fileInputId}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={pastEditionUploadIndex === index}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        void handleImageFile(index, file);
+                        e.target.value = "";
+                      }}
+                    />
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        disabled={pastEditionUploadIndex === index}
+                        onClick={() => document.getElementById(fileInputId)?.click()}
+                      >
+                        {pastEditionUploadIndex === index ? "Subiendo…" : "Elegir imagen…"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => patchEdition(index, { image: "" })}
+                      >
+                        Quitar imagen
+                      </Button>
+                      <Button type="button" variant="destructive" size="sm" onClick={() => removeEdition(index)}>
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Eliminar edición
+                      </Button>
+                    </div>
+                    <div className="grid sm:grid-cols-3 gap-2">
+                      <div>
+                        <Label className="text-xs">Nombre</Label>
+                        <Input
+                          value={(edition.name as string) ?? ""}
+                          onChange={(e) => patchEdition(index, { name: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Categoría</Label>
+                        <Input
+                          value={(edition.category as string) ?? ""}
+                          onChange={(e) => patchEdition(index, { category: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Mes</Label>
+                        <Input
+                          value={(edition.month as string) ?? ""}
+                          onChange={(e) => patchEdition(index, { month: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <Button type="button" variant="outline" onClick={addEdition} className="w-full sm:w-auto">
+            <Plus className="h-4 w-4 mr-2" />
+            Añadir imagen al carrusel
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  };
+
   // Render content (text) controls for a section: merged base (APP_REGISTRY) + overrides so all variables (e.g. all 3 pricing plans) appear
   const renderContentControls = (sectionKey: string) => {
     const sectionContent = getMergedSectionContent(sectionKey, content);
     if (!sectionContent || typeof sectionContent !== "object" || Array.isArray(sectionContent)) return null;
     const hiddenImageContentPaths = new Set(["nav.logoImagePath", "comingSoon.brand.imagePath"]);
     const entries = getContentEntries(sectionContent, [sectionKey], [SECTION_DISPLAY_NAMES[sectionKey] ?? sectionKey]).filter(
-      ({ path }) => !hiddenImageContentPaths.has(path.join("."))
+      ({ path }) =>
+        !hiddenImageContentPaths.has(path.join(".")) &&
+        !(sectionKey === "pastEditions" && path[1] === "editions")
     );
     if (entries.length === 0) return null;
     const fontOptions = getFontOptions();
@@ -1458,7 +1636,14 @@ export default function RegistryEditor() {
         {(APP_REGISTRY as Record<string, unknown>)[sectionKey] !== undefined && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Content</h2>
-            {renderContentControls(sectionKey)}
+            {sectionKey === "pastEditions" ? (
+              <div className="flex flex-col gap-6">
+                {renderPastEditionsCarouselContent()}
+                {renderContentControls(sectionKey)}
+              </div>
+            ) : (
+              renderContentControls(sectionKey)
+            )}
           </div>
         )}
         <div>

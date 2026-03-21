@@ -12,4 +12,13 @@ describe("RegistryEditor", () => {
     expect(source).toContain('updateContent([sectionKey, "brand", "imagePath"], path)');
     expect(source).toContain('new Set(["nav.logoImagePath", "comingSoon.brand.imagePath"])');
   });
+
+  it("Past Editions uses dedicated carousel file pickers and filters edition URL fields from generic content rows", () => {
+    const source = readFileSync(resolve(process.cwd(), "src/pages/RegistryEditor.tsx"), "utf8");
+
+    expect(source).toContain("renderPastEditionsCarouselContent");
+    expect(source).toContain('sectionKey === "pastEditions" && path[1] === "editions"');
+    expect(source).toContain("resolvePastEditionImageUrl");
+    expect(source).toContain("Elegir imagen");
+  });
 });

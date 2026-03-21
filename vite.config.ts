@@ -332,6 +332,83 @@ function registrySaveSourcePlugin() {
   };
 }
 
+/** Dev-only: POST /__registry-upload-past-edition — JSON { base64, mimeType, originalName } → writes public/past-editions/… */
+function registryUploadPastEditionPlugin() {
+  return {
+    name: "registry-upload-past-edition",
+    configureServer(server: { middlewares: Connect.Server }) {
+      server.middlewares.use((req: Connect.IncomingMessage, res: any, next: () => void) => {
+        if (req.method !== "POST" || req.url !== "/__registry-upload-past-edition") {
+          next();
+          return;
+        }
+        const chunks: Buffer[] = [];
+        req.on("data", (chunk: Buffer) => chunks.push(chunk));
+        req.on("end", () => {
+          try {
+            const body = JSON.parse(Buffer.concat(chunks).toString("utf8")) as {
+              base64?: string;
+              mimeType?: string;
+              originalName?: string;
+            };
+            const { base64, mimeType, originalName } = body;
+            if (!base64 || typeof base64 !== "string") {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ ok: false, error: "Missing base64" }));
+              return;
+            }
+            const mime = typeof mimeType === "string" && mimeType.startsWith("image/") ? mimeType : "image/jpeg";
+            const buf = Buffer.from(base64, "base64");
+            const max = 5 * 1024 * 1024;
+            if (buf.length > max) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ ok: false, error: "Image too large (max 5 MB)" }));
+              return;
+            }
+            const ext =
+              mime === "image/png"
+                ? "png"
+                : mime === "image/webp"
+                  ? "webp"
+                  : mime === "image/gif"
+                    ? "gif"
+                    : mime === "image/svg+xml"
+                      ? "svg"
+                      : "jpg";
+            const safe = String(originalName || "image")
+              .replace(/[^a-zA-Z0-9._-]+/g, "_")
+              .replace(/^\.+/, "")
+              .slice(0, 80);
+            const stamp = Date.now();
+            const projectRoot = path.resolve(__dirname);
+            const dir = path.join(projectRoot, "public", "past-editions");
+            fs.mkdirSync(dir, { recursive: true });
+            const fname = `${stamp}-${safe || "image"}.${ext}`;
+            const outPath = path.join(dir, fname);
+            fs.writeFileSync(outPath, buf);
+            const publicPath = `/past-editions/${fname}`;
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ ok: true, path: publicPath }));
+          } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ ok: false, error: message }));
+          }
+        });
+        req.on("error", () => {
+          res.statusCode = 500;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ ok: false, error: "Request error" }));
+        });
+      });
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   appType: "spa",
@@ -349,6 +426,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     mode === "development" && syncFontsPlugin(),
     mode === "development" && registrySaveSourcePlugin(),
+    mode === "development" && registryUploadPastEditionPlugin(),
   ].filter(Boolean),
   resolve: {
     alias: {
