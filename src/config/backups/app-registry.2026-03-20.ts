@@ -210,52 +210,52 @@ export const APP_REGISTRY = {
     fallbackImage: "https://placehold.co/590x640/e8e4de/2d2620?text=Edicion+pasada",
     editions: [
       {
-        name: "",
-        category: "",
-        month: "Abril 2024",
-        image: "/past-editions/1774067974124-2.png.png"
+        name: "Impulso de hidratacion",
+        category: "Hidratacion",
+        month: "Enero 2024",
+        image: "https://picsum.photos/seed/hydration/590/640"
       },
       {
-        name: "",
-        category: "",
-        month: "Abril 2024",
-        image: "/past-editions/1774067979702-3.png.png"
+        name: "Esenciales de luminosidad",
+        category: "Luminosidad",
+        month: "Febrero 2024",
+        image: "https://picsum.photos/seed/glow/590/640"
       },
       {
-        name: "",
-        category: "",
-        month: "Abril 2024",
-        image: "/past-editions/1774067984455-4.png.png"
+        name: "Reparacion de barrera",
+        category: "Reparacion",
+        month: "Marzo 2024",
+        image: "https://picsum.photos/seed/barrier/590/640"
       },
       {
-        name: "",
-        category: "",
+        name: "Limpieza suave",
+        category: "Limpieza",
         month: "Abril 2024",
-        image: "/past-editions/1774067989777-5.png.png"
+        image: "https://picsum.photos/seed/cleanse/590/640"
       },
       {
-        name: "",
-        category: "",
-        month: "Abril 2024",
-        image: "/past-editions/1774067995490-6.png.png"
+        name: "Luminosidad de verano",
+        category: "Proteccion",
+        month: "Mayo 2024",
+        image: "https://picsum.photos/seed/summer/590/640"
       },
       {
-        name: "",
-        category: "",
-        month: "Abril 2024",
-        image: "/past-editions/1774068001087-7.png.png"
+        name: "Hidratacion profunda",
+        category: "Hidratacion",
+        month: "Junio 2024",
+        image: "https://picsum.photos/seed/deep/590/640"
       },
       {
-        name: "",
-        category: "",
-        month: "Abril 2024",
-        image: "/past-editions/1774068007142-9.png.png"
+        name: "Rutina calmante",
+        category: "Piel sensible",
+        month: "Julio 2024",
+        image: "https://picsum.photos/seed/calming/590/640"
       },
       {
-        name: "",
-        category: "",
-        month: "Abril 2024",
-        image: "/past-editions/1774068283971-8.png.png"
+        name: "Preparacion de otono",
+        category: "Reparacion",
+        month: "Agosto 2024",
+        image: "https://picsum.photos/seed/autumn/590/640"
       }
     ]
   },
@@ -551,19 +551,21 @@ export const APP_REGISTRY = {
       placeholder: "tu@correo.com"
     },
     bottomBar: {
-      copyright: "© 2026 Kumi. Todos los derechos reservados.",
+      // Version string added so we can see which deploy is live (approximate from Git history).
+      // Example footer render: "© 2026 Kumi. v0.11.0 · Todos los derechos reservados."
+      copyright: "© 2026 Kumi. v0.11.0 · Todos los derechos reservados.",
       links: [
         {
           label: "Privacidad",
-          href: "privacy"
+          href: "/privacy"
         },
         {
           label: "Términos",
           href: "/terms"
         },
         {
-          label: "Accesibilidad",
-          href: "#"
+          label: "Cancelación",
+          href: "/politicas-de-cancelacion"
         },
         {
           label: "Envíos",
@@ -573,10 +575,10 @@ export const APP_REGISTRY = {
     }
   },
   privacy: {
-    contactEmail: "contacto@kumibox.com"
+    contactEmail: "contacto@kumibox.mx"
   },
   terms: {
-    contactEmail: "soporte@kumibox.com"
+    contactEmail: "contacto@kumibox.mx"
   },
   login: {
     title: "Bienvenida de nuevo",
